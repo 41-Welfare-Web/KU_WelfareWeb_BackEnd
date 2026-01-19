@@ -1,0 +1,6 @@
+﻿"Request, Response",Method,Path
+로그인,POST,/auth/login
+회원가입,,/auth/register
+로그아웃,,/auth/logout
+아이디 찾기,,"/auth/find_id "
+비밀번호 찾기,,/auth/find_pw
