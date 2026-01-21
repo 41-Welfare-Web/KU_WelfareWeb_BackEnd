@@ -94,11 +94,11 @@
 | `memo` | `text` | 비고 (예: 불량/취소 사유) | |
 | `changed_at` | `timestampz` | 변경 시간 | Not Null, Default: `now()` |
 
-**8. `plotter_bookings` (플로터 예약)**
+**8. `plotter_orders` (플로터 주문)**
 
 | 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
 | :--- | :--- | :--- | :--- |
-| `id` | `serial` | 예약 ID | **Primary Key** |
+| `id` | `serial` | 주문 ID | **Primary Key** |
 | `user_id` | `uuid` | 신청자 ID | Foreign Key (`users.id`) |
 | `purpose` | `varchar(100)` | 인쇄 목적 | Not Null |
 | `paper_size` | `varchar(10)` | 용지 크기 | Not Null |
@@ -110,18 +110,18 @@
 | `original_filename` | `varchar(255)` | 원본 파일명 | |
 | `file_size` | `integer` | 파일 크기 (bytes) | |
 | `pickup_date` | `date` | 수령 예정일 | Not Null |
-| `status` | `varchar(20)` | 예약 상태 ('PENDING', 'CONFIRMED', 'PRINTED', 'REJECTED', 'COMPLETED') | Not Null, Default: 'PENDING' |
+| `status` | `varchar(20)` | 주문 상태 ('PENDING', 'CONFIRMED', 'PRINTED', 'REJECTED', 'COMPLETED') | Not Null, Default: 'PENDING' |
 | `rejection_reason` | `text` | 반려 사유 | |
 | `created_at` | `timestampz` | 신청일 | Not Null, Default: `now()` |
 
-**9. `plotter_booking_history` (플로터 예약 이력)**
+**9. `plotter_order_history` (플로터 주문 이력)**
 
-플로터 예약 건의 상태 변경 이력을 모두 기록합니다.
+플로터 주문 건의 상태 변경 이력을 모두 기록합니다.
 
 | 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
 | :--- | :--- | :--- | :--- |
 | `id` | `serial` | 이력 ID | **Primary Key** |
-| `booking_id` | `integer` | 예약 ID | Foreign Key (`plotter_bookings.id`) |
+| `order_id` | `integer` | 주문 ID | Foreign Key (`plotter_orders.id`) |
 | `changed_by` | `uuid` | 변경 주체 (관리자 ID) | Foreign Key (`users.id`) |
 | `old_status` | `varchar(20)` | 변경 전 상태 | |
 | `new_status` | `varchar(20)` | 변경 후 상태 | Not Null |
