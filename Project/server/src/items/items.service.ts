@@ -24,9 +24,26 @@ export class ItemsService {
     const existing = await this.prisma.item.findUnique({ where: { itemCode } });
     if (existing) throw new ConflictException('이미 존재하는 물품 코드입니다.');
 
-    return this.prisma.item.create({
+    const item = await this.prisma.item.create({
       data: createItemDto,
+      include: { category: true },
     });
+
+    return {
+      id: item.id,
+      category: {
+        id: item.category.id,
+        name: item.category.name,
+      },
+      name: item.name,
+      item_code: item.itemCode,
+      description: item.description,
+      rental_count: item.rentalCount,
+      image_url: item.imageUrl,
+      management_type: item.managementType,
+      total_quantity: item.totalQuantity,
+      created_at: item.createdAt,
+    };
   }
 
   async findAll(search?: string, categoryIds?: string, sortBy: string = 'popularity', sortOrder: 'asc' | 'desc' = 'desc') {
@@ -46,13 +63,29 @@ export class ItemsService {
     else if (sortBy === 'createdAt') orderBy = { createdAt: sortOrder };
     else orderBy = { rentalCount: sortOrder }; // 기본값 인기순
 
-    return this.prisma.item.findMany({
+    const items = await this.prisma.item.findMany({
       where,
       orderBy,
       include: {
         category: true,
       },
     });
+
+    return items.map((item) => ({
+      id: item.id,
+      category: {
+        id: item.category.id,
+        name: item.category.name,
+      },
+      name: item.name,
+      item_code: item.itemCode,
+      rental_count: item.rentalCount,
+      image_url: item.imageUrl,
+      management_type: item.managementType,
+      total_quantity: item.totalQuantity,
+      current_stock: item.totalQuantity, // 임시: 현재 재고 계산 로직이 없으므로 총 수량 반환 (TODO: RentalItems와 연동하여 계산 필요)
+      created_at: item.createdAt,
+    }));
   }
 
   async findOne(id: number) {
@@ -62,7 +95,22 @@ export class ItemsService {
     });
 
     if (!item) throw new NotFoundException('물품을 찾을 수 없습니다.');
-    return item;
+
+    return {
+      id: item.id,
+      category: {
+        id: item.category.id,
+        name: item.category.name,
+      },
+      name: item.name,
+      item_code: item.itemCode,
+      description: item.description,
+      rental_count: item.rentalCount,
+      image_url: item.imageUrl,
+      management_type: item.managementType,
+      total_quantity: item.totalQuantity,
+      created_at: item.createdAt,
+    };
   }
 
   async update(id: number, updateItemDto: UpdateItemDto) {
@@ -76,10 +124,27 @@ export class ItemsService {
       if (existing) throw new ConflictException('이미 존재하는 물품 코드입니다.');
     }
 
-    return this.prisma.item.update({
+    const updated = await this.prisma.item.update({
       where: { id },
       data: updateItemDto,
+      include: { category: true },
     });
+
+    return {
+      id: updated.id,
+      category: {
+        id: updated.category.id,
+        name: updated.category.name,
+      },
+      name: updated.name,
+      item_code: updated.itemCode,
+      description: updated.description,
+      rental_count: updated.rentalCount,
+      image_url: updated.imageUrl,
+      management_type: updated.managementType,
+      total_quantity: updated.totalQuantity,
+      created_at: updated.createdAt,
+    };
   }
 
   async remove(id: number) {
