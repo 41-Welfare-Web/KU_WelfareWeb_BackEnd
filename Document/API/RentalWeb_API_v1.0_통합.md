@@ -7,13 +7,13 @@
 ---
 ### **1. 인증 (Auth)**
 
-#### **1.1. 회원가입 (Signup)**
+# 회원가입 (Signup)
 
 `FR-01` 요구사항에 따라, 새로운 사용자 계정을 생성합니다. 성공 시, 생성된 사용자 정보와 로그인 유지를 위한 토큰을 반환합니다.
 
-*   **Endpoint:** `POST /api/auth/register`
-*   **Description:** 사용자로부터 가입 정보를 받아 새로운 계정을 생성하고, `users` 테이블에 프로필 정보를 저장합니다.
-*   **Required Permissions:** All Users
+## **ENDPOINT:** `POST /api/auth/register`
+**Description:** 사용자로부터 가입 정보를 받아 새로운 계정을 생성하고, `users` 테이블에 프로필 정보를 저장합니다.
+**Required Permissions:** All Users
 
 ---
 
@@ -66,13 +66,13 @@
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
 
 ---
-#### **1.2. 아이디 찾기 (Find Username)**
+# 아이디 찾기 (Find Username)
 
 `FR-04` 요구사항에 따라, 이름과 전화번호로 사용자의 아이디를 찾습니다.
 
-*   **Endpoint:** `POST /api/auth/find-username`
-*   **Description:** 이름과 전화번호가 일치하는 사용자를 찾아, 해당 전화번호로 아이디를 SMS 발송합니다.
-*   **Required Permissions:** All Users
+## **ENDPOINT:** `POST /api/auth/find-username`
+**Description:** 이름과 전화번호가 일치하는 사용자를 찾아, 해당 전화번호로 아이디를 SMS 발송합니다.
+**Required Permissions:** All Users
 
 ---
 
@@ -101,13 +101,13 @@
 *   **Note:** 사용자 정보 존재 여부를 알려주지 않기 위해, 성공/실패 시 모두 동일한 메시지를 반환합니다.
 
 ---
-#### **1.3. 비밀번호 재설정 요청 (Request Password Reset)**
+# 비밀번호 재설정 요청 (Request Password Reset)
 
 `FR-04` 요구사항에 따라, 비밀번호 재설정을 위한 인증 코드를 요청합니다.
 
-*   **Endpoint:** `POST /api/auth/password-reset/request`
-*   **Description:** 아이디와 전화번호가 일치하는 사용자를 찾아, 비밀번호를 재설정할 수 있는 임시 인증 코드를 SMS로 발송합니다.
-*   **Required Permissions:** All Users
+## **ENDPOINT:** `POST /api/auth/password-reset/request`
+**Description:** 아이디와 전화번호가 일치하는 사용자를 찾아, 비밀번호를 재설정할 수 있는 임시 인증 코드를 SMS로 발송합니다.
+**Required Permissions:** All Users
 
 ---
 
@@ -135,13 +135,13 @@
 ```
 
 ---
-#### **1.4. 비밀번호 재설정 확정 (Confirm Password Reset)**
+# 비밀번호 재설정 확정 (Confirm Password Reset)
 
 `FR-04` 요구사항에 따라, 인증 코드를 이용해 비밀번호를 최종 변경합니다.
 
-*   **Endpoint:** `POST /api/auth/password-reset/confirm`
-*   **Description:** SMS로 발급받은 인증 코드가 유효한지 확인하고, 유효할 경우 새 비밀번호로 변경합니다.
-*   **Required Permissions:** All Users
+## **ENDPOINT:** `POST /api/auth/password-reset/confirm`
+**Description:** SMS로 발급받은 인증 코드가 유효한지 확인하고, 유효할 경우 새 비밀번호로 변경합니다.
+**Required Permissions:** All Users
 
 ---
 
@@ -179,13 +179,13 @@
 | `404 Not Found` | `USER_NOT_FOUND` | 해당 `username`의 사용자가 없을 때 |
 
 ---
-#### **1.5. 로그인 (Login)**
+# 로그인 (Login)
 
 `FR-03` 요구사항에 따라, 사용자를 인증하고 로그인 유지를 위한 토큰을 발급합니다.
 
-*   **Endpoint:** `POST /api/auth/login`
-*   **Description:** `username`과 `password`를 받아 유효성을 검증하고, 성공 시 사용자 정보와 새로운 `accessToken`, `refreshToken`을 발급합니다.
-*   **Required Permissions:** All Users
+## **ENDPOINT:** `POST /api/auth/login`
+**Description:** `username`과 `password`를 받아 유효성을 검증하고, 성공 시 사용자 정보와 새로운 `accessToken`, `refreshToken`을 발급합니다.
+**Required Permissions:** All Users
 
 ---
 
@@ -228,13 +228,13 @@
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
 
 ---
-#### **1.6. 로그아웃 (Logout)**
+# 로그아웃 (Logout)
 
 현재 사용자를 시스템에서 로그아웃 처리합니다.
 
-*   **Endpoint:** `POST /api/auth/logout`
-*   **Description:** 서버에 저장된 `refreshToken`을 무효화하여, 더 이상 새로운 `accessToken`을 발급받지 못하도록 합니다. 클라이언트는 이 API 호출 후 자체적으로 저장된 토큰들을 삭제해야 합니다.
-*   **Required Permissions:** Authenticated Users
+## **ENDPOINT:** `POST /api/auth/logout`
+**Description:** 서버에 저장된 `refreshToken`을 무효화하여, 더 이상 새로운 `accessToken`을 발급받지 못하도록 합니다. 클라이언트는 이 API 호출 후 자체적으로 저장된 토큰들을 삭제해야 합니다.
+**Required Permissions:** Authenticated Users
 
 ---
 
@@ -266,13 +266,13 @@
 | `400 Bad Request` | `INVALID_TOKEN` | 제공된 `refreshToken`이 유효하지 않을 때 |
 
 ---
-#### **1.7. 토큰 갱신 (Refresh Token)**
+# 토큰 갱신 (Refresh Token)
 
 만료된 `accessToken`을 `refreshToken`을 이용해 재발급받습니다.
 
-*   **Endpoint:** `POST /api/auth/refresh`
-*   **Description:** `accessToken`은 보안을 위해 수명이 짧습니다(예: 15분). 이 토큰이 만료되었을 때, 클라이언트는 이 API를 호출하여 사용자를 다시 로그인시키지 않고 새로운 `accessToken`을 발급받을 수 있습니다.
-*   **Required Permissions:** Authenticated Users (유효한 `refreshToken` 소유자)
+## **ENDPOINT:** `POST /api/auth/refresh`
+**Description:** `accessToken`은 보안을 위해 수명이 짧습니다(예: 15분). 이 토큰이 만료되었을 때, 클라이언트는 이 API를 호출하여 사용자를 다시 로그인시키지 않고 새로운 `accessToken`을 발급받을 수 있습니다.
+**Required Permissions:** Authenticated Users (유효한 `refreshToken` 소유자)
 
 ---
 
@@ -308,13 +308,13 @@
 ---
 ### **2. 사용자 (Users)**
 
-#### **2.1. 내 정보 조회 (Get My Profile)**
+# 내 정보 조회 (Get My Profile)
 
 로그인된 사용자가 자신의 프로필 정보를 조회합니다.
 
-*   **Endpoint:** `GET /api/users/me`
-*   **Description:** 요청에 포함된 `accessToken`을 검증하여 사용자를 식별하고, 해당 사용자의 상세 프로필 정보를 반환합니다.
-*   **Required Permissions:** Authenticated Users
+## **ENDPOINT:** `GET /api/users/me`
+**Description:** 요청에 포함된 `accessToken`을 검증하여 사용자를 식별하고, 해당 사용자의 상세 프로필 정보를 반환합니다.
+**Required Permissions:** Authenticated Users
 
 ---
 
@@ -347,13 +347,13 @@
 | `401 Unauthorized` | `NOT_AUTHENTICATED` | `accessToken`이 유효하지 않거나 제공되지 않았을 때 |
 
 ---
-#### **2.2. 내 정보 수정 (Update My Profile)**
+# 내 정보 수정 (Update My Profile)
 
 `FR-05` 요구사항에 따라, 로그인된 사용자가 자신의 프로필 정보를 수정합니다.
 
-*   **Endpoint:** `PUT /api/users/me`
-*   **Description:** `accessToken`으로 사용자를 식별하고, 요청된 필드의 유효성을 검증한 후 정보를 업데이트합니다.
-*   **Required Permissions:** Authenticated Users
+## **ENDPOINT:** `PUT /api/users/me`
+**Description:** `accessToken`으로 사용자를 식별하고, 요청된 필드의 유효성을 검증한 후 정보를 업데이트합니다.
+**Required Permissions:** Authenticated Users
 
 ---
 
@@ -402,13 +402,14 @@
 | `409 Conflict` | `DUPLICATE_PHONE_NUMBER` | 변경하려는 `phone_number`가 이미 존재할 때 |
 
 ---
-### **2.3. 회원 탈퇴 (Delete My Account)**
+---
+# 회원 탈퇴 (Delete My Account)
 
 `FR-06` 요구사항에 따라, 로그인된 사용자가 자신의 계정을 삭제하고 탈퇴합니다.
 
-*   **Endpoint:** `DELETE /api/users/me`
-*   **Description:** 요청에 포함된 `password`를 통해 본인임을 확인한 후, 해당 사용자의 모든 정보를 시스템에서 삭제 처리합니다.
-*   **Required Permissions:** Authenticated Users
+## **ENDPOINT:** `DELETE /api/users/me`
+**Description:** 요청에 포함된 `password`를 통해 본인임을 확인한 후, 해당 사용자의 모든 정보를 시스템에서 삭제 처리합니다.
+**Required Permissions:** Authenticated Users
 
 ---
 
@@ -442,13 +443,14 @@
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
 
 ---
-### **2.4. 전체 사용자 목록 조회 (Get All Users)**
+---
+# 전체 사용자 목록 조회 (Get All Users)
 
 `FR-22` 요구사항에 따라, 관리자가 시스템에 등록된 전체 사용자 목록을 조회합니다. 검색, 정렬, 페이지네이션 기능을 포함합니다.
 
-*   **Endpoint:** `GET /api/users`
-*   **Description:** 다양한 조건으로 사용자 목록을 필터링하고, 페이지 단위로 나누어 반환합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `GET /api/users`
+**Description:** 다양한 조건으로 사용자 목록을 필터링하고, 페이지 단위로 나누어 반환합니다.
+**Required Permissions:** Admin Only
 
 ---
 
@@ -511,13 +513,13 @@
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
 
 ---
-### **2.5. 사용자 역할 변경 (Update User Role)**
+# 사용자 역할 변경 (Update User Role)
 
 `FR-23` 요구사항에 따라, 관리자가 특정 사용자의 역할을 변경합니다.
 
-*   **Endpoint:** `PUT /api/users/{user_id}/role`
-*   **Description:** 관리자가 `user_id`를 지정하여 해당 사용자의 역할을 'USER' 또는 'ADMIN'으로 변경합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `PUT /api/users/{user_id}/role`
+**Description:** 관리자가 `user_id`를 지정하여 해당 사용자의 역할을 'USER' 또는 'ADMIN'으로 변경합니다.
+**Required Permissions:** Admin Only
 
 ---
 
@@ -571,13 +573,13 @@
 ---
 ### **3. 물품 (Items & Categories)**
 
-#### **3.1. 물품 목록 조회 (Get All Items)**
+# 물품 목록 조회 (Get All Items)
 
 `FR-08`, `FR-09` 요구사항에 따라, 모든 물품 목록을 검색, 필터링, 정렬 기능과 함께 조회합니다.
 
-*   **Endpoint:** `GET /api/items`
-*   **Description:** `FR-08`에 따라 페이지네이션 없이 모든 물품을 반환하며, 다양한 조건으로 필터링 및 정렬할 수 있습니다.
-*   **Required Permissions:** All Users
+## **ENDPOINT:** `GET /api/items`
+**Description:** `FR-08`에 따라 페이지네이션 없이 모든 물품을 반환하며, 다양한 조건으로 필터링 및 정렬할 수 있습니다.
+**Required Permissions:** All Users
 
 ---
 
@@ -639,13 +641,13 @@
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
 
 ---
-#### **3.2. 물품 상세 조회 (Get Item Details)**
+# 물품 상세 조회 (Get Item Details)
 
 `FR-10` 요구사항에 따라, 특정 물품의 상세 정보를 조회합니다.
 
-*   **Endpoint:** `GET /api/items/{item_id}`
-*   **Description:** `item_id`에 해당하는 물품의 모든 정보를 반환합니다. `description` 필드는 관리자가 입력한 상세 설명(HTML/Markdown)을 포함합니다.
-*   **Required Permissions:** All Users
+## **ENDPOINT:** `GET /api/items/{item_id}`
+**Description:** `item_id`에 해당하는 물품의 모든 정보를 반환합니다. `description` 필드는 관리자가 입력한 상세 설명(HTML/Markdown)을 포함합니다.
+**Required Permissions:** All Users
 
 ---
 
@@ -687,13 +689,13 @@
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
 
 ---
-#### **3.3. 물품 생성 (Create Item)**
+# 물품 생성 (Create Item)
 
 `FR-19` 요구사항에 따라, 관리자가 새로운 물품을 시스템에 등록합니다.
 
-*   **Endpoint:** `POST /api/items`
-*   **Description:** 새로운 물품 정보를 받아 `items` 테이블에 저장합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `POST /api/items`
+**Description:** 새로운 물품 정보를 받아 `items` 테이블에 저장합니다.
+**Required Permissions:** Admin Only
 
 ---
 
@@ -735,13 +737,13 @@
 | `409 Conflict` | `DUPLICATE_ITEM_CODE` | `item_code`가 이미 존재할 때 |
 
 ---
-#### **3.4. 물품 수정 (Update Item)**
+# 물품 수정 (Update Item)
 
 `FR-19` 요구사항에 따라, 관리자가 기존 물품의 정보를 수정합니다.
 
-*   **Endpoint:** `PUT /api/items/{item_id}`
-*   **Description:** `item_id`에 해당하는 물품의 정보를 수정합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `PUT /api/items/{item_id}`
+**Description:** `item_id`에 해당하는 물품의 정보를 수정합니다.
+**Required Permissions:** Admin Only
 
 ---
 
@@ -772,13 +774,13 @@
 | (이 외 Create Item의 Error Responses 참조) | | |
 
 ---
-#### **3.5. 물품 삭제 (Delete Item)**
+# 물품 삭제 (Delete Item)
 
 `FR-19` 요구사항에 따라, 관리자가 물품을 삭제합니다.
 
-*   **Endpoint:** `DELETE /api/items/{item_id}`
-*   **Description:** `item_id`에 해당하는 물품을 삭제합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `DELETE /api/items/{item_id}`
+**Description:** `item_id`에 해당하는 물품을 삭제합니다.
+**Required Permissions:** Admin Only
 
 ---
 
@@ -805,13 +807,13 @@
 | `409 Conflict` | `ITEM_IN_USE` | 해당 물품과 연결된 대여 기록이 있어 삭제할 수 없을 때 |
 
 ---
-#### **3.6. 카테고리 목록 조회 (Get All Categories)**
+# 카테고리 목록 조회 (Get All Categories)
 
 물품을 분류하는 데 사용되는 모든 카테고리 목록을 조회합니다.
 
-*   **Endpoint:** `GET /api/categories`
-*   **Description:** 시스템에 등록된 모든 카테고리를 반환합니다.
-*   **Required Permissions:** All Users
+## **ENDPOINT:** `GET /api/categories`
+**Description:** 시스템에 등록된 모든 카테고리를 반환합니다.
+**Required Permissions:** All Users
 
 ---
 
@@ -828,13 +830,13 @@
 ```
 
 ---
-#### **3.7. 카테고리 생성 (Create Category)**
+# 카테고리 생성 (Create Category)
 
 관리자가 새로운 카테고리를 추가합니다.
 
-*   **Endpoint:** `POST /api/categories`
-*   **Description:** 새로운 카테고리 이름을 받아 저장합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `POST /api/categories`
+**Description:** 새로운 카테고리 이름을 받아 저장합니다.
+**Required Permissions:** Admin Only
 
 ---
 
@@ -865,13 +867,13 @@
 | (이 외 Create Item의 Error Responses 참조) | | |
 
 ---
-#### **3.8. 카테고리 수정 (Update Category)**
+# 카테고리 수정 (Update Category)
 
 관리자가 기존 카테고리의 이름을 수정합니다.
 
-*   **Endpoint:** `PUT /api/categories/{category_id}`
-*   **Description:** `category_id`에 해당하는 카테고리의 이름을 수정합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `PUT /api/categories/{category_id}`
+**Description:** `category_id`에 해당하는 카테고리의 이름을 수정합니다.
+**Required Permissions:** Admin Only
 
 ---
 
@@ -910,13 +912,13 @@
 | (이 외 Create Category의 Error Responses 참조) | | |
 
 ---
-#### **3.9. 카테고리 삭제 (Delete Category)**
+# 카테고리 삭제 (Delete Category)
 
 관리자가 카테고리를 삭제합니다.
 
-*   **Endpoint:** `DELETE /api/categories/{category_id}`
-*   **Description:** `category_id`에 해당하는 카테고리를 삭제합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `DELETE /api/categories/{category_id}`
+**Description:** `category_id`에 해당하는 카테고리를 삭제합니다.
+**Required Permissions:** Admin Only
 
 ---
 
@@ -943,13 +945,13 @@
 ---
 ### **4. 대여 (Rentals)**
 
-#### **4.1. 새 대여 예약 생성 (Create Rental)**
+# 새 대여 예약 생성 (Create Rental)
 
 `FR-15` 요구사항에 따라, 사용자가 장바구니의 물품들을 최종적으로 대여 예약합니다.
 
-*   **Endpoint:** `POST /api/rentals`
-*   **Description:** 대여할 물품 목록과 대여 기간을 받아 새로운 대여 예약을 생성합니다.
-*   **Required Permissions:** Authenticated Users
+## **ENDPOINT:** `POST /api/rentals`
+**Description:** 대여할 물품 목록과 대여 기간을 받아 새로운 대여 예약을 생성합니다.
+**Required Permissions:** Authenticated Users
 
 ---
 
@@ -1003,13 +1005,13 @@
 | `409 Conflict` | `INSUFFICIENT_STOCK` | 요청한 기간에 재고가 부족할 때 |
 
 ---
-#### **4.2. 대여 목록 조회 (Get Rentals)**
+# 대여 목록 조회 (Get Rentals)
 
 사용자 또는 관리자가 대여 목록을 조회합니다.
 
-*   **Endpoint:** `GET /api/rentals`
-*   **Description:** 일반 사용자는 자신의 주문 내역만, 관리자는 전체 주문 내역을 조회할 수 있습니다.
-*   **Required Permissions:** Authenticated Users (Admin은 전체 조회 가능)
+## **ENDPOINT:** `GET /api/rentals`
+**Description:** 일반 사용자는 자신의 주문 내역만, 관리자는 전체 주문 내역을 조회할 수 있습니다.
+**Required Permissions:** Authenticated Users (Admin은 전체 조회 가능)
 
 ---
 
@@ -1052,13 +1054,13 @@
 ```
 
 ---
-#### **4.3. 대여 상세 조회 (Get Rental Details)**
+# 대여 상세 조회 (Get Rental Details)
 
 특정 대여 건의 상세 정보를 조회합니다.
 
-*   **Endpoint:** `GET /api/rentals/{rental_id}`
-*   **Description:** `rental_id`에 해당하는 대여 건의 상세 정보와 포함된 모든 물품 목록을 반환합니다.
-*   **Required Permissions:** Authenticated Users (자신의 대여 건) or Admin
+## **ENDPOINT:** `GET /api/rentals/{rental_id}`
+**Description:** `rental_id`에 해당하는 대여 건의 상세 정보와 포함된 모든 물품 목록을 반환합니다.
+**Required Permissions:** Authenticated Users (자신의 대여 건) or Admin
 
 ---
 
@@ -1083,13 +1085,13 @@
 | `404 Not Found` | `RENTAL_NOT_FOUND` | 해당 `rental_id`의 대여 건이 없을 때 |
 
 ---
-#### **4.4. 대여 정보 수정 (Update Rental)**
+# 대여 정보 수정 (Update Rental)
 
 `FR-16` 요구사항에 따라, '예약' 상태인 대여 건의 정보를 사용자가 수정합니다.
 
-*   **Endpoint:** `PUT /api/rentals/{rental_id}`
-*   **Description:** 대여 기간 또는 품목 수량을 수정합니다.
-*   **Required Permissions:** Authenticated Users (자신의 대여 건)
+## **ENDPOINT:** `PUT /api/rentals/{rental_id}`
+**Description:** 대여 기간 또는 품목 수량을 수정합니다.
+**Required Permissions:** Authenticated Users (자신의 대여 건)
 
 ---
 
@@ -1119,13 +1121,13 @@
 | (이 외 Create Rental, Get Rental Details의 Error 참조) | | |
 
 ---
-#### **4.5. 대여 예약 취소 (Cancel Rental)**
+# 대여 예약 취소 (Cancel Rental)
 
 `FR-17` 요구사항에 따라, '예약' 상태인 대여 건을 사용자가 취소합니다.
 
-*   **Endpoint:** `DELETE /api/rentals/{rental_id}`
-*   **Description:** `rental_id`에 해당하는 예약을 취소하고, 재고를 복구합니다.
-*   **Required Permissions:** Authenticated Users (자신의 대여 건)
+## **ENDPOINT:** `DELETE /api/rentals/{rental_id}`
+**Description:** `rental_id`에 해당하는 예약을 취소하고, 재고를 복구합니다.
+**Required Permissions:** Authenticated Users (자신의 대여 건)
 
 ---
 
@@ -1149,13 +1151,13 @@
 | (이 외 Get Rental Details의 Error 참조) | | |
 
 ---
-#### **4.6. 대여 상태 변경 (Update Rental Status)**
+# 대여 상태 변경 (Update Rental Status)
 
 `FR-20` 요구사항에 따라, 관리자가 대여 건의 상태를 변경합니다.
 
-*   **Endpoint:** `PUT /api/rentals/{rental_id}/status`
-*   **Description:** 관리자가 물품 수령/반납 등에 따라 대여 상태를 직접 변경합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `PUT /api/rentals/{rental_id}/status`
+**Description:** 관리자가 물품 수령/반납 등에 따라 대여 상태를 직접 변경합니다.
+**Required Permissions:** Admin Only
 
 ---
 
@@ -1196,13 +1198,13 @@
 ---
 ### **5. 플로터 (Plotter)**
 
-#### **5.1. 플로터 주문 신청 (Create Plotter Order)**
+# 플로터 주문 신청 (Create Plotter Order)
 
 `FR-27`, `FR-28` 요구사항에 따라, 사용자가 플로터 인쇄를 주문 신청합니다.
 
-*   **Endpoint:** `POST /api/plotter/orders`
-*   **Description:** 인쇄 목적, 용지 크기, 인쇄 장수 등의 정보와 PDF 파일을 받아 플로터 주문을 신청합니다. 파일 업로드를 위해 `multipart/form-data` 형식을 사용합니다.
-*   **Required Permissions:** Authenticated Users
+## **ENDPOINT:** `POST /api/plotter/orders`
+**Description:** 인쇄 목적, 용지 크기, 인쇄 장수 등의 정보와 PDF 파일을 받아 플로터 주문을 신청합니다. 파일 업로드를 위해 `multipart/form-data` 형식을 사용합니다.
+**Required Permissions:** Authenticated Users
 
 ---
 
@@ -1253,13 +1255,13 @@
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
 
 ---
-#### **5.2. 플로터 주문 목록 조회 (Get Plotter Orders)**
+# 플로터 주문 목록 조회 (Get Plotter Orders)
 
 사용자 또는 관리자가 플로터 주문 목록을 조회합니다.
 
-*   **Endpoint:** `GET /api/plotter/orders`
-*   **Description:** 일반 사용자는 자신의 주문 내역만, 관리자는 전체 주문 내역을 조회할 수 있습니다.
-*   **Required Permissions:** Authenticated Users (Admin은 전체 조회 가능)
+## **ENDPOINT:** `GET /api/plotter/orders`
+**Description:** 일반 사용자는 자신의 주문 내역만, 관리자는 전체 주문 내역을 조회할 수 있습니다.
+**Required Permissions:** Authenticated Users (Admin은 전체 조회 가능)
 
 ---
 
@@ -1303,13 +1305,13 @@
 ```
 
 ---
-#### **5.3. 플로터 주문 취소 (Cancel Plotter Order)**
+# 플로터 주문 취소 (Cancel Plotter Order)
 
 `FR-29` 요구사항에 따라, '주문 대기' 상태인 플로터 주문을 사용자가 취소합니다.
 
-*   **Endpoint:** `DELETE /api/plotter/orders/{order_id}`
-*   **Description:** `order_id`에 해당하는 주문을 취소합니다. '주문 대기' 상태에서만 가능합니다.
-*   **Required Permissions:** Authenticated Users (자신의 주문 건)
+## **ENDPOINT:** `DELETE /api/plotter/orders/{order_id}`
+**Description:** `order_id`에 해당하는 주문을 취소합니다. '주문 대기' 상태에서만 가능합니다.
+**Required Permissions:** Authenticated Users (자신의 주문 건)
 
 ---
 
@@ -1334,13 +1336,13 @@
 | `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
 
 ---
-#### **5.4. 플로터 주문 상태 변경 (Update Plotter Order Status)**
+# 플로터 주문 상태 변경 (Update Plotter Order Status)
 
 `FR-30` 요구사항에 따라, 관리자가 플로터 주문의 상태를 변경합니다.
 
-*   **Endpoint:** `PUT /api/plotter/orders/{order_id}/status`
-*   **Description:** 관리자가 플로터 주문의 상태를 변경하고, 필요한 경우 반려 사유를 기록합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `PUT /api/plotter/orders/{order_id}/status`
+**Description:** 관리자가 플로터 주문의 상태를 변경하고, 필요한 경우 반려 사유를 기록합니다.
+**Required Permissions:** Admin Only
 
 ---
 
@@ -1384,13 +1386,13 @@
 ---
 ### **6. 관리 (Admin)**
 
-#### **6.1. 통계 데이터 조회 (Get Statistics)**
+# 통계 데이터 조회 (Get Statistics)
 
 관리자가 시스템의 주요 통계 데이터를 조회합니다.
 
-*   **Endpoint:** `GET /api/admin/stats`
-*   **Description:** 총 사용자 수, 총 대여 건수, 인기 물품 목록 등 시스템 운영에 필요한 다양한 통계 정보를 반환합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `GET /api/admin/stats`
+**Description:** 총 사용자 수, 총 대여 건수, 인기 물품 목록 등 시스템 운영에 필요한 다양한 통계 정보를 반환합니다.
+**Required Permissions:** Admin Only
 
 ---
 
@@ -1422,13 +1424,13 @@
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
 
 ---
-#### **6.2. 휴무일 목록 조회 (Get Holidays)**
+# 휴무일 목록 조회 (Get Holidays)
 
 `FR-31` 요구사항에 따라, 관리자가 설정한 휴무일 목록을 조회합니다.
 
-*   **Endpoint:** `GET /api/admin/holidays`
-*   **Description:** 시스템에 등록된 모든 휴무일 목록을 반환합니다.
-*   **Required Permissions:** All Users (물품 대여/플로터 예약 시 휴무일 정보가 필요하므로)
+## **ENDPOINT:** `GET /api/admin/holidays`
+**Description:** 시스템에 등록된 모든 휴무일 목록을 반환합니다.
+**Required Permissions:** All Users (물품 대여/플로터 예약 시 휴무일 정보가 필요하므로)
 
 ---
 
@@ -1450,13 +1452,13 @@
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
 
 ---
-#### **6.3. 휴무일 추가 (Add Holiday)**
+# 휴무일 추가 (Add Holiday)
 
 `FR-31` 요구사항에 따라, 관리자가 새로운 휴무일을 추가합니다.
 
-*   **Endpoint:** `POST /api/admin/holidays`
-*   **Description:** 새로운 휴무일 정보를 받아 저장합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `POST /api/admin/holidays`
+**Description:** 새로운 휴무일 정보를 받아 저장합니다.
+**Required Permissions:** Admin Only
 
 ---
 
@@ -1489,13 +1491,13 @@
 | (이 외 Admin API의 Error Responses 참조) | | |
 
 ---
-#### **6.4. 휴무일 삭제 (Delete Holiday)**
+# 휴무일 삭제 (Delete Holiday)
 
 `FR-31` 요구사항에 따라, 관리자가 휴무일을 삭제합니다.
 
-*   **Endpoint:** `DELETE /api/admin/holidays/{holiday_id}`
-*   **Description:** `holiday_id`에 해당하는 휴무일을 삭제합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `DELETE /api/admin/holidays/{holiday_id}`
+**Description:** `holiday_id`에 해당하는 휴무일을 삭제합니다.
+**Required Permissions:** Admin Only
 
 ---
 
@@ -1519,13 +1521,13 @@
 | (이 외 Admin API의 Error Responses 참조) | | |
 
 ---
-#### **6.5. 시스템 설정 목록 조회 (Get Configurations)**
+# 시스템 설정 목록 조회 (Get Configurations)
 
 관리자가 시스템의 모든 설정 목록을 조회합니다.
 
-*   **Endpoint:** `GET /api/admin/configurations`
-*   **Description:** 시스템에 저장된 모든 설정(`config_key`, `config_value`, `description`)을 반환합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `GET /api/admin/configurations`
+**Description:** 시스템에 저장된 모든 설정(`config_key`, `config_value`, `description`)을 반환합니다.
+**Required Permissions:** Admin Only
 
 ---
 
@@ -1557,13 +1559,13 @@
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
 
 ---
-#### **6.6. 시스템 설정 수정 (Update Configurations)**
+# 시스템 설정 수정 (Update Configurations)
 
 관리자가 시스템 설정을 수정합니다.
 
-*   **Endpoint:** `PUT /api/admin/configurations`
-*   **Description:** 하나 이상의 시스템 설정을 업데이트합니다. `config_key`를 기준으로 `config_value`를 변경합니다.
-*   **Required Permissions:** Admin Only
+## **ENDPOINT:** `PUT /api/admin/configurations`
+**Description:** 하나 이상의 시스템 설정을 업데이트합니다. `config_key`를 기준으로 `config_value`를 변경합니다.
+**Required Permissions:** Admin Only
 
 ---
 
