@@ -17,13 +17,13 @@ try {
 
     # [Auth] 2. 아이디 찾기 (Mock)
     Write-Host "[Auth Test 2] Find Username..." -NoNewline
-    $findBody = @{ name = "관리자"; phone_number = "010-0000-0000" } | ConvertTo-Json
+    $findBody = @{ name = "관리자"; phoneNumber = "010-0000-0000" } | ConvertTo-Json
     $findRes = Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/find-username" -ContentType "application/json" -Body $findBody
     if ($findRes.message) { Write-Host " PASS" -ForegroundColor Green } else { Write-Host " FAIL" -ForegroundColor Red }
 
     # [Auth] 3. 비밀번호 재설정 요청 (Mock)
     Write-Host "[Auth Test 3] Password Reset Request..." -NoNewline
-    $resetReqBody = @{ username = "admin"; phone_number = "010-0000-0000" } | ConvertTo-Json
+    $resetReqBody = @{ username = "admin"; phoneNumber = "010-0000-0000" } | ConvertTo-Json
     $resetReqRes = Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/password-reset/request" -ContentType "application/json" -Body $resetReqBody
     if ($resetReqRes.message) { Write-Host " PASS" -ForegroundColor Green } else { Write-Host " FAIL" -ForegroundColor Red }
 

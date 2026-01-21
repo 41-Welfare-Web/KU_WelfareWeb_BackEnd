@@ -7,8 +7,8 @@ export class HolidaysService {
   constructor(private prisma: PrismaService) {}
 
   async create(createHolidayDto: CreateHolidayDto) {
-    const { holiday_date, description } = createHolidayDto;
-    const date = new Date(holiday_date);
+    const { holidayDate, description } = createHolidayDto;
+    const date = new Date(holidayDate);
 
     const existing = await this.prisma.holiday.findUnique({
       where: { holidayDate: date },

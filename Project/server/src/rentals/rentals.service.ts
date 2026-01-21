@@ -16,9 +16,9 @@ export class RentalsService {
 
   // 1. 대여 예약 생성
   async create(userId: string, createRentalDto: CreateRentalDto) {
-    const { start_date, end_date, items } = createRentalDto;
-    const start = new Date(start_date);
-    const end = new Date(end_date);
+    const { startDate, endDate, items } = createRentalDto;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
     if (start > end) {
       throw new BadRequestException('종료일이 시작일보다 빠를 수 없습니다.');
@@ -32,18 +32,18 @@ export class RentalsService {
     return this.prisma.$transaction(async (tx) => {
       for (const reqItem of items) {
         const item = await tx.item.findUnique({
-          where: { id: reqItem.item_id },
+          where: { id: reqItem.itemId },
         });
 
         if (!item) {
-          throw new NotFoundException(`물품(ID: ${reqItem.item_id})을 찾을 수 없습니다.`);
+          throw new NotFoundException(`물품(ID: ${reqItem.itemId})을 찾을 수 없습니다.`);
         }
 
         const totalQty = item.totalQuantity || 1;
 
         const overlappingRentals = await tx.rentalItem.findMany({
           where: {
-            itemId: reqItem.item_id,
+            itemId: reqItem.itemId,
             rental: {
               status: { in: [RentalStatus.RESERVED, RentalStatus.RENTED] },
               OR: [
@@ -77,7 +77,7 @@ export class RentalsService {
           status: RentalStatus.RESERVED,
           rentalItems: {
             create: items.map((i) => ({
-              itemId: i.item_id,
+              itemId: i.itemId,
               quantity: i.quantity,
             })),
           },
@@ -96,19 +96,7 @@ export class RentalsService {
         },
       });
 
-      return {
-        id: rental.id,
-        user_id: rental.userId,
-        start_date: rental.startDate.toISOString().split('T')[0],
-        end_date: rental.endDate.toISOString().split('T')[0],
-        status: rental.status,
-        created_at: rental.createdAt,
-        rental_items: rental.rentalItems.map((ri) => ({
-          item_id: ri.itemId,
-          name: ri.item.name,
-          quantity: ri.quantity,
-        })),
-      };
+      return rental;
     });
   }
 
@@ -148,19 +136,11 @@ export class RentalsService {
         totalPages: Math.ceil(total / pageSize),
       },
       rentals: rentals.map((r) => ({
-        id: r.id,
-        user: {
-          name: r.user.name,
-          student_id: r.user.studentId,
-        },
-        start_date: r.startDate.toISOString().split('T')[0],
-        end_date: r.endDate.toISOString().split('T')[0],
-        status: r.status,
-        item_summary:
+        ...r,
+        itemSummary:
           r.rentalItems.length > 0
             ? `${r.rentalItems[0].item.name} 외 ${r.rentalItems.length - 1}건`
             : '물품 없음',
-        created_at: r.createdAt,
       })),
     };
   }
@@ -182,23 +162,7 @@ export class RentalsService {
       throw new ForbiddenException('접근 권한이 없습니다.');
     }
 
-    return {
-      id: rental.id,
-      user_id: rental.userId,
-      user: {
-        name: rental.user.name,
-        student_id: rental.user.studentId,
-      },
-      start_date: rental.startDate.toISOString().split('T')[0],
-      end_date: rental.endDate.toISOString().split('T')[0],
-      status: rental.status,
-      created_at: rental.createdAt,
-      rental_items: rental.rentalItems.map((ri) => ({
-        item_id: ri.itemId,
-        name: ri.item.name,
-        quantity: ri.quantity,
-      })),
-    };
+    return rental;
   }
 
   // 4. 예약 취소
@@ -264,18 +228,6 @@ export class RentalsService {
       },
     });
 
-    return {
-      id: updated.id,
-      user_id: updated.userId,
-      start_date: updated.startDate.toISOString().split('T')[0],
-      end_date: updated.endDate.toISOString().split('T')[0],
-      status: updated.status,
-      created_at: updated.createdAt,
-      rental_items: updated.rentalItems.map((ri) => ({
-        item_id: ri.itemId,
-        name: ri.item.name,
-        quantity: ri.quantity,
-      })),
-    };
+    return updated;
   }
 }

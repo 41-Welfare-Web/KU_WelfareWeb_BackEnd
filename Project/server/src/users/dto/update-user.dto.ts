@@ -1,21 +1,21 @@
 import { IsOptional, IsString, Matches, MinLength } from 'class-validator';
 
 export class UpdateUserDto {
-  @IsString()
   @IsOptional()
-  current_password?: string;
+  @IsString()
+  currentPassword?: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   @MinLength(8)
-  new_password?: string;
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/)
+  newPassword?: string;
 
-  @IsString()
   @IsOptional()
-  @Matches(/^010-\d{4}-\d{4}$/)
-  phone_number?: string;
+  @IsString()
+  phoneNumber?: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   department?: string;
 }

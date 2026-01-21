@@ -8,25 +8,24 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-class RentalItemDto {
+export class RentalItemDto {
   @IsInt()
   @IsNotEmpty()
-  item_id: number;
+  itemId: number;
 
   @IsInt()
-  @Min(1)
   @IsNotEmpty()
   quantity: number;
 }
 
 export class CreateRentalDto {
-  @IsDateString() // YYYY-MM-DD
+  @IsDateString()
   @IsNotEmpty()
-  start_date: string;
+  startDate: string;
 
   @IsDateString()
   @IsNotEmpty()
-  end_date: string;
+  endDate: string;
 
   @IsArray()
   @ValidateNested({ each: true })

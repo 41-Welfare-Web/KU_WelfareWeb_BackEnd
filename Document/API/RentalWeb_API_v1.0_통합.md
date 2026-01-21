@@ -24,16 +24,16 @@
   "username": "testuser",
   "password": "password123!",
   "name": "김테스트",
-  "student_id": "202412345",
-  "phone_number": "010-1234-5678",
+  "studentId": "202412345",
+  "phoneNumber": "010-1234-5678",
   "department": "컴퓨터공학과"
 }
 ```
 * `username`: (string, required) 로그인 아이디. 5~20자의 영문 소문자, 숫자만 가능.
 * `password`: (string, required) 비밀번호. 최소 8자 이상, 영문, 숫자, 특수문자 포함.
 * `name`: (string, required) 실제 이름.
-* `student_id`: (string, required) 학번.
-* `phone_number`: (string, required) 전화번호. SMS 인증을 거친 번호.
+* `studentId`: (string, required) 학번.
+* `phoneNumber`: (string, required) 전화번호. SMS 인증을 거친 번호.
 * `department`: (string, required) 소속 단위.
 
 ---
@@ -61,8 +61,8 @@
 | :--- | :--- | :--- |
 | `400 Bad Request` | `INVALID_INPUT` | 요청값이 유효성 규칙에 맞지 않을 때 |
 | `409 Conflict` | `DUPLICATE_USERNAME` | `username`이 이미 존재할 때 |
-| `409 Conflict` | `DUPLICATE_STUDENT_ID` | `student_id`가 이미 존재할 때 |
-| `409 Conflict` | `DUPLICATE_PHONE_NUMBER` | `phone_number`가 이미 존재할 때 |
+| `409 Conflict` | `DUPLICATE_STUDENT_ID` | `studentId`가 이미 존재할 때 |
+| `409 Conflict` | `DUPLICATE_PHONE_NUMBER` | `phoneNumber`가 이미 존재할 때 |
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
 
 ---
@@ -81,11 +81,11 @@
 ```json
 {
   "name": "김테스트",
-  "phone_number": "010-1234-5678"
+  "phoneNumber": "010-1234-5678"
 }
 ```
 * `name`: (string, required) 가입 시 입력한 실제 이름.
-* `phone_number`: (string, required) 가입 시 인증한 전화번호.
+* `phoneNumber`: (string, required) 가입 시 인증한 전화번호.
 
 ---
 
@@ -116,11 +116,11 @@
 ```json
 {
   "username": "testuser",
-  "phone_number": "010-1234-5678"
+  "phoneNumber": "010-1234-5678"
 }
 ```
 * `username`: (string, required) 아이디.
-* `phone_number`: (string, required) 가입 시 인증한 전화번호.
+* `phoneNumber`: (string, required) 가입 시 인증한 전화번호.
 
 ---
 
@@ -150,13 +150,13 @@
 ```json
 {
   "username": "testuser",
-  "verification_code": "123456",
-  "new_password": "newPassword123!"
+  "verificationCode": "123456",
+  "newPassword": "newPassword123!"
 }
 ```
 * `username`: (string, required) 아이디.
-* `verification_code`: (string, required) SMS로 수신한 인증 코드.
-* `new_password`: (string, required) 새 비밀번호. 비밀번호 정책을 따라야 함.
+* `verificationCode`: (string, required) SMS로 수신한 인증 코드.
+* `newPassword`: (string, required) 새 비밀번호. 비밀번호 정책을 따라야 함.
 
 ---
 
@@ -332,11 +332,11 @@
   "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
   "username": "testuser",
   "name": "김테스트",
-  "student_id": "202412345",
-  "phone_number": "010-1234-5678",
+  "studentId": "202412345",
+  "phoneNumber": "010-1234-5678",
   "department": "컴퓨터공학과",
   "role": "USER",
-  "created_at": "2024-01-01T12:00:00Z"
+  "createdAt": "2024-01-01T12:00:00Z"
 }
 ```
 
@@ -361,15 +361,15 @@
 
 ```json
 {
-  "current_password": "password123!",
-  "new_password": "newPassword456!",
-  "phone_number": "010-8765-4321",
+  "currentPassword": "password123!",
+  "newPassword": "newPassword456!",
+  "phoneNumber": "010-8765-4321",
   "department": "총학생회"
 }
 ```
-* `current_password`: (string, required) 정보 수정을 위한 본인 확인용 현재 비밀번호.
-* `new_password`: (string, optional) 변경할 새 비밀번호.
-* `phone_number`: (string, optional) 변경할 전화번호. 변경 시 SMS 재인증 필요.
+* `currentPassword`: (string, required) 정보 수정을 위한 본인 확인용 현재 비밀번호.
+* `newPassword`: (string, optional) 변경할 새 비밀번호.
+* `phoneNumber`: (string, optional) 변경할 전화번호. 변경 시 SMS 재인증 필요.
 * `department`: (string, optional) 변경할 소속 단위.
 
 ---
@@ -383,11 +383,11 @@
   "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
   "username": "testuser",
   "name": "김테스트",
-  "student_id": "202412345",
-  "phone_number": "010-8765-4321",
+  "studentId": "202412345",
+  "phoneNumber": "010-8765-4321",
   "department": "총학생회",
   "role": "USER",
-  "created_at": "2024-01-01T12:00:00Z"
+  "createdAt": "2024-01-01T12:00:00Z"
 }
 ```
 * **Note:** 수정이 완료된 최신 사용자 정보를 반환합니다.
@@ -396,10 +396,10 @@
 
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
-| `400 Bad Request` | `INVALID_INPUT` | `new_password` 등이 유효성 규칙에 맞지 않을 때 |
+| `400 Bad Request` | `INVALID_INPUT` | `newPassword` 등이 유효성 규칙에 맞지 않을 때 |
 | `401 Unauthorized` | `NOT_AUTHENTICATED` | `accessToken`이 유효하지 않을 때 |
-| `403 Forbidden` | `INCORRECT_PASSWORD` | `current_password`가 일치하지 않을 때 |
-| `409 Conflict` | `DUPLICATE_PHONE_NUMBER` | 변경하려는 `phone_number`가 이미 존재할 때 |
+| `403 Forbidden` | `INCORRECT_PASSWORD` | `currentPassword`가 일치하지 않을 때 |
+| `409 Conflict` | `DUPLICATE_PHONE_NUMBER` | 변경하려는 `phoneNumber`가 이미 존재할 때 |
 
 ---
 ---
@@ -460,9 +460,9 @@
 | :--- | :--- | :--- | :--- |
 | `page` | `integer` | 선택 | 조회할 페이지 번호. (기본값: 1) |
 | `pageSize` | `integer` | 선택 | 한 페이지에 보여줄 사용자 수. (기본값: 20) |
-| `search` | `string` | 선택 | 검색어. `name`, `username`, `student_id` 필드를 대상으로 부분 일치 검색을 수행합니다. |
+| `search` | `string` | 선택 | 검색어. `name`, `username`, `studentId` 필드를 대상으로 부분 일치 검색을 수행합니다. |
 | `role` | `string` | 선택 | 특정 역할(`USER` 또는 `ADMIN`)을 가진 사용자만 필터링합니다. |
-| `sortBy` | `string` | 선택 | 정렬 기준 필드. (예: `name`, `student_id`, `created_at`. 기본값: `created_at`) |
+| `sortBy` | `string` | 선택 | 정렬 기준 필드. (예: `name`, `studentId`, `createdAt`. 기본값: `createdAt`) |
 | `sortOrder` | `string` | 선택 | 정렬 순서. `asc` (오름차순) 또는 `desc` (내림차순). (기본값: `desc`) |
 
 ---
@@ -484,21 +484,21 @@
       "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
       "username": "testuser",
       "name": "김테스트",
-      "student_id": "202412345",
-      "phone_number": "010-1234-5678",
+      "studentId": "202412345",
+      "phoneNumber": "010-1234-5678",
       "department": "컴퓨터공학과",
       "role": "USER",
-      "created_at": "2024-01-01T12:00:00Z"
+      "createdAt": "2024-01-01T12:00:00Z"
     },
     {
       "id": "b2c3d4e5-f6g7-h8i9-j0k1-l2m3n4o5p6q7",
       "username": "adminuser",
       "name": "박관리",
-      "student_id": "202000001",
-      "phone_number": "010-0000-0001",
+      "studentId": "202000001",
+      "phoneNumber": "010-0000-0001",
       "department": "총학생회",
       "role": "ADMIN",
-      "created_at": "2023-12-25T10:00:00Z"
+      "createdAt": "2023-12-25T10:00:00Z"
     }
   ]
 }
@@ -517,8 +517,8 @@
 
 `FR-23` 요구사항에 따라, 관리자가 특정 사용자의 역할을 변경합니다.
 
-## **ENDPOINT:** `PUT /api/users/{user_id}/role`
-**Description:** 관리자가 `user_id`를 지정하여 해당 사용자의 역할을 'USER' 또는 'ADMIN'으로 변경합니다.
+## **ENDPOINT:** `PUT /api/users/{userId}/role`
+**Description:** 관리자가 `userId`를 지정하여 해당 사용자의 역할을 'USER' 또는 'ADMIN'으로 변경합니다.
 **Required Permissions:** Admin Only
 
 ---
@@ -527,7 +527,7 @@
 
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `user_id` | `uuid` | 역할을 변경할 사용자의 고유 ID |
+| `userId` | `uuid` | 역할을 변경할 사용자의 고유 ID |
 
 ---
 
@@ -551,11 +551,11 @@
   "id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
   "username": "testuser",
   "name": "김테스트",
-  "student_id": "202412345",
-  "phone_number": "010-1234-5678",
+  "studentId": "202412345",
+  "phoneNumber": "010-1234-5678",
   "department": "컴퓨터공학과",
   "role": "ADMIN",
-  "created_at": "2024-01-01T12:00:00Z"
+  "createdAt": "2024-01-01T12:00:00Z"
 }
 ```
 * **Note:** 역할 변경이 완료된 최신 사용자 정보를 반환합니다.
@@ -567,7 +567,7 @@
 | `400 Bad Request` | `INVALID_ROLE` | `role` 필드의 값이 'USER' 또는 'ADMIN'이 아닐 때 |
 | `401 Unauthorized` | `NOT_AUTHENTICATED` | `accessToken`이 유효하지 않을 때 |
 | `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
-| `404 Not Found` | `USER_NOT_FOUND` | 해당 `user_id`의 사용자가 없을 때 |
+| `404 Not Found` | `USER_NOT_FOUND` | 해당 `userId`의 사용자가 없을 때 |
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
 
 ---
@@ -588,7 +588,7 @@
 | 파라미터 | 타입 | 필수 여부 | 설명 |
 | :--- | :--- | :--- | :--- |
 | `search` | `string` | 선택 | 물품 이름(name)을 대상으로 부분 일치 검색을 수행합니다. |
-| `category_ids` | `string` | 선택 | 카테고리 ID를 쉼표(`,`)로 구분하여 전달합니다. (예: `1,3,5`) |
+| `categoryIds` | `string` | 선택 | 카테고리 ID를 쉼표(`,`)로 구분하여 전달합니다. (예: `1,3,5`) |
 | `sortBy` | `string` | 선택 | 정렬 기준. `popularity` (인기순), `name` (이름순), `createdAt` (최신순). (기본값: `popularity`) |
 | `sortOrder` | `string` | 선택 | 정렬 순서. `asc` (오름차순) 또는 `desc` (내림차순). (기본값: `desc`) |
 
@@ -607,13 +607,13 @@
       "name": "촬영장비"
     },
     "name": "DSLR 카메라",
-    "item_code": "CAM-001",
-    "rental_count": 120,
-    "image_url": "https://example.com/images/camera.jpg",
-    "management_type": "INDIVIDUAL",
-    "total_quantity": 5,
-    "current_stock": 2,
-    "created_at": "2024-01-10T10:00:00Z"
+    "itemCode": "CAM-001",
+    "rentalCount": 120,
+    "imageUrl": "https://example.com/images/camera.jpg",
+    "managementType": "INDIVIDUAL",
+    "totalQuantity": 5,
+    "currentStock": 2,
+    "createdAt": "2024-01-10T10:00:00Z"
   },
   {
     "id": 2,
@@ -622,17 +622,17 @@
       "name": "음향장비"
     },
     "name": "블루투스 마이크",
-    "item_code": "MIC-003",
-    "rental_count": 95,
-    "image_url": "https://example.com/images/mic.jpg",
-    "management_type": "BULK",
-    "total_quantity": 10,
-    "current_stock": 8,
-    "created_at": "2024-01-05T15:30:00Z"
+    "itemCode": "MIC-003",
+    "rentalCount": 95,
+    "imageUrl": "https://example.com/images/mic.jpg",
+    "managementType": "BULK",
+    "totalQuantity": 10,
+    "currentStock": 8,
+    "createdAt": "2024-01-05T15:30:00Z"
   }
 ]
 ```
-* **Note:** `current_stock`은 현재 시점에서 대여 가능한 재고 수량을 의미합니다.
+* **Note:** `currentStock`은 현재 시점에서 대여 가능한 재고 수량을 의미합니다.
 
 *   **Error Responses**
 
@@ -645,8 +645,8 @@
 
 `FR-10` 요구사항에 따라, 특정 물품의 상세 정보를 조회합니다.
 
-## **ENDPOINT:** `GET /api/items/{item_id}`
-**Description:** `item_id`에 해당하는 물품의 모든 정보를 반환합니다. `description` 필드는 관리자가 입력한 상세 설명(HTML/Markdown)을 포함합니다.
+## **ENDPOINT:** `GET /api/items/{itemId}`
+**Description:** `itemId`에 해당하는 물품의 모든 정보를 반환합니다. `description` 필드는 관리자가 입력한 상세 설명(HTML/Markdown)을 포함합니다.
 **Required Permissions:** All Users
 
 ---
@@ -655,7 +655,7 @@
 
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `item_id` | `integer` | 조회할 물품의 고유 ID |
+| `itemId` | `integer` | 조회할 물품의 고유 ID |
 
 ---
 
@@ -671,13 +671,13 @@
     "name": "촬영장비"
   },
   "name": "DSLR 카메라",
-  "item_code": "CAM-001",
+  "itemCode": "CAM-001",
   "description": "<h1>고화질 DSLR 카메라</h1><p>제품 특징: ...</p><img src='...' />",
-  "rental_count": 120,
-  "image_url": "https://example.com/images/camera.jpg",
-  "management_type": "INDIVIDUAL",
-  "total_quantity": 5,
-  "created_at": "2024-01-10T10:00:00Z"
+  "rentalCount": 120,
+  "imageUrl": "https://example.com/images/camera.jpg",
+  "managementType": "INDIVIDUAL",
+  "totalQuantity": 5,
+  "createdAt": "2024-01-10T10:00:00Z"
 }
 ```
 
@@ -685,7 +685,7 @@
 
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
-| `404 Not Found` | `ITEM_NOT_FOUND` | 해당 `item_id`의 물품이 없을 때 |
+| `404 Not Found` | `ITEM_NOT_FOUND` | 해당 `itemId`의 물품이 없을 때 |
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
 
 ---
@@ -703,22 +703,22 @@
 
 ```json
 {
-  "category_id": 2,
+  "categoryId": 2,
   "name": "새로운 삼각대",
-  "item_code": "TRI-005",
+  "itemCode": "TRI-005",
   "description": "가볍고 튼튼한 전문가용 삼각대입니다.",
-  "image_url": "https://example.com/images/tripod.jpg",
-  "management_type": "BULK",
-  "total_quantity": 10
+  "imageUrl": "https://example.com/images/tripod.jpg",
+  "managementType": "BULK",
+  "totalQuantity": 10
 }
 ```
-* `category_id`: (integer, required)
+* `categoryId`: (integer, required)
 * `name`: (string, required)
-* `item_code`: (string, required, unique)
+* `itemCode`: (string, required, unique)
 * `description`: (string, optional)
-* `image_url`: (string, optional)
-* `management_type`: (string, required) 'INDIVIDUAL' 또는 'BULK'
-* `total_quantity`: (integer, optional) `management_type`이 'BULK'일 때 필요합니다.
+* `imageUrl`: (string, optional)
+* `managementType`: (string, required) 'INDIVIDUAL' 또는 'BULK'
+* `totalQuantity`: (integer, optional) `managementType`이 'BULK'일 때 필요합니다.
 
 ---
 
@@ -734,15 +734,15 @@
 | `400 Bad Request` | `INVALID_INPUT` | 필수 필드가 누락되거나 유효하지 않을 때 |
 | `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
 | `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
-| `409 Conflict` | `DUPLICATE_ITEM_CODE` | `item_code`가 이미 존재할 때 |
+| `409 Conflict` | `DUPLICATE_ITEM_CODE` | `itemCode`가 이미 존재할 때 |
 
 ---
 # 물품 수정 (Update Item)
 
 `FR-19` 요구사항에 따라, 관리자가 기존 물품의 정보를 수정합니다.
 
-## **ENDPOINT:** `PUT /api/items/{item_id}`
-**Description:** `item_id`에 해당하는 물품의 정보를 수정합니다.
+## **ENDPOINT:** `PUT /api/items/{itemId}`
+**Description:** `itemId`에 해당하는 물품의 정보를 수정합니다.
 **Required Permissions:** Admin Only
 
 ---
@@ -751,7 +751,7 @@
 
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `item_id` | `integer` | 수정할 물품의 고유 ID |
+| `itemId` | `integer` | 수정할 물품의 고유 ID |
 
 ---
 
@@ -769,8 +769,8 @@
 
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
-| `404 Not Found` | `ITEM_NOT_FOUND` | 해당 `item_id`의 물품이 없을 때 |
-| `409 Conflict` | `DUPLICATE_ITEM_CODE` | 수정하려는 `item_code`가 다른 물품에 이미 존재할 때 |
+| `404 Not Found` | `ITEM_NOT_FOUND` | 해당 `itemId`의 물품이 없을 때 |
+| `409 Conflict` | `DUPLICATE_ITEM_CODE` | 수정하려는 `itemCode`가 다른 물품에 이미 존재할 때 |
 | (이 외 Create Item의 Error Responses 참조) | | |
 
 ---
@@ -778,8 +778,8 @@
 
 `FR-19` 요구사항에 따라, 관리자가 물품을 삭제합니다.
 
-## **ENDPOINT:** `DELETE /api/items/{item_id}`
-**Description:** `item_id`에 해당하는 물품을 삭제합니다.
+## **ENDPOINT:** `DELETE /api/items/{itemId}`
+**Description:** `itemId`에 해당하는 물품을 삭제합니다.
 **Required Permissions:** Admin Only
 
 ---
@@ -788,7 +788,7 @@
 
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `item_id` | `integer` | 삭제할 물품의 고유 ID |
+| `itemId` | `integer` | 삭제할 물품의 고유 ID |
 
 ---
 
@@ -803,7 +803,7 @@
 | :--- | :--- | :--- |
 | `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
 | `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
-| `404 Not Found` | `ITEM_NOT_FOUND` | 해당 `item_id`의 물품이 없을 때 |
+| `404 Not Found` | `ITEM_NOT_FOUND` | 해당 `itemId`의 물품이 없을 때 |
 | `409 Conflict` | `ITEM_IN_USE` | 해당 물품과 연결된 대여 기록이 있어 삭제할 수 없을 때 |
 
 ---
@@ -871,8 +871,8 @@
 
 관리자가 기존 카테고리의 이름을 수정합니다.
 
-## **ENDPOINT:** `PUT /api/categories/{category_id}`
-**Description:** `category_id`에 해당하는 카테고리의 이름을 수정합니다.
+## **ENDPOINT:** `PUT /api/categories/{categoryId}`
+**Description:** `categoryId`에 해당하는 카테고리의 이름을 수정합니다.
 **Required Permissions:** Admin Only
 
 ---
@@ -881,7 +881,7 @@
 
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `category_id` | `integer` | 수정할 카테고리의 고유 ID |
+| `categoryId` | `integer` | 수정할 카테고리의 고유 ID |
 
 ---
 
@@ -908,7 +908,7 @@
 
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
-| `404 Not Found` | `CATEGORY_NOT_FOUND` | 해당 `category_id`의 카테고리가 없을 때 |
+| `404 Not Found` | `CATEGORY_NOT_FOUND` | 해당 `categoryId`의 카테고리가 없을 때 |
 | (이 외 Create Category의 Error Responses 참조) | | |
 
 ---
@@ -916,8 +916,8 @@
 
 관리자가 카테고리를 삭제합니다.
 
-## **ENDPOINT:** `DELETE /api/categories/{category_id}`
-**Description:** `category_id`에 해당하는 카테고리를 삭제합니다.
+## **ENDPOINT:** `DELETE /api/categories/{categoryId}`
+**Description:** `categoryId`에 해당하는 카테고리를 삭제합니다.
 **Required Permissions:** Admin Only
 
 ---
@@ -926,7 +926,7 @@
 
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `category_id` | `integer` | 삭제할 카테고리의 고유 ID |
+| `categoryId` | `integer` | 삭제할 카테고리의 고유 ID |
 
 ---
 
@@ -938,9 +938,10 @@
 
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
-| `404 Not Found` | `CATEGORY_NOT_FOUND` | 해당 `category_id`의 카테고리가 없을 때 |
+| `404 Not Found` | `CATEGORY_NOT_FOUND` | 해당 `categoryId`의 카테고리가 없을 때 |
 | `409 Conflict` | `CATEGORY_IN_USE` | 해당 카테고리에 속한 물품이 있어 삭제할 수 없을 때 |
 | (이 외 Delete Item의 Error Responses 참조) | | |
+
 
 ---
 ### **4. 대여 (Rentals)**
@@ -959,18 +960,18 @@
 
 ```json
 {
-  "start_date": "2024-08-01",
-  "end_date": "2024-08-05",
+  "startDate": "2024-08-01",
+  "endDate": "2024-08-05",
   "items": [
-    { "item_id": 1, "quantity": 1 },
-    { "item_id": 5, "quantity": 2 }
+    { "itemId": 1, "quantity": 1 },
+    { "itemId": 5, "quantity": 2 }
   ]
 }
 ```
-* `start_date`: (string, required) 대여 시작일 (YYYY-MM-DD)
-* `end_date`: (string, required) 반납 예정일 (YYYY-MM-DD)
+* `startDate`: (string, required) 대여 시작일 (YYYY-MM-DD)
+* `endDate`: (string, required) 반납 예정일 (YYYY-MM-DD)
 * `items`: (array, required) 대여할 물품 목록
-    * `item_id`: (integer, required) 물품 ID
+    * `itemId`: (integer, required) 물품 ID
     * `quantity`: (integer, required) 대여 수량
 
 ---
@@ -978,19 +979,19 @@
 #### **Responses**
 
 *   **Success Response (`201 Created`)**
-    *   생성된 대여 정보(`rental`)와 포함된 품목(`rental_items`) 정보를 반환합니다.
+    *   생성된 대여 정보(`rental`)와 포함된 품목(`rentalItems`) 정보를 반환합니다.
 
 ```json
 {
   "id": 101,
-  "user_id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
-  "start_date": "2024-08-01",
-  "end_date": "2024-08-05",
+  "userId": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+  "startDate": "2024-08-01",
+  "endDate": "2024-08-05",
   "status": "RESERVED",
-  "created_at": "2024-07-20T10:00:00Z",
-  "rental_items": [
-    { "item_id": 1, "name": "DSLR 카메라", "quantity": 1 },
-    { "item_id": 5, "name": "삼각대", "quantity": 2 }
+  "createdAt": "2024-07-20T10:00:00Z",
+  "rentalItems": [
+    { "itemId": 1, "name": "DSLR 카메라", "quantity": 1 },
+    { "itemId": 5, "name": "삼각대", "quantity": 2 }
   ]
 }
 ```
@@ -1019,7 +1020,7 @@
 
 | 파라미터 | 타입 | 필수 여부 | 설명 |
 | :--- | :--- | :--- | :--- |
-| `user_id` | `uuid` | 선택 (Admin) | 특정 사용자의 대여 내역을 조회합니다. (관리자 전용) |
+| `userId` | `uuid` | 선택 (Admin) | 특정 사용자의 대여 내역을 조회합니다. (관리자 전용) |
 | `status` | `string` | 선택 | 특정 상태의 대여 건만 필터링합니다. (예: `RESERVED`, `RENTED`, `OVERDUE`) |
 | `page` | `integer` | 선택 | 페이지 번호 (기본값: 1) |
 | `pageSize` | `integer` | 선택 | 페이지 당 항목 수 (기본값: 10) |
@@ -1042,12 +1043,12 @@
   "rentals": [
     {
       "id": 101,
-      "user": { "name": "김테스트", "student_id": "202412345" },
-      "start_date": "2024-08-01",
-      "end_date": "2024-08-05",
+      "user": { "name": "김테스트", "studentId": "202412345" },
+      "startDate": "2024-08-01",
+      "endDate": "2024-08-05",
       "status": "RESERVED",
-      "item_summary": "DSLR 카메라 외 1건",
-      "created_at": "2024-07-20T10:00:00Z"
+      "itemSummary": "DSLR 카메라 외 1건",
+      "createdAt": "2024-07-20T10:00:00Z"
     }
   ]
 }
@@ -1058,8 +1059,8 @@
 
 특정 대여 건의 상세 정보를 조회합니다.
 
-## **ENDPOINT:** `GET /api/rentals/{rental_id}`
-**Description:** `rental_id`에 해당하는 대여 건의 상세 정보와 포함된 모든 물품 목록을 반환합니다.
+## **ENDPOINT:** `GET /api/rentals/{rentalId}`
+**Description:** `rentalId`에 해당하는 대여 건의 상세 정보와 포함된 모든 물품 목록을 반환합니다.
 **Required Permissions:** Authenticated Users (자신의 대여 건) or Admin
 
 ---
@@ -1068,7 +1069,7 @@
 
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `rental_id` | `integer` | 조회할 대여의 고유 ID |
+| `rentalId` | `integer` | 조회할 대여의 고유 ID |
 
 ---
 
@@ -1082,14 +1083,14 @@
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
 | `403 Forbidden` | `NO_PERMISSION` | 자신의 대여 건이 아닌 경우 (User) |
-| `404 Not Found` | `RENTAL_NOT_FOUND` | 해당 `rental_id`의 대여 건이 없을 때 |
+| `404 Not Found` | `RENTAL_NOT_FOUND` | 해당 `rentalId`의 대여 건이 없을 때 |
 
 ---
 # 대여 정보 수정 (Update Rental)
 
 `FR-16` 요구사항에 따라, '예약' 상태인 대여 건의 정보를 사용자가 수정합니다.
 
-## **ENDPOINT:** `PUT /api/rentals/{rental_id}`
+## **ENDPOINT:** `PUT /api/rentals/{rentalId}`
 **Description:** 대여 기간 또는 품목 수량을 수정합니다.
 **Required Permissions:** Authenticated Users (자신의 대여 건)
 
@@ -1099,7 +1100,7 @@
 
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `rental_id` | `integer` | 수정할 대여의 고유 ID |
+| `rentalId` | `integer` | 수정할 대여의 고유 ID |
 
 ---
 
@@ -1125,8 +1126,8 @@
 
 `FR-17` 요구사항에 따라, '예약' 상태인 대여 건을 사용자가 취소합니다.
 
-## **ENDPOINT:** `DELETE /api/rentals/{rental_id}`
-**Description:** `rental_id`에 해당하는 예약을 취소하고, 재고를 복구합니다.
+## **ENDPOINT:** `DELETE /api/rentals/{rentalId}`
+**Description:** `rentalId`에 해당하는 예약을 취소하고, 재고를 복구합니다.
 **Required Permissions:** Authenticated Users (자신의 대여 건)
 
 ---
@@ -1135,7 +1136,7 @@
 
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `rental_id` | `integer` | 취소할 대여의 고유 ID |
+| `rentalId` | `integer` | 취소할 대여의 고유 ID |
 
 ---
 
@@ -1155,7 +1156,7 @@
 
 `FR-20` 요구사항에 따라, 관리자가 대여 건의 상태를 변경합니다.
 
-## **ENDPOINT:** `PUT /api/rentals/{rental_id}/status`
+## **ENDPOINT:** `PUT /api/rentals/{rentalId}/status`
 **Description:** 관리자가 물품 수령/반납 등에 따라 대여 상태를 직접 변경합니다.
 **Required Permissions:** Admin Only
 
@@ -1165,7 +1166,7 @@
 
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `rental_id` | `integer` | 상태를 변경할 대여의 고유 ID |
+| `rentalId` | `integer` | 상태를 변경할 대여의 고유 ID |
 
 ---
 
@@ -1195,6 +1196,7 @@
 | `400 Bad Request` | `MEMO_REQUIRED` | 특정 상태 변경 시(예: 불량, 관리자 취소) `memo`가 누락되었을 때 |
 | (이 외 Get Rental Details의 Error 참조) | | |
 
+
 ---
 ### **5. 플로터 (Plotter)**
 
@@ -1213,11 +1215,11 @@
 | 필드명 | 타입 | 필수 여부 | 설명 |
 | :--- | :--- | :--- | :--- |
 | `purpose` | `string` | 필수 | 인쇄 목적 |
-| `paper_size` | `string` | 필수 | 용지 크기 (예: `A0`, `A1`) |
-| `page_count` | `integer` | 필수 | 인쇄 장수 (업로드된 PDF 파일의 페이지 수와 일치해야 함) |
-| `is_paid_service` | `boolean` | 필수 | 유료 서비스 여부 (서버에서 자동 판별 후 클라이언트에 전달) |
-| `payment_receipt_image` | `file` | 유료 시 필수 | 입금 내역 캡처 이미지 파일 (유료 서비스일 경우) |
-| `pdf_file` | `file` | 필수 | 인쇄할 PDF 파일 |
+| `paperSize` | `string` | 필수 | 용지 크기 (예: `A0`, `A1`) |
+| `pageCount` | `integer` | 필수 | 인쇄 장수 (업로드된 PDF 파일의 페이지 수와 일치해야 함) |
+| `isPaidService` | `boolean` | 필수 | 유료 서비스 여부 (서버에서 자동 판별 후 클라이언트에 전달) |
+| `paymentReceiptImage` | `file` | 유료 시 필수 | 입금 내역 캡처 이미지 파일 (유료 서비스일 경우) |
+| `pdfFile` | `file` | 필수 | 인쇄할 PDF 파일 |
 
 ---
 
@@ -1229,17 +1231,17 @@
 ```json
 {
   "id": 201,
-  "user_id": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+  "userId": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
   "purpose": "졸업 작품 포스터",
-  "paper_size": "A0",
-  "page_count": 1,
-  "is_paid_service": true,
+  "paperSize": "A0",
+  "pageCount": 1,
+  "isPaidService": true,
   "price": 5000,
-  "file_url": "https://example.com/files/order_201.pdf",
-  "original_filename": "poster.pdf",
-  "pickup_date": "2024-07-25",
+  "fileUrl": "https://example.com/files/order_201.pdf",
+  "originalFilename": "poster.pdf",
+  "pickupDate": "2024-07-25",
   "status": "PENDING",
-  "created_at": "2024-07-22T11:00:00Z"
+  "createdAt": "2024-07-22T11:00:00Z"
 }
 ```
 
@@ -1248,8 +1250,8 @@
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
 | `400 Bad Request` | `INVALID_FILE_TYPE` | PDF 파일이 아닐 때 |
-| `400 Bad Request` | `PAGE_COUNT_MISMATCH` | 입력된 `page_count`와 실제 PDF 페이지 수가 다를 때 |
-| `400 Bad Request` | `PAYMENT_RECEIPT_REQUIRED` | 유료 서비스인데 `payment_receipt_image`가 누락되었을 때 |
+| `400 Bad Request` | `PAGE_COUNT_MISMATCH` | 입력된 `pageCount`와 실제 PDF 페이지 수가 다를 때 |
+| `400 Bad Request` | `PAYMENT_RECEIPT_REQUIRED` | 유료 서비스인데 `paymentReceiptImage`가 누락되었을 때 |
 | `400 Bad Request` | `INVALID_INPUT` | 필수 필드 누락 또는 유효성 검사 실패 |
 | `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
@@ -1269,7 +1271,7 @@
 
 | 파라미터 | 타입 | 필수 여부 | 설명 |
 | :--- | :--- | :--- | :--- |
-| `user_id` | `uuid` | 선택 (Admin) | 특정 사용자의 주문 내역을 조회합니다. (관리자 전용) |
+| `userId` | `uuid` | 선택 (Admin) | 특정 사용자의 주문 내역을 조회합니다. (관리자 전용) |
 | `status` | `string` | 선택 | 특정 상태의 주문 건만 필터링합니다. (예: `PENDING`, `CONFIRMED`, `PRINTED`) |
 | `page` | `integer` | 선택 | 페이지 번호 (기본값: 1) |
 | `pageSize` | `integer` | 선택 | 페이지 당 항목 수 (기본값: 10) |
@@ -1292,13 +1294,13 @@
   "orders": [
     {
       "id": 201,
-      "user": { "name": "김테스트", "student_id": "202412345" },
+      "user": { "name": "김테스트", "studentId": "202412345" },
       "purpose": "졸업 작품 포스터",
-      "paper_size": "A0",
-      "page_count": 1,
-      "pickup_date": "2024-07-25",
+      "paperSize": "A0",
+      "pageCount": 1,
+      "pickupDate": "2024-07-25",
       "status": "PENDING",
-      "created_at": "2024-07-22T11:00:00Z"
+      "createdAt": "2024-07-22T11:00:00Z"
     }
   ]
 }
@@ -1309,8 +1311,8 @@
 
 `FR-29` 요구사항에 따라, '주문 대기' 상태인 플로터 주문을 사용자가 취소합니다.
 
-## **ENDPOINT:** `DELETE /api/plotter/orders/{order_id}`
-**Description:** `order_id`에 해당하는 주문을 취소합니다. '주문 대기' 상태에서만 가능합니다.
+## **ENDPOINT:** `DELETE /api/plotter/orders/{orderId}`
+**Description:** `orderId`에 해당하는 주문을 취소합니다. '주문 대기' 상태에서만 가능합니다.
 **Required Permissions:** Authenticated Users (자신의 주문 건)
 
 ---
@@ -1319,7 +1321,7 @@
 
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `order_id` | `integer` | 취소할 주문의 고유 ID |
+| `orderId` | `integer` | 취소할 주문의 고유 ID |
 
 ---
 
@@ -1332,7 +1334,7 @@
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
 | `403 Forbidden` | `NOT_CANCELLABLE` | '주문 대기' 상태가 아니어서 취소할 수 없을 때 |
-| `404 Not Found` | `ORDER_NOT_FOUND` | 해당 `order_id`의 주문이 없을 때 |
+| `404 Not Found` | `ORDER_NOT_FOUND` | 해당 `orderId`의 주문이 없을 때 |
 | `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
 
 ---
@@ -1340,7 +1342,7 @@
 
 `FR-30` 요구사항에 따라, 관리자가 플로터 주문의 상태를 변경합니다.
 
-## **ENDPOINT:** `PUT /api/plotter/orders/{order_id}/status`
+## **ENDPOINT:** `PUT /api/plotter/orders/{orderId}/status`
 **Description:** 관리자가 플로터 주문의 상태를 변경하고, 필요한 경우 반려 사유를 기록합니다.
 **Required Permissions:** Admin Only
 
@@ -1350,7 +1352,7 @@
 
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `order_id` | `integer` | 상태를 변경할 주문의 고유 ID |
+| `orderId` | `integer` | 상태를 변경할 주문의 고유 ID |
 
 ---
 
@@ -1359,11 +1361,11 @@
 ```json
 {
   "status": "CONFIRMED",
-  "rejection_reason": "PDF 파일에 문제가 있습니다."
+  "rejectionReason": "PDF 파일에 문제가 있습니다."
 }
 ```
 * `status`: (string, required) 변경할 상태. (`PENDING`, `CONFIRMED`, `PRINTED`, `REJECTED`, `COMPLETED`)
-* `rejection_reason`: (string, optional) `status`가 `REJECTED`일 경우 필수.
+* `rejectionReason`: (string, optional) `status`가 `REJECTED`일 경우 필수.
 
 ---
 
@@ -1377,11 +1379,12 @@
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
 | `400 Bad Request` | `INVALID_STATUS_TRANSITION` | 유효하지 않은 상태 변경일 때 |
-| `400 Bad Request` | `REJECTION_REASON_REQUIRED` | `status`가 `REJECTED`인데 `rejection_reason`이 누락되었을 때 |
-| `404 Not Found` | `ORDER_NOT_FOUND` | 해당 `order_id`의 주문이 없을 때 |
+| `400 Bad Request` | `REJECTION_REASON_REQUIRED` | `status`가 `REJECTED`인데 `rejectionReason`이 누락되었을 때 |
+| `404 Not Found` | `ORDER_NOT_FOUND` | 해당 `orderId`의 주문이 없을 때 |
 | `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
 | `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
+
 
 ---
 ### **6. 관리 (Admin)**
@@ -1402,16 +1405,16 @@
 
 ```json
 {
-  "total_users": 1250,
-  "total_rentals": 3450,
-  "active_rentals": 50,
-  "overdue_rentals": 5,
-  "most_rented_items": [
-    { "item_id": 1, "name": "DSLR 카메라", "rental_count": 120 },
-    { "item_id": 2, "name": "빔 프로젝터", "rental_count": 98 }
+  "totalUsers": 1250,
+  "totalRentals": 3450,
+  "activeRentals": 50,
+  "overdueRentals": 5,
+  "mostRentedItems": [
+    { "itemId": 1, "name": "DSLR 카메라", "rentalCount": 120 },
+    { "itemId": 2, "name": "빔 프로젝터", "rentalCount": 98 }
   ],
-  "plotter_orders_pending": 10,
-  "plotter_orders_completed": 150
+  "plotterOrdersPending": 10,
+  "plotterOrdersCompleted": 150
 }
 ```
 
@@ -1440,8 +1443,8 @@
 
 ```json
 [
-  { "id": 1, "holiday_date": "2024-09-16", "description": "추석 연휴" },
-  { "id": 2, "holiday_date": "2024-10-03", "description": "개천절" }
+  { "id": 1, "holidayDate": "2024-09-16", "description": "추석 연휴" },
+  { "id": 2, "holidayDate": "2024-10-03", "description": "개천절" }
 ]
 ```
 
@@ -1466,11 +1469,11 @@
 
 ```json
 {
-  "holiday_date": "2024-12-25",
+  "holidayDate": "2024-12-25",
   "description": "성탄절"
 }
 ```
-* `holiday_date`: (string, required, unique) 휴무일 날짜 (YYYY-MM-DD)
+* `holidayDate`: (string, required, unique) 휴무일 날짜 (YYYY-MM-DD)
 * `description`: (string, optional) 휴무일 설명
 
 ---
@@ -1480,7 +1483,7 @@
 *   **Success Response (`201 Created`)**
 
 ```json
-{ "id": 3, "holiday_date": "2024-12-25", "description": "성탄절" }
+{ "id": 3, "holidayDate": "2024-12-25", "description": "성탄절" }
 ```
 
 *   **Error Responses**
@@ -1495,8 +1498,8 @@
 
 `FR-31` 요구사항에 따라, 관리자가 휴무일을 삭제합니다.
 
-## **ENDPOINT:** `DELETE /api/admin/holidays/{holiday_id}`
-**Description:** `holiday_id`에 해당하는 휴무일을 삭제합니다.
+## **ENDPOINT:** `DELETE /api/admin/holidays/{holidayId}`
+**Description:** `holidayId`에 해당하는 휴무일을 삭제합니다.
 **Required Permissions:** Admin Only
 
 ---
@@ -1505,7 +1508,7 @@
 
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `holiday_id` | `integer` | 삭제할 휴무일의 고유 ID |
+| `holidayId` | `integer` | 삭제할 휴무일의 고유 ID |
 
 ---
 
@@ -1517,7 +1520,7 @@
 
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
-| `404 Not Found` | `HOLIDAY_NOT_FOUND` | 해당 `holiday_id`의 휴무일이 없을 때 |
+| `404 Not Found` | `HOLIDAY_NOT_FOUND` | 해당 `holidayId`의 휴무일이 없을 때 |
 | (이 외 Admin API의 Error Responses 참조) | | |
 
 ---
@@ -1526,7 +1529,7 @@
 관리자가 시스템의 모든 설정 목록을 조회합니다.
 
 ## **ENDPOINT:** `GET /api/admin/configurations`
-**Description:** 시스템에 저장된 모든 설정(`config_key`, `config_value`, `description`)을 반환합니다.
+**Description:** 시스템에 저장된 모든 설정(`configKey`, `configValue`, `description`)을 반환합니다.
 **Required Permissions:** Admin Only
 
 ---
@@ -1538,13 +1541,13 @@
 ```json
 [
   {
-    "config_key": "login_attempt_limit",
-    "config_value": "5",
+    "configKey": "loginAttemptLimit",
+    "configValue": "5",
     "description": "로그인 시도 횟수 제한"
   },
   {
-    "config_key": "rental_max_period_months",
-    "config_value": "2",
+    "configKey": "rentalMaxPeriodMonths",
+    "configValue": "2",
     "description": "최대 대여 가능 기간 (개월)"
   }
 ]
@@ -1564,7 +1567,7 @@
 관리자가 시스템 설정을 수정합니다.
 
 ## **ENDPOINT:** `PUT /api/admin/configurations`
-**Description:** 하나 이상의 시스템 설정을 업데이트합니다. `config_key`를 기준으로 `config_value`를 변경합니다.
+**Description:** 하나 이상의 시스템 설정을 업데이트합니다. `configKey`를 기준으로 `configValue`를 변경합니다.
 **Required Permissions:** Admin Only
 
 ---
@@ -1573,12 +1576,12 @@
 
 ```json
 {
-  "config_key": "login_attempt_limit",
-  "config_value": "7"
+  "configKey": "loginAttemptLimit",
+  "configValue": "7"
 }
 ```
-* `config_key`: (string, required) 설정 키
-* `config_value`: (string, required) 변경할 설정 값
+* `configKey`: (string, required) 설정 키
+* `configValue`: (string, required) 변경할 설정 값
 
 ---
 
@@ -1590,13 +1593,13 @@
 ```json
 [
   {
-    "config_key": "login_attempt_limit",
-    "config_value": "7",
+    "configKey": "loginAttemptLimit",
+    "configValue": "7",
     "description": "로그인 시도 횟수 제한"
   },
   {
-    "config_key": "rental_max_period_months",
-    "config_value": "3",
+    "configKey": "rentalMaxPeriodMonths",
+    "configValue": "3",
     "description": "최대 대여 가능 기간 (개월)"
   }
 ]
@@ -1606,6 +1609,6 @@
 
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
-| `400 Bad Request` | `INVALID_INPUT` | `config_value`가 유효하지 않을 때 |
-| `404 Not Found` | `CONFIG_KEY_NOT_FOUND` | 존재하지 않는 `config_key`를 수정하려 할 때 |
+| `400 Bad Request` | `INVALID_INPUT` | `configValue`가 유효하지 않을 때 |
+| `404 Not Found` | `CONFIG_KEY_NOT_FOUND` | 존재하지 않는 `configKey`를 수정하려 할 때 |
 | (이 외 Admin API의 Error Responses 참조) | | |

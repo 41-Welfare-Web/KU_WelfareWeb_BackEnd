@@ -31,50 +31,40 @@ export class UsersService {
       },
     });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
-    
-    return {
-      id: user.id,
-      username: user.username,
-      name: user.name,
-      student_id: user.studentId,
-      phone_number: user.phoneNumber,
-      department: user.department,
-      role: user.role,
-      created_at: user.createdAt,
-    };
+    return user;
   }
 
   // 2. 내 정보 수정
   async updateMe(userId: string, updateUserDto: UpdateUserDto) {
-    const { current_password, new_password, phone_number, department } =
+    const { currentPassword, newPassword, phoneNumber, department } =
       updateUserDto;
 
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
-    if (new_password) {
-      if (!current_password) {
+    if (newPassword) {
+      if (!currentPassword) {
         throw new UnauthorizedException('비밀번호 변경을 위해 현재 비밀번호가 필요합니다.');
       }
-      const isMatch = await bcrypt.compare(current_password, user.password);
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
       if (!isMatch) {
         throw new UnauthorizedException('현재 비밀번호가 일치하지 않습니다.');
       }
     }
 
-    if (phone_number && phone_number !== user.phoneNumber) {
+    if (phoneNumber && phoneNumber !== user.phoneNumber) {
       const existing = await this.prisma.user.findUnique({
-        where: { phoneNumber: phone_number },
+        where: { phoneNumber },
       });
       if (existing) throw new ConflictException('이미 사용 중인 전화번호입니다.');
     }
 
     const data: any = {};
-    if (new_password) {
+    if (newPassword) {
       const salt = await bcrypt.genSalt();
-      data.password = await bcrypt.hash(new_password, salt);
+      data.password = await bcrypt.hash(newPassword, salt);
     }
-    if (phone_number) data.phoneNumber = phone_number;
+    if (phoneNumber) data.phoneNumber = phoneNumber;
     if (department) data.department = department;
 
     const updatedUser = await this.prisma.user.update({
@@ -92,16 +82,7 @@ export class UsersService {
       },
     });
 
-    return {
-      id: updatedUser.id,
-      username: updatedUser.username,
-      name: updatedUser.name,
-      student_id: updatedUser.studentId,
-      phone_number: updatedUser.phoneNumber,
-      department: updatedUser.department,
-      role: updatedUser.role,
-      created_at: updatedUser.createdAt,
-    };
+    return updatedUser;
   }
 
   // 3. 회원 탈퇴
@@ -122,7 +103,14 @@ export class UsersService {
   }
 
   // 4. 관리자: 전체 사용자 조회
-  async findAll(page: number, pageSize: number, search?: string, role?: Role) {
+  async findAll(
+    page: number,
+    pageSize: number,
+    search?: string,
+    role?: Role,
+    sortBy: string = 'createdAt',
+    sortOrder: 'asc' | 'desc' = 'desc',
+  ) {
     const skip = (page - 1) * pageSize;
     const where: any = {};
 
@@ -137,12 +125,24 @@ export class UsersService {
       where.role = role;
     }
 
+    // 정렬 필드 매핑 (API field -> Prisma field)
+    let orderBy: any = {};
+    const sortFieldMap: { [key: string]: string } = {
+      name: 'name',
+      studentId: 'studentId',
+      createdAt: 'createdAt',
+    };
+    
+    // sortBy가 매핑에 없으면 기본값 createdAt 사용, 있으면 매핑된 필드 사용
+    const prismaSortField = sortFieldMap[sortBy] || 'createdAt';
+    orderBy = { [prismaSortField]: sortOrder };
+
     const [users, total] = await this.prisma.$transaction([
       this.prisma.user.findMany({
         where,
         skip,
         take: pageSize,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
         select: {
           id: true,
           username: true,
@@ -164,16 +164,7 @@ export class UsersService {
         totalItems: total,
         totalPages: Math.ceil(total / pageSize),
       },
-      users: users.map((u) => ({
-        id: u.id,
-        username: u.username,
-        name: u.name,
-        student_id: u.studentId,
-        phone_number: u.phoneNumber,
-        department: u.department,
-        role: u.role,
-        created_at: u.createdAt,
-      })),
+      users,
     };
   }
 
@@ -191,15 +182,6 @@ export class UsersService {
       data: { role },
     });
 
-    return {
-      id: updated.id,
-      username: updated.username,
-      name: updated.name,
-      student_id: updated.studentId,
-      phone_number: updated.phoneNumber,
-      department: updated.department,
-      role: updated.role,
-      created_at: updated.createdAt,
-    };
+    return updated;
   }
 }

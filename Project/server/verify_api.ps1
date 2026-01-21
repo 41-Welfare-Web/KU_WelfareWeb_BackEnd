@@ -62,9 +62,9 @@ try {
     # 물품 ID 1번이 존재한다고 가정 (Seed에서 생성됨)
     $itemId = $itemsRes[0].id
     $rentalBody = @{
-        start_date = "2026-03-01"
-        end_date = "2026-03-03"
-        items = @( @{ item_id = $itemId; quantity = 1 } )
+        startDate = "2026-03-01"
+        endDate = "2026-03-03"
+        items = @( @{ itemId = $itemId; quantity = 1 } )
     } | ConvertTo-Json
 
     try {

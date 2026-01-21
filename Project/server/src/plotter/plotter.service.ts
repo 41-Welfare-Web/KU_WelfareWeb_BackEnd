@@ -25,11 +25,11 @@ export class PlotterService {
       throw new BadRequestException('PDF 파일만 업로드 가능합니다.');
     }
 
-    const { purpose, paper_size, page_count, is_paid_service } = createOrderDto;
+    const { purpose, paperSize, pageCount, isPaidService } = createOrderDto;
 
     // 유료 서비스인데 영수증이 없는 경우 체크
     // form-data로 넘어오는 boolean은 문자열 'true'/'false'일 수 있으므로 변환 주의
-    const isPaid = String(is_paid_service) === 'true';
+    const isPaid = String(isPaidService) === 'true';
 
     if (isPaid && !receiptFile) {
       throw new BadRequestException('유료 서비스는 입금 내역 이미지가 필요합니다.');
@@ -49,8 +49,8 @@ export class PlotterService {
       data: {
         userId,
         purpose,
-        paperSize: paper_size,
-        pageCount: Number(page_count),
+        paperSize,
+        pageCount: Number(pageCount),
         isPaidService: isPaid,
         fileUrl,
         originalFilename: pdfFile.originalname,
@@ -62,7 +62,7 @@ export class PlotterService {
       include: { user: { select: { name: true, studentId: true } } },
     });
 
-    return this.mapToResponse(order);
+    return order;
   }
 
   async findAll(
@@ -104,7 +104,7 @@ export class PlotterService {
         totalItems: total,
         totalPages: Math.ceil(total / pageSize),
       },
-      orders: orders.map((o) => this.mapToResponse(o)),
+      orders,
     };
   }
 
@@ -158,28 +158,6 @@ export class PlotterService {
       include: { user: { select: { name: true, studentId: true } } },
     });
 
-    return this.mapToResponse(updated);
-  }
-
-  private mapToResponse(o: any) {
-    return {
-      id: o.id,
-      user: {
-        name: o.user.name,
-        student_id: o.user.studentId,
-      },
-      purpose: o.purpose,
-      paper_size: o.paperSize,
-      page_count: o.pageCount,
-      is_paid_service: o.isPaidService,
-      price: o.price,
-      file_url: o.fileUrl,
-      original_filename: o.originalFilename,
-      payment_receipt_url: o.paymentReceiptUrl,
-      pickup_date: o.pickupDate.toISOString().split('T')[0],
-      status: o.status,
-      rejection_reason: o.rejectionReason,
-      created_at: o.createdAt,
-    };
+    return updated;
   }
 }

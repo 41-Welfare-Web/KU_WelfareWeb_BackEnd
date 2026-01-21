@@ -1,88 +1,127 @@
-# RentalWeb API 테스트 가이드 (PowerShell 스마트 모드)
+# RentalWeb API 테스트 가이드
 
-이 문서는 긴 토큰이 화면에서 잘리는(`...`) 문제를 방지하기 위해, **토큰을 변수에 자동으로 저장**하여 테스트하는 방법을 안내합니다. 복사/붙여넣기를 할 필요가 없어 훨씬 편리합니다.
-
-## 1. 서버 실행
-
-테스트 전 반드시 서버가 구동 중이어야 합니다.
-
-```powershell
-cd Project/server
-npm run start:dev
-```
-- 기본 주소: `http://localhost:3000/api`
+이 문서는 RentalWeb 프로젝트의 API 품질을 유지하기 위한 테스트 방법들을 안내합니다. 모든 API는 **camelCase** 관례를 따릅니다.
 
 ---
 
-## 2. 인증 및 토큰 자동 저장
+## 1. 서버 실행 및 환경 준비
 
-아래 명령어들은 로그인 결과를 `$token` 변수에 바로 저장합니다. **이 섹션을 먼저 실행해야 이후 테스트가 가능합니다.**
-
-### 2.1 관리자 로그인 (Admin)
-`seed`로 생성된 관리자 계정으로 로그인합니다.
+모든 테스트는 서버가 로컬에서 구동 중인 상태를 가정합니다.
 
 ```powershell
-# 1. 로그인 요청 후 결과를 $res 변수에 저장
-$res = Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/auth/login" -ContentType "application/json" -Body '{"username":"admin","password":"admin123!"}'
+cd Project/server; npm run start:dev
+```
+- **Base URL:** `http://localhost:3000/api`
+- **DB:** `npx prisma studio`를 통해 실시간 데이터 확인 가능
 
-# 2. accessToken만 뽑아서 $token 변수에 저장
-$token = $res.accessToken
+---
 
-# 3. 확인 (전체 토큰이 출력됩니다)
-Write-Host "토큰 획득 완료: $token"
+## 2. 자동화된 검증 스크립트 (PowerShell)
+
+백엔드 폴더(`Project/server`)에는 주요 시나리오를 한 번에 검증할 수 있는 PowerShell 스크립트가 포함되어 있습니다.
+
+### 2.1 주요 API 기능 검증 (`verify_api.ps1`)
+```powershell
+cd Project/server; .\verify_api.ps1
 ```
 
-### 2.2 일반 사용자 로그인 (User)
-직접 가입시킨 사용자로 로그인할 경우입니다.
-
+### 2.2 인증 및 플로터 기능 검증 (`verify_auth_plotter.ps1`)
 ```powershell
-$res = Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/auth/login" -ContentType "application/json" -Body '{"username":"tester01","password":"password123!"}'
-$token = $res.accessToken
-Write-Host "토큰 획득 완료"
+cd Project/server; .\verify_auth_plotter.ps1
 ```
 
 ---
 
-## 3. 기능별 테스트 (변수 사용)
+## 3. 백엔드 자체 테스트 (Jest)
 
-위에서 저장한 `$token`을 사용하여 API를 호출합니다. 복사/붙여넣기 없이 아래 명령어를 바로 실행하세요.
-
-### 3.1 내 정보 조회 (My Profile)
 ```powershell
+# 모든 단위 테스트 실행
+cd Project/server; npm run test
+
+# E2E(End-to-End) 테스트 실행
+cd Project/server; npm run test:e2e
+```
+
+---
+
+## 4. 수동 테스트 가이드 (PowerShell CLI)
+
+### 4.1 인증 토큰 획득 및 저장
+```powershell
+$res = Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/auth/login" -ContentType "application/json" -Body '{"username":"admin","password":"admin123!"}'; $token = $res.accessToken; $refreshToken = $res.refreshToken
+```
+
+### 4.2 API 호출 예시 (Bearer 토큰 포함)
+```powershell
+# 내 프로필 조회
 Invoke-RestMethod -Method Get -Uri "http://localhost:3000/api/users/me" -Headers @{ Authorization = "Bearer $token" }
-```
 
-### 3.2 관리자 통계 조회 (Admin Stats)
-(관리자 토큰일 때만 성공)
-```powershell
-Invoke-RestMethod -Method Get -Uri "http://localhost:3000/api/admin/stats" -Headers @{ Authorization = "Bearer $token" }
-```
-
-### 3.3 물품 목록 조회 (Items)
-```powershell
-Invoke-RestMethod -Method Get -Uri "http://localhost:3000/api/items"
-```
-
-### 3.4 대여 예약 (Rentals)
-물품 ID `1`번을 2일간 대여합니다.
-```powershell
-$body = @{
-    start_date = "2026-03-01"
-    end_date = "2026-03-03"
-    items = @( @{ item_id = 1; quantity = 1 } )
-} | ConvertTo-Json
-
-Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/rentals" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body $body
-```
-
-### 3.5 내 대여 목록 조회
-```powershell
-Invoke-RestMethod -Method Get -Uri "http://localhost:3000/api/rentals" -Headers @{ Authorization = "Bearer $token" }
+# 새 대여 생성
+Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/rentals" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"startDate":"2026-03-01","endDate":"2026-03-03","items":[{"itemId":1,"quantity":1}]}'
 ```
 
 ---
 
-## 4. 문제 해결 (Troubleshooting)
+## 5. 기능별 개별 테스트 스니펫 (한 줄 커맨드)
 
-- **401 Unauthorized**: `$token` 변수가 비어있거나 만료된 경우입니다. **2. 인증** 섹션의 명령어를 다시 실행해서 토큰을 갱신하세요.
-- **500 Internal Server Error**: 서버 로그(npm run start 창)를 확인하여 에러 원인을 파악하세요.
+복사하여 터미널에 붙여넣기만 하면 바로 동작합니다. (사전에 `$token` 변수가 설정되어 있어야 합니다.)
+
+### 5.1 인증 (Auth)
+```powershell
+# 회원가입 (Register)
+Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/register" -ContentType "application/json" -Body '{"username":"newuser01","password":"password123!","name":"홍길동","studentId":"20260001","phoneNumber":"010-9999-8888","department":"컴퓨터공학과"}'
+
+# 아이디 찾기 (Find Username)
+Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/find-username" -ContentType "application/json" -Body '{"name":"홍길동","phoneNumber":"010-9999-8888"}'
+
+# 토큰 갱신 (Refresh Token)
+$res = Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/refresh" -ContentType "application/json" -Body @{ refreshToken = $refreshToken }; $token = $res.accessToken
+```
+
+### 5.2 사용자 (Users)
+```powershell
+# 내 정보 수정 (Update My Profile)
+Invoke-RestMethod -Method Put -Uri "$baseUrl/users/me" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"department":"소프트웨어학부","phoneNumber":"010-1111-2222"}'
+
+# 관리자: 특정 사용자 역할 변경 (Update User Role)
+Invoke-RestMethod -Method Put -Uri "$baseUrl/users/{userId}/role" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"role":"ADMIN"}'
+```
+
+### 5.3 물품 (Items)
+```powershell
+# 물품 생성 (Create Item - Admin)
+Invoke-RestMethod -Method Post -Uri "$baseUrl/items" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"categoryId":1,"name":"테스트용 노트북","itemCode":"LAP-999","managementType":"INDIVIDUAL"}'
+
+# 물품 상세 조회 (Get Item Detail)
+Invoke-RestMethod -Method Get -Uri "$baseUrl/items/1"
+```
+
+### 5.4 대여 (Rentals)
+```powershell
+# 대여 상태 변경 (Update Rental Status - Admin)
+Invoke-RestMethod -Method Put -Uri "$baseUrl/rentals/{rentalId}/status" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"status":"RENTED","memo":"물품 전달 완료"}'
+```
+
+### 5.5 플로터 (Plotter)
+```powershell
+# 플로터 주문 목록 조회 (Get Orders)
+Invoke-RestMethod -Method Get -Uri "$baseUrl/plotter/orders?status=PENDING" -Headers @{ Authorization = "Bearer $token" }
+```
+
+### 5.6 관리 (Admin)
+```powershell
+# 휴무일 추가 (Add Holiday)
+Invoke-RestMethod -Method Post -Uri "$baseUrl/admin/holidays" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"holidayDate":"2026-05-05","description":"어린이날"}'
+
+# 시스템 설정 수정 (Update Config)
+Invoke-RestMethod -Method Put -Uri "$baseUrl/admin/configurations" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"configKey":"loginAttemptLimit","configValue":"10"}'
+```
+
+---
+
+## 6. 테스트 시 주의사항 (Checklist)
+
+1.  **Naming Convention**: 모든 필드는 `camelCase`를 사용해야 합니다.
+2.  **Date Format**: 날짜는 `YYYY-MM-DD` 형식을 따릅니다.
+3.  **Permissions**: 관리자 API는 `ADMIN` 권한 토큰이 필수입니다.
+4.  **One-Liner**: 위 커맨드들은 복사 편의를 위해 한 줄(Single-line)로 작성되었습니다.

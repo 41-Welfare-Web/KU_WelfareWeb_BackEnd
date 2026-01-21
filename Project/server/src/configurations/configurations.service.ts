@@ -11,17 +11,17 @@ export class ConfigurationsService {
   }
 
   async update(updateConfigDto: UpdateConfigDto) {
-    const { config_key, config_value } = updateConfigDto;
+    const { configKey, configValue } = updateConfigDto;
 
     const config = await this.prisma.configuration.findUnique({
-      where: { configKey: config_key },
+      where: { configKey },
     });
 
     if (!config) throw new NotFoundException('설정 값을 찾을 수 없습니다.');
 
     await this.prisma.configuration.update({
-      where: { configKey: config_key },
-      data: { configValue: config_value },
+      where: { configKey },
+      data: { configValue },
     });
 
     return this.findAll(); // 변경된 전체 목록 반환

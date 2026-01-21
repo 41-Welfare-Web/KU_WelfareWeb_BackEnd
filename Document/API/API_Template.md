@@ -3,7 +3,7 @@
 [API에 대한 간략한 설명. 어떤 요구사항(FR-XX)과 관련 있는지 명시하면 좋음.]
 
 *   **Endpoint:** `[HTTP Method] [URL]`
-    *   예: `GET /api/items/{item_id}`
+    *   예: `GET /api/items/{itemId}`
 *   **Description:** [API의 역할과 동작에 대한 상세 설명]
 *   **Required Permissions:** [API 호출에 필요한 권한 (예: All Users, Authenticated Users, Admin Only)]
 
@@ -13,7 +13,7 @@
 
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
-| `example_id` | `integer` | [설명] |
+| `exampleId` | `integer` | [설명] |
 
 #### **Query Parameters**
 

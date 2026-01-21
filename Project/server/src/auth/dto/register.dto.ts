@@ -22,15 +22,11 @@ export class RegisterDto {
 
   @IsString()
   @IsNotEmpty()
-  @Matches(/^[0-9]+$/, { message: '학번은 숫자만 입력해야 합니다.' })
-  student_id: string;
+  studentId: string;
 
   @IsString()
   @IsNotEmpty()
-  @Matches(/^010-\d{4}-\d{4}$/, {
-    message: '전화번호는 010-0000-0000 형식이어야 합니다.',
-  })
-  phone_number: string;
+  phoneNumber: string;
 
   @IsString()
   @IsNotEmpty()

@@ -7,5 +7,5 @@ export class PasswordResetRequestDto {
 
   @IsString()
   @IsNotEmpty()
-  phone_number: string;
+  phoneNumber: string;
 }

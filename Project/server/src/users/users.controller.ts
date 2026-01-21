@@ -37,8 +37,17 @@ export class UsersController {
     @Query('pageSize') pageSize: string = '20',
     @Query('search') search?: string,
     @Query('role') role?: Role,
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder: 'asc' | 'desc' = 'desc',
   ) {
-    return this.usersService.findAll(+page, +pageSize, search, role);
+    return this.usersService.findAll(
+      +page,
+      +pageSize,
+      search,
+      role,
+      sortBy,
+      sortOrder,
+    );
   }
 
   @Put(':id/role')

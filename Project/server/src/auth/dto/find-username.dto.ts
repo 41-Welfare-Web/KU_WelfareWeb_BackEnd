@@ -7,5 +7,5 @@ export class FindUsernameDto {
 
   @IsString()
   @IsNotEmpty()
-  phone_number: string;
+  phoneNumber: string;
 }

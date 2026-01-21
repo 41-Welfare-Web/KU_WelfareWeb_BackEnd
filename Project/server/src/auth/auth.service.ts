@@ -29,15 +29,15 @@ export class AuthService {
 
   // 회원가입
   async register(registerDto: RegisterDto) {
-    const { username, password, student_id, phone_number, name, department } =
+    const { username, password, studentId, phoneNumber, name, department } =
       registerDto;
 
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [
           { username },
-          { studentId: student_id },
-          { phoneNumber: phone_number },
+          { studentId },
+          { phoneNumber },
         ],
       },
     });
@@ -46,10 +46,10 @@ export class AuthService {
       if (existingUser.username === username) {
         throw new ConflictException('이미 존재하는 아이디입니다.');
       }
-      if (existingUser.studentId === student_id) {
+      if (existingUser.studentId === studentId) {
         throw new ConflictException('이미 등록된 학번입니다.');
       }
-      if (existingUser.phoneNumber === phone_number) {
+      if (existingUser.phoneNumber === phoneNumber) {
         throw new ConflictException('이미 등록된 전화번호입니다.');
       }
     }
@@ -63,8 +63,8 @@ export class AuthService {
           username,
           password: hashedPassword,
           name,
-          studentId: student_id,
-          phoneNumber: phone_number,
+          studentId,
+          phoneNumber,
           department,
           role: 'USER',
         },
@@ -115,14 +115,14 @@ export class AuthService {
 
   // 아이디 찾기
   async findUsername(dto: FindUsernameDto) {
-    const { name, phone_number } = dto;
+    const { name, phoneNumber } = dto;
     const user = await this.prisma.user.findFirst({
-      where: { name, phoneNumber: phone_number },
+      where: { name, phoneNumber },
     });
 
     // 보안상 사용자가 존재하는지 여부를 명확히 알리지 않음
     if (user) {
-      console.log(`[SMS 발송] ${phone_number}: 회원님의 아이디는 ${user.username} 입니다.`);
+      console.log(`[SMS 발송] ${phoneNumber}: 회원님의 아이디는 ${user.username} 입니다.`);
     }
 
     return {
@@ -133,9 +133,9 @@ export class AuthService {
 
   // 비밀번호 재설정 요청
   async requestPasswordReset(dto: PasswordResetRequestDto) {
-    const { username, phone_number } = dto;
+    const { username, phoneNumber } = dto;
     const user = await this.prisma.user.findFirst({
-      where: { username, phoneNumber: phone_number },
+      where: { username, phoneNumber },
     });
 
     if (user) {
@@ -144,7 +144,7 @@ export class AuthService {
       // 5분 후 만료
       setTimeout(() => this.verificationCodes.delete(username), 5 * 60 * 1000);
 
-      console.log(`[SMS 발송] ${phone_number}: 인증 코드는 [${code}] 입니다.`);
+      console.log(`[SMS 발송] ${phoneNumber}: 인증 코드는 [${code}] 입니다.`);
     }
 
     return {
@@ -155,11 +155,11 @@ export class AuthService {
 
   // 비밀번호 재설정 확정
   async confirmPasswordReset(dto: PasswordResetConfirmDto) {
-    const { username, verification_code, new_password } = dto;
+    const { username, verificationCode, newPassword } = dto;
 
     const savedCode = this.verificationCodes.get(username);
 
-    if (!savedCode || savedCode !== verification_code) {
+    if (!savedCode || savedCode !== verificationCode) {
       throw new BadRequestException('인증 코드가 일치하지 않거나 만료되었습니다.');
     }
 
@@ -167,7 +167,7 @@ export class AuthService {
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
     const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(new_password, salt);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
 
     await this.prisma.user.update({
       where: { username },

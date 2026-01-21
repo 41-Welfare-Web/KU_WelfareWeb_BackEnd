@@ -8,14 +8,13 @@ export class CreatePlotterOrderDto {
 
   @IsString()
   @IsNotEmpty()
-  paper_size: string;
+  paperSize: string;
 
-  @IsInt()
-  @Type(() => Number) // form-data는 문자열로 오므로 숫자로 변환
+  @IsString() // form-data로 오면 string일 수 있음, transform은 main.ts 설정 의존
   @IsNotEmpty()
-  page_count: number;
+  pageCount: number;
 
-  @IsBoolean()
-  @Type(() => Boolean) // 문자열 "true"/"false"를 불리언으로 변환
-  is_paid_service: boolean;
+  @IsBoolean() // form-data의 경우 Transform 필요할 수 있음
+  @IsNotEmpty()
+  isPaidService: boolean;
 }

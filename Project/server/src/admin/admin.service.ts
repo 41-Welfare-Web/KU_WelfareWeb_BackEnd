@@ -41,13 +41,13 @@ export class AdminService {
     });
 
     return {
-      total_users: totalUsers,
-      total_rentals: totalRentals,
-      active_rentals: activeRentals,
-      overdue_rentals: overdueRentals,
-      most_rented_items: mostRentedItems,
-      plotter_orders_pending: plotterPending,
-      plotter_orders_completed: plotterCompleted,
+      totalUsers: totalUsers,
+      totalRentals: totalRentals,
+      activeRentals: activeRentals,
+      overdueRentals: overdueRentals,
+      mostRentedItems: mostRentedItems,
+      plotterOrdersPending: plotterPending,
+      plotterOrdersCompleted: plotterCompleted,
     };
   }
 }

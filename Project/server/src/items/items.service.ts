@@ -29,21 +29,7 @@ export class ItemsService {
       include: { category: true },
     });
 
-    return {
-      id: item.id,
-      category: {
-        id: item.category.id,
-        name: item.category.name,
-      },
-      name: item.name,
-      item_code: item.itemCode,
-      description: item.description,
-      rental_count: item.rentalCount,
-      image_url: item.imageUrl,
-      management_type: item.managementType,
-      total_quantity: item.totalQuantity,
-      created_at: item.createdAt,
-    };
+    return item;
   }
 
   async findAll(search?: string, categoryIds?: string, sortBy: string = 'popularity', sortOrder: 'asc' | 'desc' = 'desc') {
@@ -72,19 +58,8 @@ export class ItemsService {
     });
 
     return items.map((item) => ({
-      id: item.id,
-      category: {
-        id: item.category.id,
-        name: item.category.name,
-      },
-      name: item.name,
-      item_code: item.itemCode,
-      rental_count: item.rentalCount,
-      image_url: item.imageUrl,
-      management_type: item.managementType,
-      total_quantity: item.totalQuantity,
-      current_stock: item.totalQuantity, // 임시: 현재 재고 계산 로직이 없으므로 총 수량 반환 (TODO: RentalItems와 연동하여 계산 필요)
-      created_at: item.createdAt,
+      ...item,
+      currentStock: item.totalQuantity, // 임시: 현재 재고 계산 로직 필요
     }));
   }
 
@@ -96,21 +71,7 @@ export class ItemsService {
 
     if (!item) throw new NotFoundException('물품을 찾을 수 없습니다.');
 
-    return {
-      id: item.id,
-      category: {
-        id: item.category.id,
-        name: item.category.name,
-      },
-      name: item.name,
-      item_code: item.itemCode,
-      description: item.description,
-      rental_count: item.rentalCount,
-      image_url: item.imageUrl,
-      management_type: item.managementType,
-      total_quantity: item.totalQuantity,
-      created_at: item.createdAt,
-    };
+    return item;
   }
 
   async update(id: number, updateItemDto: UpdateItemDto) {
@@ -130,21 +91,7 @@ export class ItemsService {
       include: { category: true },
     });
 
-    return {
-      id: updated.id,
-      category: {
-        id: updated.category.id,
-        name: updated.category.name,
-      },
-      name: updated.name,
-      item_code: updated.itemCode,
-      description: updated.description,
-      rental_count: updated.rentalCount,
-      image_url: updated.imageUrl,
-      management_type: updated.managementType,
-      total_quantity: updated.totalQuantity,
-      created_at: updated.createdAt,
-    };
+    return updated;
   }
 
   async remove(id: number) {
