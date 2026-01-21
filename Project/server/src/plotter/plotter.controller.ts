@@ -13,19 +13,17 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { PlotterService } from './plotter.service';
-import { CreatePlotterOrderDto } from './dto/create-plotter-order.dto';
+import { CreatePlotterOrderDto, CreatePlotterOrderWithFilesDto } from './dto/create-plotter-order.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../auth/get-user.decorator';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '@prisma/client';
-import { UpdateRentalStatusDto } from '../rentals/dto/update-rental-status.dto'; // 재사용하거나 새로 만듦. 여기서는 일단 body type any or specific dto.
-// UpdatePlotterStatusDto가 없으므로 간단한 DTO 정의 필요 혹은 Body 객체 사용.
-// 편의상 DTO 없이 Body로 처리하거나, `rentals`의 DTO와 구조가 비슷하다면 확인 필요.
-// `rejection_reason`이 필요하므로 별도 DTO가 낫음. -> 일단 any로 받고 추후 DTO 생성 권장.
-// 여기서는 일단 인라인으로 처리하거나 service에 위임.
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiBody, ApiQuery } from '@nestjs/swagger';
 
+@ApiTags('플로터 (Plotter)')
+@ApiBearerAuth()
 @Controller('plotter')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class PlotterController {
@@ -34,22 +32,25 @@ export class PlotterController {
   @Post('orders')
   @UseInterceptors(
     FileFieldsInterceptor([
-      { name: 'pdf_file', maxCount: 1 },
-      { name: 'payment_receipt_image', maxCount: 1 },
+      { name: 'pdfFile', maxCount: 1 },
+      { name: 'paymentReceiptImage', maxCount: 1 },
     ]),
   )
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: '플로터 주문 신청' })
+  @ApiBody({ type: CreatePlotterOrderWithFilesDto })
   create(
     @GetUser() user: any,
     @Body() createOrderDto: CreatePlotterOrderDto,
     @UploadedFiles()
     files: {
-      pdf_file?: Express.Multer.File[];
-      payment_receipt_image?: Express.Multer.File[];
+      pdfFile?: Express.Multer.File[];
+      paymentReceiptImage?: Express.Multer.File[];
     },
   ) {
-    const pdfFile = files.pdf_file ? files.pdf_file[0] : undefined;
-    const receiptFile = files.payment_receipt_image
-      ? files.payment_receipt_image[0]
+    const pdfFile = files.pdfFile ? files.pdfFile[0] : undefined;
+    const receiptFile = files.paymentReceiptImage
+      ? files.paymentReceiptImage[0]
       : undefined;
     return this.plotterService.create(
       user.userId,
@@ -60,11 +61,16 @@ export class PlotterController {
   }
 
   @Get('orders')
+  @ApiOperation({ summary: '플로터 주문 목록 조회' })
+  @ApiQuery({ name: 'page', required: false, example: '1' })
+  @ApiQuery({ name: 'pageSize', required: false, example: '10' })
+  @ApiQuery({ name: 'userId', required: false, description: '특정 사용자 ID 필터 (관리자 전용)' })
+  @ApiQuery({ name: 'status', required: false, description: '상태 필터 (PENDING, CONFIRMED 등)' })
   findAll(
     @GetUser() user: any,
     @Query('page') page: string = '1',
     @Query('pageSize') pageSize: string = '10',
-    @Query('user_id') targetUserId?: string,
+    @Query('userId') targetUserId?: string,
     @Query('status') status?: string,
   ) {
     return this.plotterService.findAll(
@@ -78,22 +84,34 @@ export class PlotterController {
   }
 
   @Delete('orders/:id')
+  @ApiOperation({ summary: '플로터 주문 취소' })
   cancel(@GetUser() user: any, @Param('id', ParseIntPipe) id: number) {
     return this.plotterService.cancel(id, user.userId);
   }
 
   @Put('orders/:id/status')
   @Roles(Role.ADMIN)
+  @ApiOperation({ summary: '플로터 주문 상태 변경 (관리자)' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        status: { type: 'string', example: 'CONFIRMED' },
+        rejectionReason: { type: 'string', example: 'PDF 파일 깨짐', nullable: true },
+      },
+      required: ['status'],
+    },
+  })
   updateStatus(
     @GetUser() user: any,
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { status: string; rejection_reason?: string },
+    @Body() body: { status: string; rejectionReason?: string },
   ) {
     return this.plotterService.updateStatus(
       id,
       user.userId,
       body.status,
-      body.rejection_reason,
+      body.rejectionReason,
     );
   }
 }

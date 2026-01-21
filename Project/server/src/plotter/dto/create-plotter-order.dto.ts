@@ -1,20 +1,35 @@
 import { IsNotEmpty, IsString, IsBoolean, IsInt } from 'class-validator';
-import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class CreatePlotterOrderDto {
+  @ApiProperty({ example: '졸업 작품 포스터', description: '인쇄 목적' })
   @IsString()
   @IsNotEmpty()
   purpose: string;
 
+  @ApiProperty({ example: 'A0', description: '용지 크기 (A0, A1)' })
   @IsString()
   @IsNotEmpty()
   paperSize: string;
 
-  @IsString() // form-data로 오면 string일 수 있음, transform은 main.ts 설정 의존
+  @ApiProperty({ example: 1, description: '인쇄 페이지 수' })
+  @Transform(({ value }) => parseInt(value))
+  @IsInt()
   @IsNotEmpty()
   pageCount: number;
 
-  @IsBoolean() // form-data의 경우 Transform 필요할 수 있음
+  @ApiProperty({ example: true, description: '유료 서비스 여부' })
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
   @IsNotEmpty()
   isPaidService: boolean;
+}
+
+export class CreatePlotterOrderWithFilesDto extends CreatePlotterOrderDto {
+  @ApiProperty({ type: 'string', format: 'binary', description: '인쇄할 PDF 파일' })
+  pdfFile: any;
+
+  @ApiProperty({ type: 'string', format: 'binary', description: '결제 영수증 이미지 (유료 시 필수)', required: false })
+  paymentReceiptImage?: any;
 }
