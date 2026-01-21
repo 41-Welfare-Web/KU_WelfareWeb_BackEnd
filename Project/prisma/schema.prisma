@@ -1,0 +1,233 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. Users
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String   @db.VarChar(30)
+  username     String   @unique @db.VarChar(20)
+  studentId    String   @unique @map("student_id") @db.VarChar(20)
+  phoneNumber  String   @unique @map("phone_number") @db.VarChar(20)
+  department   String   @db.VarChar(50)
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  rentals              Rental[]
+  rentalHistories      RentalHistory[]
+  plotterOrders        PlotterOrder[]
+  plotterOrderHistories PlotterOrderHistory[]
+  auditLogs            AuditLog[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// 2. Categories
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String @unique @db.VarChar(50)
+
+  items Item[]
+
+  @@map("categories")
+}
+
+// 3. Items
+model Item {
+  id             Int            @id @default(autoincrement())
+  categoryId     Int            @map("category_id")
+  name           String         @db.VarChar(100)
+  itemCode       String         @unique @map("item_code") @db.VarChar(20)
+  description    String?        @db.Text
+  rentalCount    Int            @default(0) @map("rental_count")
+  imageUrl       String?        @map("image_url") @db.Text
+  managementType ManagementType @map("management_type")
+  totalQuantity  Int?           @map("total_quantity")
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz
+
+  category      Category       @relation(fields: [categoryId], references: [id])
+  itemInstances ItemInstance[]
+  rentalItems   RentalItem[]
+
+  @@map("items")
+}
+
+enum ManagementType {
+  INDIVIDUAL
+  BULK
+}
+
+// 4. Item Instances
+model ItemInstance {
+  id           Int            @id @default(autoincrement())
+  itemId       Int            @map("item_id")
+  serialNumber String         @unique @map("serial_number") @db.VarChar(50)
+  status       InstanceStatus @default(AVAILABLE)
+  imageUrl     String?        @map("image_url") @db.Text
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz
+
+  item        Item         @relation(fields: [itemId], references: [id])
+  rentalItems RentalItem[]
+
+  @@map("item_instances")
+}
+
+enum InstanceStatus {
+  AVAILABLE
+  RENTED
+  BROKEN
+}
+
+// 5. Rentals
+model Rental {
+  id        Int          @id @default(autoincrement())
+  userId    String       @map("user_id") @db.Uuid
+  startDate DateTime     @map("start_date") @db.Date
+  endDate   DateTime     @map("end_date") @db.Date
+  status    RentalStatus @default(RESERVED)
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz
+
+  user            User            @relation(fields: [userId], references: [id])
+  rentalItems     RentalItem[]
+  rentalHistories RentalHistory[]
+
+  @@map("rentals")
+}
+
+enum RentalStatus {
+  RESERVED
+  RENTED
+  RETURNED
+  CANCELED
+  OVERDUE
+}
+
+// 6. Rental Items
+model RentalItem {
+  id         Int    @id @default(autoincrement())
+  rentalId   Int    @map("rental_id")
+  itemId     Int    @map("item_id")
+  quantity   Int    @default(1)
+  instanceId Int?   @map("instance_id")
+
+  rental          Rental          @relation(fields: [rentalId], references: [id])
+  item            Item            @relation(fields: [itemId], references: [id])
+  itemInstance    ItemInstance?   @relation(fields: [instanceId], references: [id])
+  rentalHistories RentalHistory[]
+
+  @@map("rental_items")
+}
+
+// 7. Rental History
+model RentalHistory {
+  id           Int      @id @default(autoincrement())
+  rentalId     Int      @map("rental_id")
+  rentalItemId Int?     @map("rental_item_id")
+  changedBy    String   @map("changed_by") @db.Uuid
+  oldStatus    String?  @map("old_status") @db.VarChar(20)
+  newStatus    String   @map("new_status") @db.VarChar(20)
+  memo         String?  @db.Text
+  changedAt    DateTime @default(now()) @map("changed_at") @db.Timestamptz
+
+  rental     Rental      @relation(fields: [rentalId], references: [id])
+  rentalItem RentalItem? @relation(fields: [rentalItemId], references: [id])
+  user       User        @relation(fields: [changedBy], references: [id])
+
+  @@map("rental_history")
+}
+
+// 8. Plotter Orders
+model PlotterOrder {
+  id                Int           @id @default(autoincrement())
+  userId            String        @map("user_id") @db.Uuid
+  purpose           String        @db.VarChar(100)
+  paperSize         String        @map("paper_size") @db.VarChar(10)
+  pageCount         Int           @map("page_count")
+  isPaidService     Boolean       @map("is_paid_service")
+  price             Int           @default(0)
+  paymentReceiptUrl String?       @map("payment_receipt_url") @db.Text
+  fileUrl           String        @map("file_url") @db.Text
+  originalFilename  String?       @map("original_filename") @db.VarChar(255)
+  fileSize          Int?          @map("file_size")
+  pickupDate        DateTime      @map("pickup_date") @db.Date
+  status            PlotterStatus @default(PENDING)
+  rejectionReason   String?       @map("rejection_reason") @db.Text
+  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz
+
+  user                  User                  @relation(fields: [userId], references: [id])
+  plotterOrderHistories PlotterOrderHistory[]
+
+  @@map("plotter_orders")
+}
+
+enum PlotterStatus {
+  PENDING
+  CONFIRMED
+  PRINTED
+  REJECTED
+  COMPLETED
+}
+
+// 9. Plotter Order History
+model PlotterOrderHistory {
+  id        Int      @id @default(autoincrement())
+  orderId   Int      @map("order_id")
+  changedBy String   @map("changed_by") @db.Uuid
+  oldStatus String?  @map("old_status") @db.VarChar(20)
+  newStatus String   @map("new_status") @db.VarChar(20)
+  memo      String?  @db.Text
+  changedAt DateTime @default(now()) @map("changed_at") @db.Timestamptz
+
+  order PlotterOrder @relation(fields: [orderId], references: [id])
+  user  User         @relation(fields: [changedBy], references: [id])
+
+  @@map("plotter_order_history")
+}
+
+// 10. Holidays
+model Holiday {
+  id          Int      @id @default(autoincrement())
+  holidayDate DateTime @unique @map("holiday_date") @db.Date
+  description String?  @db.VarChar(100)
+
+  @@map("holidays")
+}
+
+// 11. Configurations
+model Configuration {
+  configKey   String   @id @map("config_key") @db.VarChar(50)
+  configValue String   @map("config_value") @db.VarChar(255)
+  description String?  @db.Text
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz
+
+  @@map("configurations")
+}
+
+// 12. Audit Log
+model AuditLog {
+  id         BigInt   @id @default(autoincrement())
+  userId     String?  @map("user_id") @db.Uuid
+  action     String   @db.VarChar(50)
+  targetType String?  @map("target_type") @db.VarChar(50)
+  targetId   String?  @map("target_id") @db.Text
+  details    Json?
+  ipAddress  String?  @map("ip_address") @db.VarChar(45) // Support IPv6
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("audit_log")
+}
