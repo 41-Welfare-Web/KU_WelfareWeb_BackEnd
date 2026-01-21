@@ -1,0 +1,22 @@
+# Node modules
+node_modules/
+Project/server/node_modules/
+Project/prototype_old/node_modules/
+
+# Environment variables
+.env
+Project/server/.env
+
+# Build output
+dist/
+Project/server/dist/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup folders
+Project/prototype_old/
