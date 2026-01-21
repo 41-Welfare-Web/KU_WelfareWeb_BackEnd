@@ -7,10 +7,14 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePlotterOrderDto } from './dto/create-plotter-order.dto';
 import { PlotterStatus, Role } from '@prisma/client';
+import { FilesService } from '../common/files.service';
 
 @Injectable()
 export class PlotterService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private filesService: FilesService,
+  ) {}
 
   async create(
     userId: string,
@@ -27,23 +31,21 @@ export class PlotterService {
 
     const { purpose, paperSize, pageCount, isPaidService } = createOrderDto;
 
-    // 유료 서비스인데 영수증이 없는 경우 체크
-    // form-data로 넘어오는 boolean은 문자열 'true'/'false'일 수 있으므로 변환 주의
     const isPaid = String(isPaidService) === 'true';
 
     if (isPaid && !receiptFile) {
       throw new BadRequestException('유료 서비스는 입금 내역 이미지가 필요합니다.');
     }
 
-    // 근무일 2일 뒤 수령 예정일 계산 (간단히 +2일로 구현, 주말 제외 로직은 추후 고도화)
+    // 파일 업로드 처리
+    const fileUrl = await this.filesService.uploadFile(pdfFile, 'plotter/pdfs');
+    const paymentReceiptUrl = receiptFile
+      ? await this.filesService.uploadFile(receiptFile, 'plotter/receipts')
+      : null;
+
+    // 근무일 2일 뒤 수령 예정일 계산
     const pickupDate = new Date();
     pickupDate.setDate(pickupDate.getDate() + 2);
-
-    // 실제로는 여기서 파일을 S3/Supabase Storage에 올리고 URL을 받아야 함
-    const fileUrl = `https://storage.example.com/${pdfFile.filename}`;
-    const paymentReceiptUrl = receiptFile
-      ? `https://storage.example.com/${receiptFile.filename}`
-      : null;
 
     const order = await this.prisma.plotterOrder.create({
       data: {
