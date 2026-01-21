@@ -15,6 +15,7 @@ model User {
   id           String   @id @default(uuid()) @db.Uuid
   name         String   @db.VarChar(30)
   username     String   @unique @db.VarChar(20)
+  password     String   @db.VarChar(255) // 비밀번호 필드 추가
   studentId    String   @unique @map("student_id") @db.VarChar(20)
   phoneNumber  String   @unique @map("phone_number") @db.VarChar(20)
   department   String   @db.VarChar(50)
