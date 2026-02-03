@@ -1,7 +1,7 @@
 import {
+  Injectable,
   BadRequestException,
   ConflictException,
-  Injectable,
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
@@ -9,10 +9,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateRentalDto } from './dto/create-rental.dto';
 import { UpdateRentalStatusDto } from './dto/update-rental-status.dto';
 import { RentalStatus, Role } from '@prisma/client';
+import { ConfigurationsService } from '../configurations/configurations.service';
 
 @Injectable()
 export class RentalsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private configService: ConfigurationsService,
+  ) {}
 
   // 1. 대여 예약 생성
   async create(userId: string, createRentalDto: CreateRentalDto) {
@@ -27,6 +31,21 @@ export class RentalsService {
     today.setHours(0, 0, 0, 0);
     if (start < today) {
       throw new BadRequestException('과거 날짜로 예약할 수 없습니다.');
+    }
+
+    // Config Check: 최대 대여 가능 기간
+    const maxMonthsStr = await this.configService.getValue(
+      'rental_max_period_months',
+      '2',
+    );
+    const maxMonths = parseInt(maxMonthsStr, 10);
+    const maxDate = new Date(today);
+    maxDate.setMonth(maxDate.getMonth() + maxMonths);
+
+    if (end > maxDate) {
+      throw new BadRequestException(
+        `최대 ${maxMonths}개월까지만 예약할 수 있습니다.`,
+      );
     }
 
     return this.prisma.$transaction(async (tx) => {

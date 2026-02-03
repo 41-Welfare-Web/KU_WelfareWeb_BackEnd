@@ -56,6 +56,8 @@ async function main() {
   const configs = [
     { key: 'rental_max_period_months', value: '2', desc: '최대 대여 가능 기간 (개월)' },
     { key: 'login_attempt_limit', value: '5', desc: '로그인 시도 횟수 제한' },
+    { key: 'plotter_pickup_delay_days', value: '2', desc: '플로터 신청 후 수령까지 걸리는 근무일 수' },
+    { key: 'verification_code_ttl_minutes', value: '5', desc: '인증번호 유효 시간 (분)' },
   ];
   for (const config of configs) {
     await prisma.configuration.upsert({

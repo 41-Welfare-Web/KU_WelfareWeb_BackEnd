@@ -6,6 +6,21 @@ import { UpdateConfigDto } from './dto/update-config.dto';
 export class ConfigurationsService {
   constructor(private prisma: PrismaService) {}
 
+  async getValue(key: string, defaultValue?: string): Promise<string> {
+    const config = await this.prisma.configuration.findUnique({
+      where: { configKey: key },
+    });
+
+    if (!config) {
+      if (defaultValue !== undefined) {
+        return defaultValue;
+      }
+      throw new NotFoundException(`설정 키 '${key}'를 찾을 수 없습니다.`);
+    }
+
+    return config.configValue;
+  }
+
   async findAll() {
     return this.prisma.configuration.findMany();
   }

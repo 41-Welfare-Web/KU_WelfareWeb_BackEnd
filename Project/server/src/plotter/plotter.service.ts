@@ -8,12 +8,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreatePlotterOrderDto } from './dto/create-plotter-order.dto';
 import { PlotterStatus, Role } from '@prisma/client';
 import { FilesService } from '../common/files.service';
+import { ConfigurationsService } from '../configurations/configurations.service';
 
 @Injectable()
 export class PlotterService {
   constructor(
     private prisma: PrismaService,
     private filesService: FilesService,
+    private configService: ConfigurationsService,
   ) {}
 
   async create(
@@ -43,9 +45,15 @@ export class PlotterService {
       ? await this.filesService.uploadFile(receiptFile, 'plotter/receipts')
       : null;
 
-    // 근무일 2일 뒤 수령 예정일 계산
+    // 근무일 수령 예정일 계산 (Config 활용)
+    const delayDaysStr = await this.configService.getValue(
+      'plotter_pickup_delay_days',
+      '2',
+    );
+    const delayDays = parseInt(delayDaysStr, 10);
     const pickupDate = new Date();
-    pickupDate.setDate(pickupDate.getDate() + 2);
+    pickupDate.setDate(pickupDate.getDate() + delayDays);
+    // TODO: 주말/휴무일 제외 로직 추가 필요
 
     const order = await this.prisma.plotterOrder.create({
       data: {
