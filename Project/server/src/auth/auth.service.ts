@@ -19,9 +19,6 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  // 임시 인증 코드 저장소 (운영 환경에서는 Redis 등을 사용 권장)
-  private verificationCodes = new Map<string, string>();
-
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
@@ -140,9 +137,21 @@ export class AuthService {
 
     if (user) {
       const code = Math.floor(100000 + Math.random() * 900000).toString();
-      this.verificationCodes.set(username, code);
-      // 5분 후 만료
-      setTimeout(() => this.verificationCodes.delete(username), 5 * 60 * 1000);
+      const expiresAt = new Date();
+      expiresAt.setMinutes(expiresAt.getMinutes() + 5); // 5분 유효
+
+      // 기존 코드가 있다면 무효화(삭제) 후 재생성
+      await this.prisma.verificationCode.deleteMany({
+        where: { target: username },
+      });
+
+      await this.prisma.verificationCode.create({
+        data: {
+          target: username,
+          code,
+          expiresAt,
+        },
+      });
 
       console.log(`[SMS 발송] ${phoneNumber}: 인증 코드는 [${code}] 입니다.`);
     }
@@ -157,9 +166,15 @@ export class AuthService {
   async confirmPasswordReset(dto: PasswordResetConfirmDto) {
     const { username, verificationCode, newPassword } = dto;
 
-    const savedCode = this.verificationCodes.get(username);
+    const savedRecord = await this.prisma.verificationCode.findFirst({
+      where: {
+        target: username,
+        code: verificationCode,
+        expiresAt: { gt: new Date() }, // 만료되지 않은 것만 조회
+      },
+    });
 
-    if (!savedCode || savedCode !== verificationCode) {
+    if (!savedRecord) {
       throw new BadRequestException('인증 코드가 일치하지 않거나 만료되었습니다.');
     }
 
@@ -174,7 +189,10 @@ export class AuthService {
       data: { password: hashedPassword },
     });
 
-    this.verificationCodes.delete(username);
+    // 사용 완료된 인증 코드 삭제
+    await this.prisma.verificationCode.delete({
+      where: { id: savedRecord.id },
+    });
 
     return { message: '비밀번호가 성공적으로 변경되었습니다.' };
   }

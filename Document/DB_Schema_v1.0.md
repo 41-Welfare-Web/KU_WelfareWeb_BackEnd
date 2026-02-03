@@ -149,7 +149,19 @@
 | `description` | `text` | 해당 설정에 대한 설명 | |
 | `updated_at` | `timestampz` | 마지막 수정일 | Not Null, Default: `now()` |
 
-**12. `audit_log` (시스템 활동 로그)**
+**12. `verification_codes` (인증 코드)**
+
+SMS 인증 및 비밀번호 찾기 시 발급되는 임시 코드를 관리합니다. (서버 메모리가 아닌 DB에 저장하여 Stateless 보장)
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `id` | `serial` | ID | **Primary Key** |
+| `target` | `varchar(50)` | 인증 대상 (로그인 ID 또는 전화번호) | Not Null, Index |
+| `code` | `varchar(10)` | 발급된 인증 코드 (6자리 숫자) | Not Null |
+| `expires_at` | `timestampz` | 만료 시간 | Not Null |
+| `created_at` | `timestampz` | 생성 시간 | Not Null, Default: `now()` |
+
+**13. `audit_log` (시스템 활동 로그)**
 
 시스템의 모든 주요 활동을 기록하여 보안 및 책임 추적성을 확보합니다.
 
