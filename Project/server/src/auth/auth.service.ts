@@ -15,6 +15,7 @@ import { PasswordResetConfirmDto } from './dto/password-reset-confirm.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import * as bcrypt from 'bcrypt';
+import { SmsService } from '../sms/sms.service';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -22,6 +23,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private smsService: SmsService,
   ) {}
 
   // 회원가입
@@ -31,11 +33,7 @@ export class AuthService {
 
     const existingUser = await this.prisma.user.findFirst({
       where: {
-        OR: [
-          { username },
-          { studentId },
-          { phoneNumber },
-        ],
+        OR: [{ username }, { studentId }, { phoneNumber }],
       },
     });
 
@@ -79,7 +77,9 @@ export class AuthService {
         ...tokens,
       };
     } catch (error) {
-      throw new InternalServerErrorException('회원가입 중 오류가 발생했습니다.');
+      throw new InternalServerErrorException(
+        '회원가입 중 오류가 발생했습니다.',
+      );
     }
   }
 
@@ -106,7 +106,9 @@ export class AuthService {
         ...tokens,
       };
     } else {
-      throw new UnauthorizedException('아이디 또는 비밀번호가 일치하지 않습니다.');
+      throw new UnauthorizedException(
+        '아이디 또는 비밀번호가 일치하지 않습니다.',
+      );
     }
   }
 
@@ -119,7 +121,10 @@ export class AuthService {
 
     // 보안상 사용자가 존재하는지 여부를 명확히 알리지 않음
     if (user) {
-      console.log(`[SMS 발송] ${phoneNumber}: 회원님의 아이디는 ${user.username} 입니다.`);
+      await this.smsService.sendSMS(
+        phoneNumber,
+        `[RentalWeb] 회원님의 아이디는 [${user.username}] 입니다.`,
+      );
     }
 
     return {
@@ -153,7 +158,7 @@ export class AuthService {
         },
       });
 
-      console.log(`[SMS 발송] ${phoneNumber}: 인증 코드는 [${code}] 입니다.`);
+      await this.smsService.sendVerificationCode(phoneNumber, code);
     }
 
     return {
@@ -175,7 +180,9 @@ export class AuthService {
     });
 
     if (!savedRecord) {
-      throw new BadRequestException('인증 코드가 일치하지 않거나 만료되었습니다.');
+      throw new BadRequestException(
+        '인증 코드가 일치하지 않거나 만료되었습니다.',
+      );
     }
 
     const user = await this.prisma.user.findUnique({ where: { username } });
