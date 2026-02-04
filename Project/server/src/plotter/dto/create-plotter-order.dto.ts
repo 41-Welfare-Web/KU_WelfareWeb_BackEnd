@@ -27,9 +27,18 @@ export class CreatePlotterOrderDto {
 }
 
 export class CreatePlotterOrderWithFilesDto extends CreatePlotterOrderDto {
-  @ApiProperty({ type: 'string', format: 'binary', description: '인쇄할 PDF 파일' })
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: '인쇄할 PDF 파일',
+  })
   pdfFile: any;
 
-  @ApiProperty({ type: 'string', format: 'binary', description: '결제 영수증 이미지 (유료 시 필수)', required: false })
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: '결제 영수증 이미지 (유료 시 필수)',
+    required: false,
+  })
   paymentReceiptImage?: any;
 }

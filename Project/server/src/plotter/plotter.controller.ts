@@ -13,14 +13,24 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { PlotterService } from './plotter.service';
-import { CreatePlotterOrderDto, CreatePlotterOrderWithFilesDto } from './dto/create-plotter-order.dto';
+import {
+  CreatePlotterOrderDto,
+  CreatePlotterOrderWithFilesDto,
+} from './dto/create-plotter-order.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../auth/get-user.decorator';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '@prisma/client';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiBody, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiBody,
+  ApiQuery,
+} from '@nestjs/swagger';
 
 @ApiTags('플로터 (Plotter)')
 @ApiBearerAuth()
@@ -64,8 +74,16 @@ export class PlotterController {
   @ApiOperation({ summary: '플로터 주문 목록 조회' })
   @ApiQuery({ name: 'page', required: false, example: '1' })
   @ApiQuery({ name: 'pageSize', required: false, example: '10' })
-  @ApiQuery({ name: 'userId', required: false, description: '특정 사용자 ID 필터 (관리자 전용)' })
-  @ApiQuery({ name: 'status', required: false, description: '상태 필터 (PENDING, CONFIRMED 등)' })
+  @ApiQuery({
+    name: 'userId',
+    required: false,
+    description: '특정 사용자 ID 필터 (관리자 전용)',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description: '상태 필터 (PENDING, CONFIRMED 등)',
+  })
   findAll(
     @GetUser() user: any,
     @Query('page') page: string = '1',
@@ -97,7 +115,11 @@ export class PlotterController {
       type: 'object',
       properties: {
         status: { type: 'string', example: 'CONFIRMED' },
-        rejectionReason: { type: 'string', example: 'PDF 파일 깨짐', nullable: true },
+        rejectionReason: {
+          type: 'string',
+          example: 'PDF 파일 깨짐',
+          nullable: true,
+        },
       },
       required: ['status'],
     },

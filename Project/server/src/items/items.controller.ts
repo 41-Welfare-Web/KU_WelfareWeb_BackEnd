@@ -17,7 +17,12 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '@prisma/client';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 
 @ApiTags('물품 (Items)')
 @Controller('items')
@@ -36,7 +41,11 @@ export class ItemsController {
   @Get()
   @ApiOperation({ summary: '물품 목록 조회' })
   @ApiQuery({ name: 'search', required: false, description: '물품 이름 검색' })
-  @ApiQuery({ name: 'categoryIds', required: false, description: '카테고리 ID 목록 (쉼표 구분)' })
+  @ApiQuery({
+    name: 'categoryIds',
+    required: false,
+    description: '카테고리 ID 목록 (쉼표 구분)',
+  })
   findAll(
     @Query('search') search?: string,
     @Query('categoryIds') categoryIds?: string,

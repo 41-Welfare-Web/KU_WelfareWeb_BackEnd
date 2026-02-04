@@ -40,7 +40,12 @@ export class RentalsController {
     @Query('page') page: string = '1',
     @Query('pageSize') pageSize: string = '10',
   ) {
-    return this.rentalsService.findAll(user.userId, user.role, +page, +pageSize);
+    return this.rentalsService.findAll(
+      user.userId,
+      user.role,
+      +page,
+      +pageSize,
+    );
   }
 
   @Get(':id')

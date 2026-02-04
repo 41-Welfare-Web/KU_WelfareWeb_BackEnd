@@ -10,7 +10,7 @@ export class AdminService {
     // 1. 기본 카운트
     const totalUsers = await this.prisma.user.count();
     const totalRentals = await this.prisma.rental.count();
-    
+
     // 2. 활성 대여 (대여 중)
     const activeRentals = await this.prisma.rental.count({
       where: { status: RentalStatus.RENTED },

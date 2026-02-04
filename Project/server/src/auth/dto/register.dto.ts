@@ -1,8 +1,17 @@
-import { IsString, IsNotEmpty, Matches, MinLength, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  Matches,
+  MinLength,
+  MaxLength,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
-  @ApiProperty({ example: 'testuser', description: '로그인 아이디 (5~20자 영문/숫자)' })
+  @ApiProperty({
+    example: 'testuser',
+    description: '로그인 아이디 (5~20자 영문/숫자)',
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(5)
@@ -12,7 +21,10 @@ export class RegisterDto {
   })
   username: string;
 
-  @ApiProperty({ example: 'password123!', description: '비밀번호 (최소 8자, 영문/숫자/특수문자)' })
+  @ApiProperty({
+    example: 'password123!',
+    description: '비밀번호 (최소 8자, 영문/숫자/특수문자)',
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(8, { message: '비밀번호는 최소 8자 이상이어야 합니다.' })

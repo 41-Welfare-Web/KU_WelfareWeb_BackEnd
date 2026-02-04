@@ -39,7 +39,9 @@ export class CategoriesService {
     }
 
     if (name) {
-      const existing = await this.prisma.category.findUnique({ where: { name } });
+      const existing = await this.prisma.category.findUnique({
+        where: { name },
+      });
       if (existing && existing.id !== id) {
         throw new ConflictException('이미 존재하는 카테고리 이름입니다.');
       }

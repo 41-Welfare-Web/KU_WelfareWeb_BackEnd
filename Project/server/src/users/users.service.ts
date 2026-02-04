@@ -44,7 +44,9 @@ export class UsersService {
 
     if (newPassword) {
       if (!currentPassword) {
-        throw new UnauthorizedException('비밀번호 변경을 위해 현재 비밀번호가 필요합니다.');
+        throw new UnauthorizedException(
+          '비밀번호 변경을 위해 현재 비밀번호가 필요합니다.',
+        );
       }
       const isMatch = await bcrypt.compare(currentPassword, user.password);
       if (!isMatch) {
@@ -56,7 +58,8 @@ export class UsersService {
       const existing = await this.prisma.user.findUnique({
         where: { phoneNumber },
       });
-      if (existing) throw new ConflictException('이미 사용 중인 전화번호입니다.');
+      if (existing)
+        throw new ConflictException('이미 사용 중인 전화번호입니다.');
     }
 
     const data: any = {};
@@ -132,7 +135,7 @@ export class UsersService {
       studentId: 'studentId',
       createdAt: 'createdAt',
     };
-    
+
     // sortBy가 매핑에 없으면 기본값 createdAt 사용, 있으면 매핑된 필드 사용
     const prismaSortField = sortFieldMap[sortBy] || 'createdAt';
     orderBy = { [prismaSortField]: sortOrder };

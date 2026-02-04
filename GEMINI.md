@@ -9,15 +9,15 @@ This file contains context for continuing work on the RentalWeb project.
 - **Backend (Decision Pending):** The choice between BaaS (e.g., Supabase) and a custom Monolithic API (e.g., Node.js/NestJS) is pending. The current task is to finalize the requirements specification to inform this decision.
 
 ## Current Task
-- **Objective:** Collaboratively refine the "Requirements Specification Document" (`Document/요구사항_명세서_v1.0.md`).
-- **Current Phase:** Detailing the "Non-functional Requirements" (NFRs).
-- **Last Discussed Item:** `NFR-02: 페이지 로드 시간`.
-- **Pending User Action:** The user needs to approve the proposed changes for `NFR-02`.
-- **Process:** The agent proposes details for each requirement, the user approves/modifies, and the agent updates the document.
-
-## Next Expected Action
-- Await user's decision on the proposed changes for `NFR-02: 페이지 로드 시간`.
-- Once approved, update the document and proceed to `NFR-03`.
+- **Objective:** Finalize backend integration and transition to frontend development.
+- **Completed (2026-02-04):**
+  1. **Holiday Logic**: Implemented `HolidaysService` and integrated into Rentals/Plotter services.
+  2. **PDF Verification**: Added Magic Number check (`%PDF-`) for plotter orders.
+  3. **SMS Service**: Integrated Solapi(CoolSMS) SDK. Verified real SMS sending (`01090665493` -> `777888`).
+  4. **File Service**: Integrated Supabase Storage. Verified file upload and public URL generation.
+  5. **Documentation**: Updated `Requirements Spec`, `Backend Guide`, and created `TODO.md` with deployment notes.
+- **Pending User Action:** None. Backend is ready.
+- **Next Step:** Initialize `Project/client` (React + Vite + TS).
 
 ## Key Documents
 - `Document/요구사항_명세서_v1.0.md`: The main requirements specification document.

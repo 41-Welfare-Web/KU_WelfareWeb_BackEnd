@@ -23,12 +23,18 @@ export class RentalItemDto {
 }
 
 export class CreateRentalDto {
-  @ApiProperty({ example: '2026-03-01', description: '대여 시작일 (YYYY-MM-DD)' })
+  @ApiProperty({
+    example: '2026-03-01',
+    description: '대여 시작일 (YYYY-MM-DD)',
+  })
   @IsDateString()
   @IsNotEmpty()
   startDate: string;
 
-  @ApiProperty({ example: '2026-03-03', description: '반납 예정일 (YYYY-MM-DD)' })
+  @ApiProperty({
+    example: '2026-03-03',
+    description: '반납 예정일 (YYYY-MM-DD)',
+  })
   @IsDateString()
   @IsNotEmpty()
   endDate: string;

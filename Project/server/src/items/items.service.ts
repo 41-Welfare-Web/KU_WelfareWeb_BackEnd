@@ -32,7 +32,12 @@ export class ItemsService {
     return item;
   }
 
-  async findAll(search?: string, categoryIds?: string, sortBy: string = 'popularity', sortOrder: 'asc' | 'desc' = 'desc') {
+  async findAll(
+    search?: string,
+    categoryIds?: string,
+    sortBy: string = 'popularity',
+    sortOrder: 'asc' | 'desc' = 'desc',
+  ) {
     const where: any = {};
 
     if (search) {
@@ -82,7 +87,8 @@ export class ItemsService {
       const existing = await this.prisma.item.findUnique({
         where: { itemCode: updateItemDto.itemCode },
       });
-      if (existing) throw new ConflictException('이미 존재하는 물품 코드입니다.');
+      if (existing)
+        throw new ConflictException('이미 존재하는 물품 코드입니다.');
     }
 
     const updated = await this.prisma.item.update({
@@ -103,7 +109,9 @@ export class ItemsService {
     if (!item) throw new NotFoundException('물품을 찾을 수 없습니다.');
 
     if (item._count.rentalItems > 0) {
-      throw new ConflictException('대여 기록이 있는 물품은 삭제할 수 없습니다.');
+      throw new ConflictException(
+        '대여 기록이 있는 물품은 삭제할 수 없습니다.',
+      );
     }
 
     await this.prisma.item.delete({ where: { id } });
