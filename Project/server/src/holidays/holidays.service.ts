@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateHolidayDto } from './dto/create-holiday.dto';
 
@@ -35,5 +39,37 @@ export class HolidaysService {
 
     await this.prisma.holiday.delete({ where: { id } });
     return { message: '휴무일이 삭제되었습니다.' };
+  }
+
+  // Check if a specific date is a holiday (Weekend or Registered Holiday)
+  async isHoliday(date: Date): Promise<boolean> {
+    const day = date.getDay();
+    if (day === 0 || day === 6) {
+      return true; // Weekend
+    }
+
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const holiday = await this.prisma.holiday.findUnique({
+      where: { holidayDate: startOfDay },
+    });
+
+    return !!holiday;
+  }
+
+  // Calculate the date after 'days' business days
+  async calculateBusinessDate(startDate: Date, days: number): Promise<Date> {
+    const currentDate = new Date(startDate);
+    let addedDays = 0;
+
+    while (addedDays < days) {
+      currentDate.setDate(currentDate.getDate() + 1);
+      if (!(await this.isHoliday(currentDate))) {
+        addedDays++;
+      }
+    }
+
+    return currentDate;
   }
 }

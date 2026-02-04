@@ -10,12 +10,14 @@ import { CreateRentalDto } from './dto/create-rental.dto';
 import { UpdateRentalStatusDto } from './dto/update-rental-status.dto';
 import { RentalStatus, Role } from '@prisma/client';
 import { ConfigurationsService } from '../configurations/configurations.service';
+import { HolidaysService } from '../holidays/holidays.service';
 
 @Injectable()
 export class RentalsService {
   constructor(
     private prisma: PrismaService,
     private configService: ConfigurationsService,
+    private holidaysService: HolidaysService,
   ) {}
 
   // 1. 대여 예약 생성
@@ -31,6 +33,14 @@ export class RentalsService {
     today.setHours(0, 0, 0, 0);
     if (start < today) {
       throw new BadRequestException('과거 날짜로 예약할 수 없습니다.');
+    }
+
+    // 휴무일 체크
+    if (await this.holidaysService.isHoliday(start)) {
+      throw new BadRequestException('대여 시작일이 휴무일(주말 포함)입니다.');
+    }
+    if (await this.holidaysService.isHoliday(end)) {
+      throw new BadRequestException('반납일이 휴무일(주말 포함)입니다.');
     }
 
     // Config Check: 최대 대여 가능 기간
@@ -55,7 +65,9 @@ export class RentalsService {
         });
 
         if (!item) {
-          throw new NotFoundException(`물품(ID: ${reqItem.itemId})을 찾을 수 없습니다.`);
+          throw new NotFoundException(
+            `물품(ID: ${reqItem.itemId})을 찾을 수 없습니다.`,
+          );
         }
 
         const totalQty = item.totalQuantity || 1;
@@ -189,7 +201,8 @@ export class RentalsService {
     const rental = await this.prisma.rental.findUnique({ where: { id } });
     if (!rental) throw new NotFoundException('대여 건을 찾을 수 없습니다.');
 
-    if (rental.userId !== userId) throw new ForbiddenException('권한이 없습니다.');
+    if (rental.userId !== userId)
+      throw new ForbiddenException('권한이 없습니다.');
     if (rental.status !== RentalStatus.RESERVED) {
       throw new BadRequestException('예약 상태일 때만 취소할 수 있습니다.');
     }
