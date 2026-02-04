@@ -15,7 +15,8 @@ This file contains context for continuing work on the RentalWeb project.
   2. **PDF Verification**: Added Magic Number check (`%PDF-`) for plotter orders.
   3. **SMS Service**: Integrated Solapi(CoolSMS) SDK. Verified real SMS sending (`01090665493` -> `777888`).
   4. **File Service**: Integrated Supabase Storage. Verified file upload and public URL generation.
-  5. **Documentation**: Updated `Requirements Spec`, `Backend Guide`, and created `TODO.md` with deployment notes.
+  5. **Security**: Applied Rate Limiting (Throttler), Auth Attempt Limits (DB), and CORS policy.
+  6. **Documentation**: Synchronized `Requirements`, `Backend Guide`, `API List`, and created `TODO.md` with deployment/future tasks.
 - **Pending User Action:** None. Backend is ready.
 - **Next Step:** Initialize `Project/client` (React + Vite + TS).
 
