@@ -1,35 +1,49 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { ItemsModule } from './items/items.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ItemsModule } from './items/items.module';
 import { RentalsModule } from './rentals/rentals.module';
 import { PlotterModule } from './plotter/plotter.module';
-import { HolidaysModule } from './holidays/holidays.module';
-import { ConfigurationsModule } from './configurations/configurations.module';
 import { AdminModule } from './admin/admin.module';
+import { ConfigModule } from '@nestjs/config';
+import { ConfigurationsModule } from './configurations/configurations.module';
+import { HolidaysModule } from './holidays/holidays.module';
+import { SmsModule } from './sms/sms.module';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true, // 전역 모듈로 설정하여 어디서든 ConfigService 사용 가능
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // 60 seconds (milliseconds)
+        limit: 60,  // 60 requests per ttl
+      },
+    ]),
     PrismaModule,
     AuthModule,
     UsersModule,
-    ItemsModule,
     CategoriesModule,
+    ItemsModule,
     RentalsModule,
     PlotterModule,
-    HolidaysModule,
-    ConfigurationsModule,
     AdminModule,
+    ConfigurationsModule,
+    HolidaysModule,
+    SmsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

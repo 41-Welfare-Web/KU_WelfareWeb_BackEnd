@@ -171,20 +171,44 @@ export class AuthService {
   async confirmPasswordReset(dto: PasswordResetConfirmDto) {
     const { username, verificationCode, newPassword } = dto;
 
+    // 1. 해당 유저의 유효한 인증 코드 조회
     const savedRecord = await this.prisma.verificationCode.findFirst({
       where: {
         target: username,
-        code: verificationCode,
         expiresAt: { gt: new Date() }, // 만료되지 않은 것만 조회
       },
     });
 
     if (!savedRecord) {
       throw new BadRequestException(
-        '인증 코드가 일치하지 않거나 만료되었습니다.',
+        '인증 코드가 만료되었거나 존재하지 않습니다. 다시 요청해주세요.',
       );
     }
 
+    // 2. 코드 일치 여부 확인
+    if (savedRecord.code !== verificationCode) {
+      // 시도 횟수 증가
+      const updatedRecord = await this.prisma.verificationCode.update({
+        where: { id: savedRecord.id },
+        data: { attempts: { increment: 1 } },
+      });
+
+      // 5회 이상 실패 시 코드 무효화
+      if (updatedRecord.attempts >= 5) {
+        await this.prisma.verificationCode.delete({
+          where: { id: savedRecord.id },
+        });
+        throw new BadRequestException(
+          '인증 시도 횟수를 초과(5회)하였습니다. 다시 요청해주세요.',
+        );
+      }
+
+      throw new BadRequestException(
+        `인증 코드가 일치하지 않습니다. (현재 실패 횟수: ${updatedRecord.attempts}/5)`,
+      );
+    }
+
+    // 3. 코드 일치 시 비밀번호 변경 로직 진행
     const user = await this.prisma.user.findUnique({ where: { username } });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 

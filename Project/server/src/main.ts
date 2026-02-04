@@ -29,7 +29,11 @@ async function bootstrap() {
   );
 
   // 4. CORS 설정
-  app.enableCors();
+  // TODO: 배포 시 origin을 프론트엔드 도메인(예: https://rentalweb.com)으로 제한해야 함
+  app.enableCors({
+    origin: true, // 개발 중에는 모든 도메인 허용
+    credentials: true,
+  });
 
   await app.listen(process.env.PORT ?? 3000);
 }

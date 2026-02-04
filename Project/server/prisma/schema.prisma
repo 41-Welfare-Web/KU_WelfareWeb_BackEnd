@@ -222,6 +222,7 @@ model VerificationCode {
   id        Int      @id @default(autoincrement())
   target    String   @db.VarChar(50) // username 또는 phoneNumber
   code      String   @db.VarChar(10)
+  attempts  Int      @default(0)     // 시도 횟수 추가
   expiresAt DateTime @map("expires_at") @db.Timestamptz
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 

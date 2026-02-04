@@ -16,6 +16,7 @@ import { LogoutDto } from './dto/logout.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('인증 (Auth)')
 @Controller('auth')
@@ -36,6 +37,7 @@ export class AuthController {
   }
 
   @Post('find-username')
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 1분에 3회 제한
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: '아이디 찾기' })
   async findUsername(@Body() dto: FindUsernameDto) {
@@ -43,6 +45,7 @@ export class AuthController {
   }
 
   @Post('password-reset/request')
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 1분에 3회 제한
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: '비밀번호 재설정 요청' })
   async requestPasswordReset(@Body() dto: PasswordResetRequestDto) {
