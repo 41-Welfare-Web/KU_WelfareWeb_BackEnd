@@ -1,25 +1,86 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class FilesService {
-  /**
-   * 실제로는 S3, Supabase Storage 등에 업로드하는 로직이 들어갑니다.
-   * 현재는 테스트를 위해 파일 정보를 바탕으로 가상 경로를 생성합니다.
-   */
+  private supabase: SupabaseClient | null = null;
+  private bucketName: string;
+
+  constructor() {
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_KEY;
+    this.bucketName = process.env.SUPABASE_BUCKET_NAME || 'rental-web';
+
+    if (supabaseUrl && supabaseKey) {
+      this.supabase = createClient(supabaseUrl, supabaseKey);
+    } else {
+      console.warn(
+        '[FilesService] Supabase credentials not found. File upload will be mocked.',
+      );
+    }
+  }
+
   async uploadFile(file: Express.Multer.File, folder: string): Promise<string> {
     const fileExt = path.extname(file.originalname);
     const fileName = `${uuidv4()}${fileExt}`;
     const filePath = `${folder}/${fileName}`;
 
-    // TODO: 실제 Storage SDK 연동 (예: supabase.storage.from('bucket').upload(...))
-    // 지금은 가상의 URL을 반환하도록 합니다.
-    return `https://your-storage-url.com/${filePath}`;
+    // Mock Mode
+    if (!this.supabase) {
+      console.log(`[Mock Upload] Uploading ${filePath} (Size: ${file.size})`);
+      return `https://mock-storage.com/${filePath}`;
+    }
+
+    // Real Upload
+    const { data, error } = await this.supabase.storage
+      .from(this.bucketName)
+      .upload(filePath, file.buffer, {
+        contentType: file.mimetype,
+        upsert: false,
+      });
+
+    if (error) {
+      console.error('[FilesService] Upload Error:', error);
+      throw new InternalServerErrorException('파일 업로드 중 오류가 발생했습니다.');
+    }
+
+    // Get Public URL
+    const { data: publicData } = this.supabase.storage
+      .from(this.bucketName)
+      .getPublicUrl(filePath);
+
+    return publicData.publicUrl;
   }
 
   async deleteFile(fileUrl: string): Promise<void> {
-    // TODO: 실제 Storage에서 파일 삭제 로직
-    console.log(`[File Deleted] ${fileUrl}`);
+    if (!this.supabase) {
+      console.log(`[Mock Delete] Deleting file at ${fileUrl}`);
+      return;
+    }
+
+    // URL에서 경로 추출 (예: .../bucketName/folder/file.pdf -> folder/file.pdf)
+    // 간단하게 구현: URL의 마지막 부분(파일명)과 그 앞의 폴더명을 조합
+    // *주의* 실제 URL 구조에 따라 파싱 로직이 달라질 수 있음.
+    // 여기서는 간단히 전체 경로가 URL에 포함되어 있다고 가정하고 파싱
+    try {
+        const urlObj = new URL(fileUrl);
+        // Pathname: /storage/v1/object/public/rental-web/plotter/pdfs/uuid.pdf
+        const pathParts = urlObj.pathname.split(`/${this.bucketName}/`);
+        if (pathParts.length < 2) return; // 버킷명 없는 경우 패스
+
+        const filePath = pathParts[1]; // plotter/pdfs/uuid.pdf
+
+        const { error } = await this.supabase.storage
+        .from(this.bucketName)
+        .remove([filePath]);
+
+        if (error) {
+            console.error('[FilesService] Delete Error:', error);
+        }
+    } catch (e) {
+        console.warn(`[FilesService] Failed to parse file URL: ${fileUrl}`);
+    }
   }
 }
