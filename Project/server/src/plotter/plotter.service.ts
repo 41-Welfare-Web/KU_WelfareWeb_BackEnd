@@ -9,6 +9,7 @@ import { CreatePlotterOrderDto } from './dto/create-plotter-order.dto';
 import { PlotterStatus, Role } from '@prisma/client';
 import { FilesService } from '../common/files.service';
 import { ConfigurationsService } from '../configurations/configurations.service';
+import { HolidaysService } from '../holidays/holidays.service';
 
 @Injectable()
 export class PlotterService {
@@ -16,6 +17,7 @@ export class PlotterService {
     private prisma: PrismaService,
     private filesService: FilesService,
     private configService: ConfigurationsService,
+    private holidaysService: HolidaysService,
   ) {}
 
   async create(
@@ -27,8 +29,17 @@ export class PlotterService {
     if (!pdfFile) {
       throw new BadRequestException('PDF 파일이 필요합니다.');
     }
+    
+    // 1. MIME Type 체크 (기본)
     if (pdfFile.mimetype !== 'application/pdf') {
       throw new BadRequestException('PDF 파일만 업로드 가능합니다.');
+    }
+
+    // 2. Magic Number 체크 (실제 파일 내용 검증)
+    // PDF 파일은 반드시 %PDF- (0x25 0x50 0x44 0x46 0x2D)로 시작해야 함
+    const header = pdfFile.buffer.slice(0, 5).toString();
+    if (header !== '%PDF-') {
+      throw new BadRequestException('유효하지 않은 PDF 형식입니다. 실제 PDF 파일을 업로드해주세요.');
     }
 
     const { purpose, paperSize, pageCount, isPaidService } = createOrderDto;
@@ -36,7 +47,9 @@ export class PlotterService {
     const isPaid = String(isPaidService) === 'true';
 
     if (isPaid && !receiptFile) {
-      throw new BadRequestException('유료 서비스는 입금 내역 이미지가 필요합니다.');
+      throw new BadRequestException(
+        '유료 서비스는 입금 내역 이미지가 필요합니다.',
+      );
     }
 
     // 파일 업로드 처리
@@ -51,9 +64,12 @@ export class PlotterService {
       '2',
     );
     const delayDays = parseInt(delayDaysStr, 10);
-    const pickupDate = new Date();
-    pickupDate.setDate(pickupDate.getDate() + delayDays);
-    // TODO: 주말/휴무일 제외 로직 추가 필요
+
+    // 영업일 기준 수령일 계산
+    const pickupDate = await this.holidaysService.calculateBusinessDate(
+      new Date(),
+      delayDays,
+    );
 
     const order = await this.prisma.plotterOrder.create({
       data: {
@@ -122,10 +138,13 @@ export class PlotterService {
     const order = await this.prisma.plotterOrder.findUnique({ where: { id } });
     if (!order) throw new NotFoundException('주문을 찾을 수 없습니다.');
 
-    if (order.userId !== userId) throw new ForbiddenException('권한이 없습니다.');
+    if (order.userId !== userId)
+      throw new ForbiddenException('권한이 없습니다.');
 
     if (order.status !== PlotterStatus.PENDING) {
-      throw new BadRequestException('주문 대기 상태일 때만 취소할 수 있습니다.');
+      throw new BadRequestException(
+        '주문 대기 상태일 때만 취소할 수 있습니다.',
+      );
     }
 
     await this.prisma.plotterOrder.delete({ where: { id } });
