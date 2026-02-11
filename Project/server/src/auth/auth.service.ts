@@ -51,53 +51,60 @@ export class AuthService {
   async requestSignupVerification(dto: SignupVerificationRequestDto) {
     const { phoneNumber } = dto;
 
-    // 1. 이미 가입된 번호인지 확인
-    const existingUser = await this.prisma.user.findUnique({
-      where: { phoneNumber },
-    });
-    if (existingUser) {
-      throw new ConflictException('이미 가입된 전화번호입니다.');
-    }
+    try {
+      // 1. 이미 가입된 번호인지 확인
+      const existingUser = await this.prisma.user.findUnique({
+        where: { phoneNumber },
+      });
+      if (existingUser) {
+        throw new ConflictException('이미 가입된 전화번호입니다.');
+      }
 
-    // 2. 24시간 내 발송 횟수 확인 (최대 5회)
-    const oneDayAgo = new Date();
-    oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+      // 2. 24시간 내 발송 횟수 확인 (최대 5회)
+      const oneDayAgo = new Date();
+      oneDayAgo.setHours(oneDayAgo.getHours() - 24);
 
-    const resendCount = await this.prisma.verificationCode.count({
-      where: {
-        target: phoneNumber,
-        createdAt: { gte: oneDayAgo },
-      },
-    });
+      const resendCount = await this.prisma.verificationCode.count({
+        where: {
+          target: phoneNumber,
+          createdAt: { gte: oneDayAgo },
+        },
+      });
 
-    if (resendCount >= 5) {
-      throw new BadRequestException(
-        '하루 최대 인증번호 발송 횟수(5회)를 초과하였습니다. 내일 다시 시도해주세요.',
+      if (resendCount >= 5) {
+        throw new BadRequestException(
+          '하루 최대 인증번호 발송 횟수(5회)를 초과하였습니다. 내일 다시 시도해주세요.',
+        );
+      }
+
+      // 3. 인증번호 생성 및 저장
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = new Date();
+      expiresAt.setMinutes(expiresAt.getMinutes() + 5); // 5분 유효
+
+      await this.prisma.verificationCode.create({
+        data: {
+          target: phoneNumber,
+          code,
+          expiresAt,
+        },
+      });
+
+      await this.smsService.sendVerificationCode(phoneNumber, code);
+
+      return { 
+        message: '인증번호가 발송되었습니다.',
+        code: code // 프론트엔드에서 사용할 수 있도록 코드 반환
+      };
+    } catch (error) {
+      console.error('[AuthService] Signup Verification Error:', error);
+      if (error instanceof ConflictException || error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        `인증번호 발송 처리 중 에러가 발생했습니다: ${error.message}`,
       );
     }
-
-    // 3. 인증번호 생성 및 저장
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date();
-    expiresAt.setMinutes(expiresAt.getMinutes() + 5); // 5분 유효
-
-    // 기존 유효 코드가 있다면 삭제 (선택 사항, 여기서는 누적하여 횟수 체크를 위해 유지하거나 삭제)
-    // 횟수 체크를 위해 삭제하지 않고 만료된 것만 주기적으로 지우는 것이 좋지만, 
-    // 여기서는 간단히 새로운 코드를 생성하고 기존 코드는 target으로 조회 시 최신 것만 쓰도록 함
-    await this.prisma.verificationCode.create({
-      data: {
-        target: phoneNumber,
-        code,
-        expiresAt,
-      },
-    });
-
-    await this.smsService.sendVerificationCode(phoneNumber, code);
-
-    return { 
-      message: '인증번호가 발송되었습니다.',
-      code: code // 프론트엔드에서 사용할 수 있도록 코드 반환
-    };
   }
 
   // 회원가입
