@@ -29,7 +29,7 @@
 ```powershell
 cd Project/server; npm run start:dev
 ```
-- **Base URL:** `http://localhost:3000/api`
+- **Base URL:** `http://localhost:3000/api` (스크립트 테스트 시 `$baseUrl` 변수로 활용)
 - **DB:** `npx prisma studio`를 통해 실시간 데이터 확인 가능
 
 ---
@@ -39,11 +39,13 @@ cd Project/server; npm run start:dev
 백엔드 폴더(`Project/server`)에는 주요 시나리오를 한 번에 검증할 수 있는 PowerShell 스크립트가 포함되어 있습니다.
 
 ### 2.1 주요 API 기능 검증 (`verify_api.ps1`)
+관리자 로그인, 내 정보 조회, 물품 목록, 대여 예약 등을 테스트합니다.
 ```powershell
 cd Project/server; .\verify_api.ps1
 ```
 
 ### 2.2 인증 및 플로터 기능 검증 (`verify_auth_plotter.ps1`)
+회원가입 인증번호 요청, 아이디 찾기, 비밀번호 재설정 요청 등을 테스트합니다.
 ```powershell
 cd Project/server; .\verify_auth_plotter.ps1
 ```
@@ -86,11 +88,17 @@ Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/rentals" -Headers
 
 ### 5.1 인증 (Auth)
 ```powershell
-# 회원가입 (Register)
-Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/register" -ContentType "application/json" -Body '{"username":"newuser01","password":"password123!","name":"홍길동","studentId":"20260001","phoneNumber":"010-9999-8888","department":"컴퓨터공학과"}'
+# 1. 회원가입 인증번호 요청 (응답에서 code 확인 가능)
+Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/request-signup-verification" -ContentType "application/json" -Body '{"phoneNumber":"01090665493"}'
 
-# 아이디 찾기 (Find Username)
-Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/find-username" -ContentType "application/json" -Body '{"name":"홍길동","phoneNumber":"010-9999-8888"}'
+# 2. 회원가입 인증번호 확인 (버튼 활성화용)
+Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/verify-signup-code" -ContentType "application/json" -Body '{"phoneNumber":"01090665493","verificationCode":"123456"}'
+
+# 3. 회원가입 (Register)
+Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/register" -ContentType "application/json" -Body '{"username":"newuser01","password":"password123!","name":"홍길동","studentId":"20260001","phoneNumber":"01090665493","department":"컴퓨터공학과","verificationCode":"123456"}'
+
+# 4. 아이디 찾기 (Find Username)
+Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/find-username" -ContentType "application/json" -Body '{"name":"홍길동","phoneNumber":"01090665493"}'
 
 # 토큰 갱신 (Refresh Token)
 $res = Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/refresh" -ContentType "application/json" -Body @{ refreshToken = $refreshToken }; $token = $res.accessToken
@@ -99,7 +107,7 @@ $res = Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/refresh" -ContentType 
 ### 5.2 사용자 (Users)
 ```powershell
 # 내 정보 수정 (Update My Profile)
-Invoke-RestMethod -Method Put -Uri "$baseUrl/users/me" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"department":"소프트웨어학부","phoneNumber":"010-1111-2222"}'
+Invoke-RestMethod -Method Put -Uri "$baseUrl/users/me" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"department":"소프트웨어학부","phoneNumber":"01011112222"}'
 
 # 관리자: 특정 사용자 역할 변경 (Update User Role)
 Invoke-RestMethod -Method Put -Uri "$baseUrl/users/{userId}/role" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"role":"ADMIN"}'
@@ -128,6 +136,9 @@ Invoke-RestMethod -Method Get -Uri "$baseUrl/plotter/orders?status=PENDING" -Hea
 
 ### 5.6 관리 (Admin)
 ```powershell
+# 이미지 업로드 (Upload Image - Admin)
+curl -X POST "$baseUrl/admin/upload-image" -H "Authorization: Bearer $token" -F "file=@C:\path\to\image.png"
+
 # 휴무일 추가 (Add Holiday)
 Invoke-RestMethod -Method Post -Uri "$baseUrl/admin/holidays" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"holidayDate":"2026-05-05","description":"어린이날"}'
 

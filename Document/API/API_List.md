@@ -1,6 +1,8 @@
 ### **RentalWeb API 명세 목록**
 
 **1. 인증 (Auth)**
+*   `POST /api/auth/request-signup-verification` (회원가입 인증번호 요청)
+*   `POST /api/auth/verify-signup-code` (회원가입 인증번호 확인)
 *   `POST /api/auth/register` (회원가입)
 *   `POST /api/auth/login` (로그인)
 *   `POST /api/auth/logout` (로그아웃)

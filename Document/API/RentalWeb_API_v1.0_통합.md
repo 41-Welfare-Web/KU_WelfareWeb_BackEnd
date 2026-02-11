@@ -40,6 +40,7 @@
   "code": "123456"
 }
 ```
+* **Note:** 현재 프론트엔드 개발 편의를 위해 응답 바디에 `code`가 포함되어 있습니다. 실제 운영 배포 시에는 보안을 위해 제거될 예정입니다.
 
 *   **Error Responses**
 
@@ -47,6 +48,7 @@
 | :--- | :--- | :--- |
 | `400 Bad Request` | `LIMIT_EXCEEDED` | 하루 최대 발송 횟수(5회)를 초과했을 때 |
 | `409 Conflict` | `DUPLICATE_PHONE_NUMBER` | 이미 가입된 전화번호일 때 |
+| `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 에러 (Solapi 설정 누락 등) |
 
 ---
 
@@ -1582,33 +1584,45 @@
 
 ---
 # 휴무일 삭제 (Delete Holiday)
+... (생략) ...
 
-`FR-31` 요구사항에 따라, 관리자가 휴무일을 삭제합니다.
+---
+# 이미지 업로드 (Upload Image)
 
-## **ENDPOINT:** `DELETE /api/admin/holidays/{holidayId}`
-**Description:** `holidayId`에 해당하는 휴무일을 삭제합니다.
+관리자가 물품 등록이나 상세 설명에 사용할 이미지를 서버에 업로드합니다.
+
+## **ENDPOINT:** `POST /api/admin/upload-image`
+**Description:** 이미지 파일을 받아 Supabase Storage의 `items` 폴더에 저장하고 접근 가능한 공용 URL을 반환합니다.
 **Required Permissions:** Admin Only
 
 ---
 
-#### **Path Parameters**
+#### **Request Body (multipart/form-data)**
 
-| 파라미터 | 타입 | 설명 |
-| :--- | :--- | :--- |
-| `holidayId` | `integer` | 삭제할 휴무일의 고유 ID |
+| 필드명 | 타입 | 필수 여부 | 설명 |
+| :--- | :--- | :--- | :--- |
+| `file` | `file` | 필수 | 이미지 파일 (최대 5MB, png/jpg/jpeg/webp 지원) |
 
 ---
 
 #### **Responses**
 
-*   **Success Response (`204 No Content`)**
+*   **Success Response (`201 Created`)**
+
+```json
+{
+  "url": "https://[supabase-url]/storage/v1/object/public/rental-web/items/[uuid].png"
+}
+```
 
 *   **Error Responses**
 
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
-| `404 Not Found` | `HOLIDAY_NOT_FOUND` | 해당 `holidayId`의 휴무일이 없을 때 |
-| (이 외 Admin API의 Error Responses 참조) | | |
+| `400 Bad Request` | `INVALID_FILE_TYPE` | 허용되지 않은 파일 형식일 때 |
+| `400 Bad Request` | `FILE_TOO_LARGE` | 파일 크기가 5MB를 초과할 때 |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
 
 ---
 # 시스템 설정 목록 조회 (Get Configurations)
