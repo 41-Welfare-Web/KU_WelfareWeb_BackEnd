@@ -18,10 +18,29 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 
+import { SignupVerificationRequestDto } from './dto/signup-verification-request.dto';
+
+import { SignupVerificationCheckDto } from './dto/signup-verification-check.dto';
+
 @ApiTags('인증 (Auth)')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Post('request-signup-verification')
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 1분에 3회 제한
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '회원가입 인증번호 요청' })
+  async requestSignupVerification(@Body() dto: SignupVerificationRequestDto) {
+    return this.authService.requestSignupVerification(dto);
+  }
+
+  @Post('verify-signup-code')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '회원가입 인증번호 검증' })
+  async verifySignupCode(@Body() dto: SignupVerificationCheckDto) {
+    return this.authService.verifySignupCode(dto);
+  }
 
   @Post('register')
   @ApiOperation({ summary: '회원가입' })

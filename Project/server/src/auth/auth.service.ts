@@ -8,6 +8,8 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
+import { SignupVerificationRequestDto } from './dto/signup-verification-request.dto';
+import { SignupVerificationCheckDto } from './dto/signup-verification-check.dto';
 import { LoginDto } from './dto/login.dto';
 import { FindUsernameDto } from './dto/find-username.dto';
 import { PasswordResetRequestDto } from './dto/password-reset-request.dto';
@@ -26,11 +28,126 @@ export class AuthService {
     private smsService: SmsService,
   ) {}
 
+  // 인증번호 검증 (프론트엔드 버튼 활성화용)
+  async verifySignupCode(dto: SignupVerificationCheckDto) {
+    const { phoneNumber, verificationCode } = dto;
+
+    const savedRecord = await this.prisma.verificationCode.findFirst({
+      where: {
+        target: phoneNumber,
+        expiresAt: { gt: new Date() },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!savedRecord || savedRecord.code !== verificationCode) {
+      throw new BadRequestException('인증번호가 일치하지 않거나 만료되었습니다.');
+    }
+
+    return { success: true, message: '인증에 성공하였습니다.' };
+  }
+
+  // 회원가입용 인증번호 요청
+  async requestSignupVerification(dto: SignupVerificationRequestDto) {
+    const { phoneNumber } = dto;
+
+    // 1. 이미 가입된 번호인지 확인
+    const existingUser = await this.prisma.user.findUnique({
+      where: { phoneNumber },
+    });
+    if (existingUser) {
+      throw new ConflictException('이미 가입된 전화번호입니다.');
+    }
+
+    // 2. 24시간 내 발송 횟수 확인 (최대 5회)
+    const oneDayAgo = new Date();
+    oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+
+    const resendCount = await this.prisma.verificationCode.count({
+      where: {
+        target: phoneNumber,
+        createdAt: { gte: oneDayAgo },
+      },
+    });
+
+    if (resendCount >= 5) {
+      throw new BadRequestException(
+        '하루 최대 인증번호 발송 횟수(5회)를 초과하였습니다. 내일 다시 시도해주세요.',
+      );
+    }
+
+    // 3. 인증번호 생성 및 저장
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 5); // 5분 유효
+
+    // 기존 유효 코드가 있다면 삭제 (선택 사항, 여기서는 누적하여 횟수 체크를 위해 유지하거나 삭제)
+    // 횟수 체크를 위해 삭제하지 않고 만료된 것만 주기적으로 지우는 것이 좋지만, 
+    // 여기서는 간단히 새로운 코드를 생성하고 기존 코드는 target으로 조회 시 최신 것만 쓰도록 함
+    await this.prisma.verificationCode.create({
+      data: {
+        target: phoneNumber,
+        code,
+        expiresAt,
+      },
+    });
+
+    await this.smsService.sendVerificationCode(phoneNumber, code);
+
+    return { 
+      message: '인증번호가 발송되었습니다.',
+      code: code // 프론트엔드에서 사용할 수 있도록 코드 반환
+    };
+  }
+
   // 회원가입
   async register(registerDto: RegisterDto) {
-    const { username, password, studentId, phoneNumber, name, department } =
-      registerDto;
+    const {
+      username,
+      password,
+      studentId,
+      phoneNumber,
+      name,
+      department,
+      verificationCode,
+    } = registerDto;
 
+    // 1. 인증번호 검증
+    const savedRecord = await this.prisma.verificationCode.findFirst({
+      where: {
+        target: phoneNumber,
+        expiresAt: { gt: new Date() },
+      },
+      orderBy: { createdAt: 'desc' }, // 가장 최근 것
+    });
+
+    if (!savedRecord) {
+      throw new BadRequestException(
+        '인증 코드가 만료되었거나 존재하지 않습니다. 다시 요청해주세요.',
+      );
+    }
+
+    if (savedRecord.code !== verificationCode) {
+      const updatedRecord = await this.prisma.verificationCode.update({
+        where: { id: savedRecord.id },
+        data: { attempts: { increment: 1 } },
+      });
+
+      if (updatedRecord.attempts >= 5) {
+        await this.prisma.verificationCode.delete({
+          where: { id: savedRecord.id },
+        });
+        throw new BadRequestException(
+          '인증 시도 횟수를 초과(5회)하였습니다. 다시 요청해주세요.',
+        );
+      }
+
+      throw new BadRequestException(
+        `인증 코드가 일치하지 않습니다. (현재 실패 횟수: ${updatedRecord.attempts}/5)`,
+      );
+    }
+
+    // 2. 중복 확인
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [{ username }, { studentId }, { phoneNumber }],
@@ -63,6 +180,11 @@ export class AuthService {
           department,
           role: 'USER',
         },
+      });
+
+      // 4. 인증 코드 삭제
+      await this.prisma.verificationCode.deleteMany({
+        where: { target: phoneNumber },
       });
 
       const tokens = this.generateTokens(user);
@@ -141,14 +263,26 @@ export class AuthService {
     });
 
     if (user) {
+      // 24시간 내 발송 횟수 확인 (최대 5회)
+      const oneDayAgo = new Date();
+      oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+
+      const resendCount = await this.prisma.verificationCode.count({
+        where: {
+          target: username,
+          createdAt: { gte: oneDayAgo },
+        },
+      });
+
+      if (resendCount >= 5) {
+        throw new BadRequestException(
+          '하루 최대 인증번호 발송 횟수(5회)를 초과하였습니다. 내일 다시 시도해주세요.',
+        );
+      }
+
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       const expiresAt = new Date();
       expiresAt.setMinutes(expiresAt.getMinutes() + 5); // 5분 유효
-
-      // 기존 코드가 있다면 무효화(삭제) 후 재생성
-      await this.prisma.verificationCode.deleteMany({
-        where: { target: username },
-      });
 
       await this.prisma.verificationCode.create({
         data: {

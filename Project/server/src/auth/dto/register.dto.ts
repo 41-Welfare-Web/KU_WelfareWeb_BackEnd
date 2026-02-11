@@ -49,4 +49,10 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   department: string;
+
+  @ApiProperty({ example: '123456', description: 'SMS 인증번호' })
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^\d{6}$/, { message: '인증번호는 6자리 숫자여야 합니다.' })
+  verificationCode: string;
 }

@@ -9,6 +9,89 @@
 ---
 ### **1. 인증 (Auth)**
 
+# 회원가입 인증번호 요청 (Request Signup Verification)
+
+`FR-01` 요구사항에 따라, 회원가입을 위한 SMS 인증번호를 요청합니다.
+
+## **ENDPOINT:** `POST /api/auth/request-signup-verification`
+**Description:** 입력한 전화번호로 6자리 인증번호를 발송합니다. 보안 및 어뷰징 방지를 위해 하루 최대 5회까지만 요청 가능합니다. 개발 편의를 위해 응답 바디에 생성된 코드가 포함됩니다.
+**Required Permissions:** All Users
+
+---
+
+##### **Request Body**
+
+```json
+{
+  "phoneNumber": "01012345678"
+}
+```
+* `phoneNumber`: (string, required) 하이픈 없는 전화번호 형식.
+
+---
+
+##### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "message": "인증번호가 발송되었습니다.",
+  "code": "123456"
+}
+```
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `400 Bad Request` | `LIMIT_EXCEEDED` | 하루 최대 발송 횟수(5회)를 초과했을 때 |
+| `409 Conflict` | `DUPLICATE_PHONE_NUMBER` | 이미 가입된 전화번호일 때 |
+
+---
+
+# 회원가입 인증번호 확인 (Verify Signup Code)
+
+사용자가 입력한 인증번호가 유효한지 확인합니다.
+
+## **ENDPOINT:** `POST /api/auth/verify-signup-code`
+**Description:** 서버에 저장된 인증번호와 사용자가 입력한 번호를 비교합니다. 이 API의 성공 여부에 따라 프론트엔드에서 회원가입 버튼을 활성화할 수 있습니다.
+**Required Permissions:** All Users
+
+---
+
+##### **Request Body**
+
+```json
+{
+  "phoneNumber": "01012345678",
+  "verificationCode": "123456"
+}
+```
+* `phoneNumber`: (string, required) 인증번호를 요청했던 전화번호.
+* `verificationCode`: (string, required) 사용자가 입력한 6자리 코드.
+
+---
+
+##### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "success": true,
+  "message": "인증에 성공하였습니다."
+}
+```
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `400 Bad Request` | `INVALID_CODE` | 코드가 틀렸거나 만료되었을 때 |
+
+---
+
 # 회원가입 (Register)
 
 `FR-01` 요구사항에 따라, 새로운 사용자 계정을 생성합니다. 성공 시, 생성된 사용자 정보와 로그인 유지를 위한 토큰을 반환합니다.
@@ -27,16 +110,18 @@
   "password": "password123!",
   "name": "김테스트",
   "studentId": "202412345",
-  "phoneNumber": "010-1234-5678",
-  "department": "컴퓨터공학과"
+  "phoneNumber": "01012345678",
+  "department": "컴퓨터공학과",
+  "verificationCode": "123456"
 }
 ```
 * `username`: (string, required) 로그인 아이디. 5~20자의 영문 소문자, 숫자만 가능.
 * `password`: (string, required) 비밀번호. 최소 8자 이상, 영문, 숫자, 특수문자 포함.
 * `name`: (string, required) 실제 이름.
 * `studentId`: (string, required) 학번.
-* `phoneNumber`: (string, required) 전화번호. SMS 인증을 거친 번호.
+* `phoneNumber`: (string, required) 전화번호. 하이픈 없이 입력.
 * `department`: (string, required) 소속 단위.
+* `verificationCode`: (string, required) SMS로 인증받은 6자리 코드. 최종 가입 시 서버에서 한 번 더 검증합니다.
 
 ---
 
