@@ -101,13 +101,9 @@ export class AuthService {
       if (error instanceof ConflictException || error instanceof BadRequestException) {
         throw error;
       }
-      // 상세 에러 내용을 포함하여 던짐 (원인 파악용)
-      throw new InternalServerErrorException({
-        message: '인증번호 발송 처리 중 에러가 발생했습니다.',
-        error: error.message,
-        stack: error.stack,
-        details: error
-      });
+      throw new InternalServerErrorException(
+        '인증번호 발송 처리 중 에러가 발생했습니다.',
+      );
     }
   }
 
