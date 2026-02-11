@@ -168,11 +168,11 @@
 ```json
 {
   "name": "김테스트",
-  "phoneNumber": "010-1234-5678"
+  "phoneNumber": "01012345678"
 }
 ```
 * `name`: (string, required) 가입 시 입력한 실제 이름.
-* `phoneNumber`: (string, required) 가입 시 인증한 전화번호.
+* `phoneNumber`: (string, required) 가입 시 인증한 전화번호. 하이픈 없이 입력.
 
 ---
 
@@ -203,11 +203,11 @@
 ```json
 {
   "username": "testuser",
-  "phoneNumber": "010-1234-5678"
+  "phoneNumber": "01012345678"
 }
 ```
 * `username`: (string, required) 아이디.
-* `phoneNumber`: (string, required) 가입 시 인증한 전화번호.
+* `phoneNumber`: (string, required) 가입 시 인증한 전화번호. 하이픈 없이 입력.
 
 ---
 
@@ -420,7 +420,7 @@
   "username": "testuser",
   "name": "김테스트",
   "studentId": "202412345",
-  "phoneNumber": "010-1234-5678",
+  "phoneNumber": "01012345678",
   "department": "컴퓨터공학과",
   "role": "USER",
   "createdAt": "2024-01-01T12:00:00Z"
@@ -450,13 +450,13 @@
 {
   "currentPassword": "password123!",
   "newPassword": "newPassword456!",
-  "phoneNumber": "010-8765-4321",
+  "phoneNumber": "01087654321",
   "department": "총학생회"
 }
 ```
 * `currentPassword`: (string, required) 정보 수정을 위한 본인 확인용 현재 비밀번호.
 * `newPassword`: (string, optional) 변경할 새 비밀번호.
-* `phoneNumber`: (string, optional) 변경할 전화번호. 변경 시 SMS 재인증 필요.
+* `phoneNumber`: (string, optional) 변경할 전화번호. 하이픈 없이 입력. 변경 시 SMS 재인증 필요.
 * `department`: (string, optional) 변경할 소속 단위.
 
 ---
@@ -471,7 +471,7 @@
   "username": "testuser",
   "name": "김테스트",
   "studentId": "202412345",
-  "phoneNumber": "010-8765-4321",
+  "phoneNumber": "01087654321",
   "department": "총학생회",
   "role": "USER",
   "createdAt": "2024-01-01T12:00:00Z"
@@ -572,7 +572,7 @@
       "username": "testuser",
       "name": "김테스트",
       "studentId": "202412345",
-      "phoneNumber": "010-1234-5678",
+      "phoneNumber": "01012345678",
       "department": "컴퓨터공학과",
       "role": "USER",
       "createdAt": "2024-01-01T12:00:00Z"
