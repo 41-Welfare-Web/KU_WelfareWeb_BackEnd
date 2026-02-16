@@ -20,6 +20,8 @@ model User {
   phoneNumber  String   @unique @map("phone_number") @db.VarChar(20)
   department   String   @db.VarChar(50)
   role         Role     @default(USER)
+  loginAttempts Int      @default(0) @map("login_attempts")
+  lockUntil    DateTime? @map("lock_until") @db.Timestamptz
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   rentals              Rental[]

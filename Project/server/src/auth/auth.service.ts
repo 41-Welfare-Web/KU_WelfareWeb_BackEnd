@@ -93,8 +93,7 @@ export class AuthService {
       await this.smsService.sendVerificationCode(phoneNumber, code);
 
       return { 
-        message: '인증번호가 발송되었습니다.',
-        code: code // 프론트엔드에서 사용할 수 있도록 코드 반환
+        message: '인증번호가 발송되었습니다.'
       };
     } catch (error) {
       console.error('[AuthService] Signup Verification Error:', error);
@@ -221,9 +220,31 @@ export class AuthService {
       where: { username },
     });
 
-    // 2. 비밀번호 검증
-    if (user && (await bcrypt.compare(password, user.password))) {
-      // 3. 토큰 발급
+    if (!user) {
+      throw new UnauthorizedException(
+        '아이디 또는 비밀번호가 일치하지 않습니다.',
+      );
+    }
+
+    // 2. 계정 잠금 확인 (FR-03)
+    if (user.lockUntil && user.lockUntil > new Date()) {
+      const remainingMinutes = Math.ceil(
+        (user.lockUntil.getTime() - new Date().getTime()) / 60000,
+      );
+      throw new UnauthorizedException(
+        `잦은 로그인 실패로 인해 계정이 잠겼습니다. ${remainingMinutes}분 후 다시 시도해주세요.`,
+      );
+    }
+
+    // 3. 비밀번호 검증
+    if (await bcrypt.compare(password, user.password)) {
+      // 로그인 성공 시 실패 횟수 초기화 및 잠금 해제
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { loginAttempts: 0, lockUntil: null },
+      });
+
+      // 4. 토큰 발급
       const tokens = this.generateTokens(user);
       return {
         user: {
@@ -235,6 +256,23 @@ export class AuthService {
         ...tokens,
       };
     } else {
+      // 로그인 실패 시 횟수 증가 및 필요 시 잠금 처리
+      const newAttempts = user.loginAttempts + 1;
+      let lockUntil: Date | null = null;
+
+      if (newAttempts >= 5) {
+        lockUntil = new Date();
+        lockUntil.setMinutes(lockUntil.getMinutes() + 10); // 10분 잠금
+      }
+
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          loginAttempts: newAttempts,
+          lockUntil,
+        },
+      });
+
       throw new UnauthorizedException(
         '아이디 또는 비밀번호가 일치하지 않습니다.',
       );

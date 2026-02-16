@@ -67,7 +67,8 @@ export class FilesService {
     try {
         const urlObj = new URL(fileUrl);
         // Pathname: /storage/v1/object/public/rental-web/plotter/pdfs/uuid.pdf
-        const pathParts = urlObj.pathname.split(`/${this.bucketName}/`);
+        const decodedPath = decodeURIComponent(urlObj.pathname);
+        const pathParts = decodedPath.split(`/${this.bucketName}/`);
         if (pathParts.length < 2) return; // 버킷명 없는 경우 패스
 
         const filePath = pathParts[1]; // plotter/pdfs/uuid.pdf
