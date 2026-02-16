@@ -32,6 +32,12 @@ export class UsersController {
     return this.usersService.findMe(user.userId);
   }
 
+  @Get('me/dashboard')
+  @ApiOperation({ summary: '내 대시보드 요약 조회' })
+  async getDashboard(@GetUser() user: any) {
+    return this.usersService.getDashboardSummary(user.userId);
+  }
+
   @Put('me')
   @ApiOperation({ summary: '내 정보 수정' })
   async updateMe(@GetUser() user: any, @Body() updateUserDto: UpdateUserDto) {

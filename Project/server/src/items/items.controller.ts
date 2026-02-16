@@ -13,6 +13,9 @@ import {
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
+import { GetInventoryAvailabilityDto } from './dto/get-inventory-availability.dto';
+import { CreateItemInstanceDto } from './dto/create-item-instance.dto';
+import { UpdateItemInstanceDto } from './dto/update-item-instance.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -36,6 +39,61 @@ export class ItemsController {
   @ApiOperation({ summary: '물품 생성 (관리자)' })
   create(@Body() createItemDto: CreateItemDto) {
     return this.itemsService.create(createItemDto);
+  }
+
+  @Get(':id/availability')
+  @ApiOperation({ summary: '물품 날짜별 재고 조회 (캘린더용)' })
+  getAvailability(
+    @Param('id', ParseIntPipe) id: number,
+    @Query() query: GetInventoryAvailabilityDto,
+  ) {
+    return this.itemsService.getAvailability(
+      id,
+      new Date(query.startDate),
+      new Date(query.endDate),
+    );
+  }
+
+  @Get(':id/instances')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '개별 실물 목록 조회 (관리자)' })
+  findInstances(@Param('id', ParseIntPipe) id: number) {
+    return this.itemsService.findInstances(id);
+  }
+
+  @Post(':id/instances')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '개별 실물 등록 (관리자)' })
+  createInstance(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: CreateItemInstanceDto,
+  ) {
+    return this.itemsService.createInstance(id, dto);
+  }
+
+  @Put('instances/:instanceId')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '개별 실물 상태 수정 (관리자)' })
+  updateInstance(
+    @Param('instanceId', ParseIntPipe) instanceId: number,
+    @Body() dto: UpdateItemInstanceDto,
+  ) {
+    return this.itemsService.updateInstance(instanceId, dto);
+  }
+
+  @Delete('instances/:instanceId')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '개별 실물 삭제 (관리자)' })
+  removeInstance(@Param('instanceId', ParseIntPipe) instanceId: number) {
+    return this.itemsService.removeInstance(instanceId);
   }
 
   @Get()

@@ -187,4 +187,66 @@ export class UsersService {
 
     return updated;
   }
+
+  // 6. 내 대시보드 요약 정보 조회
+  async getDashboardSummary(userId: string) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 1) 진행 중인 대여 정보 (RENTED 상태)
+    const activeRentalsCount = await this.prisma.rental.count({
+      where: {
+        userId,
+        status: 'RENTED',
+      },
+    });
+
+    // 2) 가장 가까운 반납 예정일
+    const nearestReturn = await this.prisma.rental.findFirst({
+      where: {
+        userId,
+        status: 'RENTED',
+        endDate: { gte: today },
+      },
+      orderBy: { endDate: 'asc' },
+      select: { endDate: true },
+    });
+
+    // 3) 진행 중인 플로터 주문 정보 (PENDING, CONFIRMED, PRINTED)
+    const plotterOrdersCount = await this.prisma.plotterOrder.count({
+      where: {
+        userId,
+        status: { in: ['PENDING', 'CONFIRMED', 'PRINTED'] },
+      },
+    });
+
+    // 4) 최근 대여 내역 (상위 3건)
+    const recentRentals = await this.prisma.rental.findMany({
+      where: { userId },
+      take: 3,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        rentalItems: {
+          include: { item: { select: { name: true } } },
+        },
+      },
+    });
+
+    return {
+      activeRentalsCount,
+      nearestReturnDate: nearestReturn?.endDate || null,
+      activePlotterOrdersCount: plotterOrdersCount,
+      recentRentals: recentRentals.map((r) => ({
+        id: r.id,
+        status: r.status,
+        startDate: r.startDate,
+        endDate: r.endDate,
+        itemSummary:
+          r.rentalItems.length > 0
+            ? `${r.rentalItems[0].item.name} 외 ${r.rentalItems.length - 1}건`
+            : '물품 없음',
+      })),
+    };
+  }
 }
+

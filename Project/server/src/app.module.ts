@@ -13,6 +13,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ConfigurationsModule } from './configurations/configurations.module';
 import { HolidaysModule } from './holidays/holidays.module';
 import { SmsModule } from './sms/sms.module';
+import { CommonModule } from './common/common.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -36,6 +37,7 @@ import { APP_GUARD } from '@nestjs/core';
     ConfigurationsModule,
     HolidaysModule,
     SmsModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [
