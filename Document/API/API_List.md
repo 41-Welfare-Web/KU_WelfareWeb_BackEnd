@@ -47,3 +47,12 @@
 *   `DELETE /api/admin/holidays/{holidayId}` (휴무일 삭제 - **Admin**)
 *   `GET /api/admin/configurations` (시스템 설정 목록 조회 - **Admin**)
 *   `PUT /api/admin/configurations` (시스템 설정 수정 - **Admin**)
+
+**7. 신규 추가 API (v1.1)**
+*   `GET /api/items/{itemId}/availability` (물품 날짜별 재고 조회 - 캘린더용)
+*   `GET /api/users/me/dashboard` (내 대시보드 요약 조회)
+*   `GET /api/items/{itemId}/instances` (개별 실물 목록 조회 - **Admin**)
+*   `POST /api/items/{itemId}/instances` (개별 실물 등록 - **Admin**)
+*   `PUT /api/items/instances/{instanceId}` (개별 실물 상태 수정 - **Admin**)
+*   `DELETE /api/items/instances/{instanceId}` (개별 실물 삭제 - **Admin**)
+*   `POST /api/common/upload` (공용 이미지 업로드)

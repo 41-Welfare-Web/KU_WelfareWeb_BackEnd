@@ -16,6 +16,8 @@
 | `phone_number` | `varchar(20)` | 전화번호 | **Unique**, Not Null |
 | `department` | `varchar(50)` | 소속 단위(학과, 동아리 등) | Not Null |
 | `role` | `varchar(10)` | 사용자 역할 ('USER', 'ADMIN') | Not Null, Default: 'USER' |
+| `login_attempts` | `integer` | 로그인 실패 횟수 | Not Null, Default: 0 |
+| `lock_until` | `timestampz` | 계정 잠금 만료 시간 | Nullable |
 | `created_at` | `timestampz` | 생성일 | Not Null, Default: `now()` |
 
 **2. `categories` (물품 카테고리)**
