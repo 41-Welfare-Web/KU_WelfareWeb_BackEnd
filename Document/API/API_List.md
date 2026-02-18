@@ -24,6 +24,8 @@
 *   `POST /api/items` (물품 생성 - **Admin**)
 *   `PUT /api/items/{itemId}` (물품 수정 - **Admin**)
 *   `DELETE /api/items/{itemId}` (물품 삭제 - **Admin**)
+*   `POST /api/items/{itemId}/components` (세트 구성품 추가 - **Admin**)
+*   `DELETE /api/items/{itemId}/components/{componentId}` (세트 구성품 삭제 - **Admin**)
 *   `GET /api/categories` (카테고리 목록 조회)
 
 **4. 대여 (Rentals)**

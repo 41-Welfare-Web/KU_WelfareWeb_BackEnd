@@ -44,6 +44,17 @@
 | `total_quantity` | `integer` | 총 보유 수량 (BULK 타입 전용) | |
 | `created_at` | `timestampz` | 생성일 | Not Null, Default: `now()` |
 
+**3-1. `item_components` (세트 구성)**
+
+여러 물품을 하나의 '세트'로 묶어 관리하기 위한 테이블입니다.
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `id` | `serial` | ID | **Primary Key** |
+| `parent_id` | `integer` | 부모 물품(세트) ID | Foreign Key (`items.id`) |
+| `component_id` | `integer` | 구성품 물품 ID | Foreign Key (`items.id`) |
+| `quantity` | `integer` | 세트 내 포함 수량 | Not Null, Default: 1 |
+
 **4. `item_instances` (개별 재고)**
 
 `management_type`이 'INDIVIDUAL'인 물품의 개별 실물을 관리합니다.
