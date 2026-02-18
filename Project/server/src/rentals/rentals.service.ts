@@ -264,68 +264,140 @@ export class RentalsService {
     return { message: '예약이 취소되었습니다.' };
   }
 
+import { UpdateRentalStatusDto } from './dto/update-rental-status.dto';
+import { UpdateRentalDto } from './dto/update-rental.dto';
+import { RentalStatus, Role } from '@prisma/client';
+...
   // 5. 대여 상태 변경
   async updateStatus(
     id: number,
     userId: string,
     updateDto: UpdateRentalStatusDto,
   ) {
-    const { status: newStatus, memo } = updateDto;
-
-    const rental = await this.prisma.rental.findUnique({
-      where: { id },
-      include: {
-        user: true,
-        rentalItems: { include: { item: true } },
-      },
-    });
-    if (!rental) throw new NotFoundException('대여 건을 찾을 수 없습니다.');
-
-    if (
-      rental.status === RentalStatus.CANCELED ||
-      rental.status === RentalStatus.RETURNED
-    ) {
-      throw new BadRequestException('이미 종료된 대여 건입니다.');
-    }
-
-    const updated = await this.prisma.rental.update({
-      where: { id },
-      data: {
-        status: newStatus,
-        memo: memo, // Rental 테이블에 직접 비고 기록
-        rentalHistories: {
-          create: {
-            changedBy: userId,
-            oldStatus: rental.status,
-            newStatus,
-            memo,
-          },
-        },
-      },
-      include: {
-        user: true,
-        rentalItems: { include: { item: true } },
-      },
-    });
-
-    // 상태 변경 알림 SMS 발송
-    const itemSummary =
-      updated.rentalItems.length > 0
-        ? `${updated.rentalItems[0].item.name} 외 ${updated.rentalItems.length - 1}건`
-        : '물품 없음';
-
-    await this.smsService.sendRentalStatusNotice(
-      updated.user.phoneNumber,
-      updated.user.name,
-      itemSummary,
-      newStatus,
-      memo,
-    );
-
+...
     return updated;
   }
 
-  // 6. 반납 안내 스케줄러 (매일 오전 10시)
+  // 6. 예약 내용 수정 (날짜, 수량 변경 - FR-16)
+  async update(id: number, userId: string, updateDto: UpdateRentalDto) {
+    const { startDate, endDate, items } = updateDto;
+
+    const rental = await this.prisma.rental.findUnique({
+      where: { id },
+      include: { rentalItems: true },
+    });
+
+    if (!rental) throw new NotFoundException('대여 건을 찾을 수 없습니다.');
+    if (rental.userId !== userId)
+      throw new ForbiddenException('수정 권한이 없습니다.');
+    if (rental.status !== RentalStatus.RESERVED) {
+      throw new BadRequestException('예약 상태일 때만 수정할 수 있습니다.');
+    }
+
+    const start = startDate ? new Date(startDate) : rental.startDate;
+    const end = endDate ? new Date(endDate) : rental.endDate;
+
+    if (start > end) {
+      throw new BadRequestException('종료일이 시작일보다 빠를 수 없습니다.');
+    }
+
+    // 휴무일 체크
+    if (startDate && (await this.holidaysService.isHoliday(start))) {
+      throw new BadRequestException('수정하려는 시작일이 휴무일입니다.');
+    }
+    if (endDate && (await this.holidaysService.isHoliday(end))) {
+      throw new BadRequestException('수정하려는 반납일이 휴무일입니다.');
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      // 품목 수정 시 재고 재검증
+      if (items) {
+        for (const reqItem of items) {
+          const item = await tx.item.findUnique({
+            where: { id: reqItem.itemId },
+          });
+          if (!item)
+            throw new NotFoundException(`물품(ID: ${reqItem.itemId}) 없음`);
+
+          const totalQty = item.totalQuantity || 1;
+
+          // 자신(id)을 제외한 다른 예약/대여 건들의 중복 수량 합산
+          const overlappingRentals = await tx.rentalItem.findMany({
+            where: {
+              itemId: reqItem.itemId,
+              rental: {
+                id: { not: id }, // 자신의 현재 예약은 제외
+                status: { in: [RentalStatus.RESERVED, RentalStatus.RENTED] },
+                OR: [
+                  {
+                    startDate: { lte: end },
+                    endDate: { gte: start },
+                  },
+                ],
+              },
+            },
+            select: { quantity: true },
+          });
+
+          const otherReservedQty = overlappingRentals.reduce(
+            (sum, r) => sum + r.quantity,
+            0,
+          );
+
+          if (totalQty - otherReservedQty < reqItem.quantity) {
+            throw new ConflictException(
+              `'${item.name}'의 재고가 부족합니다. (가용: ${totalQty - otherReservedQty})`,
+            );
+          }
+        }
+
+        // 기존 품목 삭제 후 새로 생성
+        await tx.rentalItem.deleteMany({ where: { rentalId: id } });
+        await tx.rental.update({
+          where: { id },
+          data: {
+            startDate: start,
+            endDate: end,
+            rentalItems: {
+              create: items.map((i) => ({
+                itemId: i.itemId,
+                quantity: i.quantity,
+              })),
+            },
+            rentalHistories: {
+              create: {
+                changedBy: userId,
+                oldStatus: RentalStatus.RESERVED,
+                newStatus: RentalStatus.RESERVED,
+                memo: '예약 내용(날짜/수량) 수정',
+              },
+            },
+          },
+        });
+      } else {
+        // 날짜만 수정하는 경우
+        await tx.rental.update({
+          where: { id },
+          data: {
+            startDate: start,
+            endDate: end,
+            rentalHistories: {
+              create: {
+                changedBy: userId,
+                oldStatus: RentalStatus.RESERVED,
+                newStatus: RentalStatus.RESERVED,
+                memo: '예약 기간 수정',
+              },
+            },
+          },
+        });
+      }
+
+      return { message: '예약 정보가 성공적으로 수정되었습니다.' };
+    });
+  }
+
+  // 7. 반납 안내 스케줄러 (매일 오전 10시)
   @Cron('0 10 * * *')
   async handleRentalReminder() {
     console.log('[RentalsService] Running D-1 Return Reminder Scheduler...');

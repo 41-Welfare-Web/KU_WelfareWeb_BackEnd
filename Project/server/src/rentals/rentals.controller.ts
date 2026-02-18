@@ -14,6 +14,7 @@ import { RentalsService } from './rentals.service';
 import { CreateRentalDto } from './dto/create-rental.dto';
 import { CreateRentalByAdminDto } from './dto/create-rental-by-admin.dto';
 import { UpdateRentalStatusDto } from './dto/update-rental-status.dto';
+import { UpdateRentalDto } from './dto/update-rental.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../auth/get-user.decorator';
 import { RolesGuard } from '../auth/roles.guard';
@@ -64,6 +65,16 @@ export class RentalsController {
   @ApiOperation({ summary: '대여 상세 조회' })
   findOne(@GetUser() user: any, @Param('id', ParseIntPipe) id: number) {
     return this.rentalsService.findOne(id, user.userId, user.role);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: '예약 정보 수정 (사용자)' })
+  update(
+    @GetUser() user: any,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDto: UpdateRentalDto,
+  ) {
+    return this.rentalsService.update(id, user.userId, updateDto);
   }
 
   @Delete(':id')
