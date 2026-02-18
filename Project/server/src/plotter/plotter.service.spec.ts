@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { FilesService } from '../common/files.service';
 import { ConfigurationsService } from '../configurations/configurations.service';
 import { HolidaysService } from '../holidays/holidays.service';
+import { SmsService } from '../sms/sms.service';
 import { BadRequestException } from '@nestjs/common';
 
 jest.mock('uuid', () => ({ v4: () => 'test-uuid' }));
@@ -17,7 +18,10 @@ describe('PlotterService', () => {
         PlotterService,
         {
           provide: PrismaService,
-          useValue: { plotterOrder: { create: jest.fn().mockResolvedValue({ id: 1 }) } },
+          useValue: {
+            plotterOrder: { create: jest.fn().mockResolvedValue({ id: 1 }) },
+            user: { findUnique: jest.fn().mockResolvedValue({ id: 'user-id', department: '중앙동아리', name: '테스터', phoneNumber: '01012341234' }) },
+          },
         },
         {
           provide: FilesService,
@@ -25,11 +29,15 @@ describe('PlotterService', () => {
         },
         {
           provide: ConfigurationsService,
-          useValue: { getValue: jest.fn().mockResolvedValue('2') },
+          useValue: { getValue: jest.fn().mockResolvedValue('0') },
         },
         {
           provide: HolidaysService,
           useValue: { calculateBusinessDate: jest.fn().mockResolvedValue(new Date()) },
+        },
+        {
+          provide: SmsService,
+          useValue: { sendPlotterStatusNotice: jest.fn().mockResolvedValue(true) },
         },
       ],
     }).compile();
@@ -66,10 +74,10 @@ describe('PlotterService', () => {
     } as Express.Multer.File;
 
     const dto = {
-      purpose: 'Test',
+      purpose: '예산안 출력',
+      department: '중앙동아리',
       paperSize: 'A0',
       pageCount: 1,
-      isPaidService: 'false', // Form data often comes as string
     } as any;
 
     const result = await service.create('user-id', dto, realPdf, undefined);
