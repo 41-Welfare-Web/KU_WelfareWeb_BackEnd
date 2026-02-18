@@ -10,6 +10,7 @@ import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { CreateItemInstanceDto } from './dto/create-item-instance.dto';
 import { UpdateItemInstanceDto } from './dto/update-item-instance.dto';
+import { AddItemComponentDto } from './dto/add-item-component.dto';
 
 @Injectable()
 export class ItemsService {
@@ -102,7 +103,7 @@ export class ItemsService {
   async findOne(id: number) {
     const item = await this.prisma.item.findUnique({
       where: { id },
-      include: { category: true },
+      include: { category: true, components: { include: { component: true } } },
     });
 
     if (!item) throw new NotFoundException('물품을 찾을 수 없습니다.');
@@ -157,7 +158,6 @@ export class ItemsService {
     const totalQty = item.totalQuantity || 0;
     const availability: any[] = [];
 
-    // 날짜 객체에서 로컬 기준 'YYYY-MM-DD' 문자열을 추출하는 헬퍼
     const toLocalDateStr = (date: Date) => {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -168,7 +168,6 @@ export class ItemsService {
     const current = new Date(startDate);
     const end = new Date(endDate);
     
-    // 시각 차이로 인한 누락 방지를 위해 범위를 넉넉히 잡고 메모리에서 필터링
     const searchStart = new Date(startDate);
     searchStart.setDate(searchStart.getDate() - 1);
     const searchEnd = new Date(endDate);
@@ -273,5 +272,49 @@ export class ItemsService {
 
     await this.prisma.itemInstance.delete({ where: { id: instanceId } });
     return { message: '실물이 삭제되었습니다.' };
+  }
+
+  // 11. 세트 구성품 추가
+  async addComponent(parentId: number, dto: AddItemComponentDto) {
+    if (parentId === dto.componentId) {
+      throw new BadRequestException('자기 자신을 구성품으로 추가할 수 없습니다.');
+    }
+
+    const [parent, component] = await Promise.all([
+      this.prisma.item.findUnique({ where: { id: parentId } }),
+      this.prisma.item.findUnique({ where: { id: dto.componentId } }),
+    ]);
+
+    if (!parent || !component) {
+      throw new NotFoundException('물품을 찾을 수 없습니다.');
+    }
+
+    return this.prisma.itemComponent.upsert({
+      where: {
+        parentId_componentId: {
+          parentId,
+          componentId: dto.componentId,
+        },
+      },
+      update: { quantity: dto.quantity },
+      create: {
+        parentId,
+        componentId: dto.componentId,
+        quantity: dto.quantity,
+      },
+    });
+  }
+
+  // 12. 세트 구성품 삭제
+  async removeComponent(parentId: number, componentId: number) {
+    await this.prisma.itemComponent.delete({
+      where: {
+        parentId_componentId: {
+          parentId,
+          componentId,
+        },
+      },
+    });
+    return { message: '구성품이 세트에서 제외되었습니다.' };
   }
 }

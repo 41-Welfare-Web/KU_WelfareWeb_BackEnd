@@ -16,6 +16,7 @@ import { UpdateItemDto } from './dto/update-item.dto';
 import { GetInventoryAvailabilityDto } from './dto/get-inventory-availability.dto';
 import { CreateItemInstanceDto } from './dto/create-item-instance.dto';
 import { UpdateItemInstanceDto } from './dto/update-item-instance.dto';
+import { AddItemComponentDto } from './dto/add-item-component.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -94,6 +95,30 @@ export class ItemsController {
   @ApiOperation({ summary: '개별 실물 삭제 (관리자)' })
   removeInstance(@Param('instanceId', ParseIntPipe) instanceId: number) {
     return this.itemsService.removeInstance(instanceId);
+  }
+
+  @Post(':id/components')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '세트 구성품 추가 (관리자)' })
+  addComponent(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddItemComponentDto,
+  ) {
+    return this.itemsService.addComponent(id, dto);
+  }
+
+  @Delete(':id/components/:componentId')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '세트 구성품 삭제 (관리자)' })
+  removeComponent(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('componentId', ParseIntPipe) componentId: number,
+  ) {
+    return this.itemsService.removeComponent(id, componentId);
   }
 
   @Get()

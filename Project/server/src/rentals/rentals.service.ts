@@ -63,22 +63,48 @@ export class RentalsService {
     }
 
     return this.prisma.$transaction(async (tx) => {
+      const finalItemsToRent: { itemId: number; quantity: number }[] = [];
+
+      // 1. 모든 요청 품목에 대해 세트 구성 확인 및 목록 확장
       for (const reqItem of items) {
-        const item = await tx.item.findUnique({
+        const itemWithComponents = await tx.item.findUnique({
           where: { id: reqItem.itemId },
+          include: { components: true },
+        });
+
+        if (!itemWithComponents) {
+          throw new NotFoundException(`물품(ID: ${reqItem.itemId})을 찾을 수 없습니다.`);
+        }
+
+        // 메인 품목 추가
+        finalItemsToRent.push({ itemId: reqItem.itemId, quantity: reqItem.quantity });
+
+        // 세트 구성품이 있다면 함께 추가
+        if (itemWithComponents.components.length > 0) {
+          for (const component of itemWithComponents.components) {
+            finalItemsToRent.push({
+              itemId: component.componentId,
+              quantity: component.quantity * reqItem.quantity,
+            });
+          }
+        }
+      }
+
+      // 2. 최종 품목 리스트(메인+구성품)에 대해 재고 검증
+      for (const finalItem of finalItemsToRent) {
+        const item = await tx.item.findUnique({
+          where: { id: finalItem.itemId },
         });
 
         if (!item) {
-          throw new NotFoundException(
-            `물품(ID: ${reqItem.itemId})을 찾을 수 없습니다.`,
-          );
+          throw new NotFoundException(`물품(ID: ${finalItem.itemId})을 찾을 수 없습니다.`);
         }
 
         const totalQty = item.totalQuantity || 1;
 
         const overlappingRentals = await tx.rentalItem.findMany({
           where: {
-            itemId: reqItem.itemId,
+            itemId: finalItem.itemId,
             rental: {
               status: { in: [RentalStatus.RESERVED, RentalStatus.RENTED] },
               OR: [
@@ -97,13 +123,14 @@ export class RentalsService {
           0,
         );
 
-        if (totalQty - reservedQty < reqItem.quantity) {
+        if (totalQty - reservedQty < finalItem.quantity) {
           throw new ConflictException(
             `'${item.name}'의 재고가 부족합니다. (남은 수량: ${totalQty - reservedQty})`,
           );
         }
       }
 
+      // 3. 대여 건 생성
       const rental = await tx.rental.create({
         data: {
           userId,
@@ -111,7 +138,7 @@ export class RentalsService {
           endDate: end,
           status: RentalStatus.RESERVED,
           rentalItems: {
-            create: items.map((i) => ({
+            create: finalItemsToRent.map((i) => ({
               itemId: i.itemId,
               quantity: i.quantity,
             })),
@@ -438,8 +465,61 @@ export class RentalsService {
     });
   }
 
-  // 7. 반납 안내 스케줄러 (매일 오전 10시)
-  @Cron('0 10 * * *')
+  // 7. 자동 연체 처리 스케줄러 (매일 오전 9시 KST)
+  @Cron('0 9 * * *', { timeZone: 'Asia/Seoul' })
+  async handleOverdueRentals() {
+    console.log('[RentalsService] Running Automated Overdue Processing...');
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 반납일이 오늘보다 이전인데 아직 대여 중인 건 조회
+    const overdueRentals = await this.prisma.rental.findMany({
+      where: {
+        status: RentalStatus.RENTED,
+        endDate: {
+          lt: today,
+        },
+      },
+      include: {
+        user: true,
+        rentalItems: { include: { item: true } },
+      },
+    });
+
+    console.log(`[RentalsService] Found ${overdueRentals.length} overdue rentals.`);
+
+    for (const rental of overdueRentals) {
+      await this.prisma.rental.update({
+        where: { id: rental.id },
+        data: {
+          status: RentalStatus.OVERDUE,
+          rentalHistories: {
+            create: {
+              changedBy: rental.userId, // 시스템 자동 처리지만 대상자 기준으로 기록
+              oldStatus: RentalStatus.RENTED,
+              newStatus: RentalStatus.OVERDUE,
+              memo: '반납 기한 도래로 인한 시스템 자동 연체 처리',
+            },
+          },
+        },
+      });
+
+      const itemSummary =
+        rental.rentalItems.length > 0
+          ? `${rental.rentalItems[0].item.name} 외 ${rental.rentalItems.length - 1}건`
+          : '물품 없음';
+
+      // 연체 안내 SMS 발송
+      await this.smsService.sendSMS(
+        rental.user.phoneNumber,
+        `[RentalWeb] ${rental.user.name}님, [${itemSummary}]의 반납 기한이 지났습니다. 현재 연체 상태이오니 즉시 반납 부탁드립니다.`,
+      );
+    }
+  }
+
+  // 8. 반납 안내 스케줄러 (매일 오전 10시 KST)
+  @Cron('0 10 * * *', { timeZone: 'Asia/Seoul' })
   async handleRentalReminder() {
     console.log('[RentalsService] Running D-1 Return Reminder Scheduler...');
 

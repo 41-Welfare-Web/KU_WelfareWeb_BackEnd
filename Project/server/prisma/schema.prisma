@@ -64,8 +64,26 @@ model Item {
   category      Category       @relation(fields: [categoryId], references: [id])
   itemInstances ItemInstance[]
   rentalItems   RentalItem[]
+  
+  // 세트 구성 (Bundle)
+  components    ItemComponent[] @relation("ParentItem")
+  isPartOf      ItemComponent[] @relation("ComponentItem")
 
   @@map("items")
+}
+
+// 3-1. Item Components (Bundle Composition)
+model ItemComponent {
+  id           Int  @id @default(autoincrement())
+  parentId     Int  @map("parent_id")
+  componentId  Int  @map("component_id")
+  quantity     Int  @default(1)
+
+  parent    Item @relation("ParentItem", fields: [parentId], references: [id])
+  component Item @relation("ComponentItem", fields: [componentId], references: [id])
+
+  @@unique([parentId, componentId])
+  @@map("item_components")
 }
 
 enum ManagementType {
