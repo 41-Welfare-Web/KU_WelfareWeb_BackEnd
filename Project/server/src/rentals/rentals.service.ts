@@ -292,6 +292,7 @@ export class RentalsService {
       where: { id },
       data: {
         status: newStatus,
+        memo: memo, // Rental 테이블에 직접 비고 기록
         rentalHistories: {
           create: {
             changedBy: userId,
