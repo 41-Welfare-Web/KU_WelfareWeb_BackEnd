@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { RentalsService } from './rentals.service';
 import { CreateRentalDto } from './dto/create-rental.dto';
+import { CreateRentalByAdminDto } from './dto/create-rental-by-admin.dto';
 import { UpdateRentalStatusDto } from './dto/update-rental-status.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../auth/get-user.decorator';
@@ -30,7 +31,18 @@ export class RentalsController {
   @Post()
   @ApiOperation({ summary: '새 대여 예약 생성' })
   create(@GetUser() user: any, @Body() createRentalDto: CreateRentalDto) {
-    return this.rentalsService.create(user.userId, createRentalDto);
+    return this.rentalsService.create(user.userId, createRentalDto, user.userId);
+  }
+
+  @Post('admin')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: '사용자 대여 대리 신청 (관리자)' })
+  createByAdmin(
+    @GetUser() admin: any,
+    @Body() createRentalByAdminDto: CreateRentalByAdminDto,
+  ) {
+    const { targetUserId, ...rest } = createRentalByAdminDto;
+    return this.rentalsService.create(targetUserId, rest, admin.userId);
   }
 
   @Get()

@@ -6,10 +6,12 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePlotterOrderDto } from './dto/create-plotter-order.dto';
+import { PlotterPriceCheckDto } from './dto/plotter-price-check.dto';
 import { PlotterStatus, Role } from '@prisma/client';
 import { FilesService } from '../common/files.service';
 import { ConfigurationsService } from '../configurations/configurations.service';
 import { HolidaysService } from '../holidays/holidays.service';
+import { SmsService } from '../sms/sms.service';
 
 @Injectable()
 export class PlotterService {
@@ -18,7 +20,44 @@ export class PlotterService {
     private filesService: FilesService,
     private configService: ConfigurationsService,
     private holidaysService: HolidaysService,
+    private smsService: SmsService,
   ) {}
+
+  // 가격 및 무료 여부 계산 (공통 로직)
+  async calculateEstimatedPrice(dto: PlotterPriceCheckDto) {
+    const { department, purpose, paperSize, pageCount } = dto;
+
+    const unitPriceStr = await this.configService.getValue(
+      `plotter_price_${paperSize.toLowerCase()}`,
+      '0',
+    );
+    const unitPrice = parseInt(unitPriceStr, 10);
+    let totalPrice = unitPrice * Number(pageCount);
+
+    // 무료 조건 체크
+    const freeDeptsStr = await this.configService.getValue('plotter_free_departments', '');
+    const freePurposesStr = await this.configService.getValue('plotter_free_purposes', '');
+
+    const freeDepts = freeDeptsStr.split(',').map((d) => d.trim());
+    const freePurposes = freePurposesStr.split(',').map((p) => p.trim());
+
+    const isFreeDept = freeDepts.includes(department);
+    const isFreePurpose = freePurposes.includes(purpose);
+
+    let message = `인쇄 비용은 총 ${totalPrice.toLocaleString()}원입니다.`;
+    if (isFreeDept && isFreePurpose) {
+      totalPrice = 0;
+      message = `${department} 소속 및 ${purpose} 목적으로 인해 무료 인쇄 대상입니다.`;
+    } else if (totalPrice > 0) {
+      message += ' 입금 확인증(영수증) 업로드가 필요합니다.';
+    }
+
+    return {
+      price: totalPrice,
+      isFree: totalPrice === 0,
+      message,
+    };
+  }
 
   async create(
     userId: string,
@@ -29,26 +68,35 @@ export class PlotterService {
     if (!pdfFile) {
       throw new BadRequestException('PDF 파일이 필요합니다.');
     }
-    
+
     // 1. MIME Type 체크 (기본)
     if (pdfFile.mimetype !== 'application/pdf') {
       throw new BadRequestException('PDF 파일만 업로드 가능합니다.');
     }
 
     // 2. Magic Number 체크 (실제 파일 내용 검증)
-    // PDF 파일은 반드시 %PDF- (0x25 0x50 0x44 0x46 0x2D)로 시작해야 함
     const header = pdfFile.buffer.slice(0, 5).toString();
     if (header !== '%PDF-') {
-      throw new BadRequestException('유효하지 않은 PDF 형식입니다. 실제 PDF 파일을 업로드해주세요.');
+      throw new BadRequestException(
+        '유효하지 않은 PDF 형식입니다. 실제 PDF 파일을 업로드해주세요.',
+      );
     }
 
-    const { purpose, paperSize, pageCount, isPaidService } = createOrderDto;
+    const { purpose, paperSize, pageCount, department } = createOrderDto;
 
-    const isPaid = String(isPaidService) === 'true';
+    // 3. 가격 계산 및 유/무료 판별 로직 호출
+    const { price: totalPrice, isFree } = await this.calculateEstimatedPrice({
+      department,
+      purpose,
+      paperSize,
+      pageCount,
+    });
+
+    const isPaid = totalPrice > 0;
 
     if (isPaid && !receiptFile) {
       throw new BadRequestException(
-        '유료 서비스는 입금 내역 이미지가 필요합니다.',
+        `해당 주문은 유료 서비스(${totalPrice}원)입니다. 입금 내역 이미지를 업로드해주세요.`,
       );
     }
 
@@ -78,6 +126,7 @@ export class PlotterService {
         paperSize,
         pageCount: Number(pageCount),
         isPaidService: isPaid,
+        price: totalPrice,
         fileUrl,
         originalFilename: pdfFile.originalname,
         fileSize: pdfFile.size,
@@ -85,7 +134,9 @@ export class PlotterService {
         pickupDate,
         status: PlotterStatus.PENDING,
       },
-      include: { user: { select: { name: true, studentId: true } } },
+      include: {
+        user: { select: { name: true, studentId: true, department: true } },
+      },
     });
 
     return order;
@@ -184,8 +235,16 @@ export class PlotterService {
           },
         },
       },
-      include: { user: { select: { name: true, studentId: true } } },
+      include: { user: true },
     });
+
+    // 상태 변경 알림 SMS 발송
+    await this.smsService.sendPlotterStatusNotice(
+      updated.user.phoneNumber,
+      updated.user.name,
+      status,
+      rejectionReason,
+    );
 
     return updated;
   }

@@ -11,6 +11,8 @@ import { UpdateRentalStatusDto } from './dto/update-rental-status.dto';
 import { RentalStatus, Role } from '@prisma/client';
 import { ConfigurationsService } from '../configurations/configurations.service';
 import { HolidaysService } from '../holidays/holidays.service';
+import { SmsService } from '../sms/sms.service';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class RentalsService {
@@ -18,13 +20,16 @@ export class RentalsService {
     private prisma: PrismaService,
     private configService: ConfigurationsService,
     private holidaysService: HolidaysService,
+    private smsService: SmsService,
   ) {}
 
   // 1. 대여 예약 생성
-  async create(userId: string, createRentalDto: CreateRentalDto) {
+  async create(userId: string, createRentalDto: CreateRentalDto, actorId?: string) {
     const { startDate, endDate, items } = createRentalDto;
     const start = new Date(startDate);
     const end = new Date(endDate);
+
+    const actualActorId = actorId || userId; // 조작한 사람이 없으면 본인으로 간주
 
     if (start > end) {
       throw new BadRequestException('종료일이 시작일보다 빠를 수 없습니다.');
@@ -114,18 +119,32 @@ export class RentalsService {
           },
           rentalHistories: {
             create: {
-              changedBy: userId,
+              changedBy: actualActorId,
               newStatus: RentalStatus.RESERVED,
-              memo: '대여 예약 생성',
+              memo: actorId && actorId !== userId ? '관리자 대리 예약 생성' : '대여 예약 생성',
             },
           },
         },
         include: {
+          user: true,
           rentalItems: {
             include: { item: true },
           },
         },
       });
+
+      // 예약 완료 SMS 발송
+      const itemSummary =
+        rental.rentalItems.length > 0
+          ? `${rental.rentalItems[0].item.name} 외 ${rental.rentalItems.length - 1}건`
+          : '물품 없음';
+
+      await this.smsService.sendRentalStatusNotice(
+        rental.user.phoneNumber,
+        rental.user.name,
+        itemSummary,
+        RentalStatus.RESERVED,
+      );
 
       return rental;
     });
@@ -152,7 +171,7 @@ export class RentalsService {
         take: pageSize,
         orderBy: { createdAt: 'desc' },
         include: {
-          user: { select: { name: true, studentId: true } },
+          user: { select: { name: true, studentId: true, phoneNumber: true } },
           rentalItems: { include: { item: { select: { name: true } } } },
         },
       }),
@@ -181,7 +200,7 @@ export class RentalsService {
     const rental = await this.prisma.rental.findUnique({
       where: { id },
       include: {
-        user: { select: { name: true, studentId: true } },
+        user: { select: { name: true, studentId: true, phoneNumber: true } },
         rentalItems: { include: { item: true } },
         rentalHistories: true,
       },
@@ -198,7 +217,13 @@ export class RentalsService {
 
   // 4. 예약 취소
   async cancel(id: number, userId: string) {
-    const rental = await this.prisma.rental.findUnique({ where: { id } });
+    const rental = await this.prisma.rental.findUnique({
+      where: { id },
+      include: {
+        user: true,
+        rentalItems: { include: { item: true } },
+      },
+    });
     if (!rental) throw new NotFoundException('대여 건을 찾을 수 없습니다.');
 
     if (rental.userId !== userId)
@@ -207,7 +232,7 @@ export class RentalsService {
       throw new BadRequestException('예약 상태일 때만 취소할 수 있습니다.');
     }
 
-    await this.prisma.rental.update({
+    const updated = await this.prisma.rental.update({
       where: { id },
       data: {
         status: RentalStatus.CANCELED,
@@ -221,6 +246,21 @@ export class RentalsService {
         },
       },
     });
+
+    // 취소 알림 SMS
+    const itemSummary =
+      rental.rentalItems.length > 0
+        ? `${rental.rentalItems[0].item.name} 외 ${rental.rentalItems.length - 1}건`
+        : '물품 없음';
+
+    await this.smsService.sendRentalStatusNotice(
+      rental.user.phoneNumber,
+      rental.user.name,
+      itemSummary,
+      RentalStatus.CANCELED,
+      '사용자 직접 취소',
+    );
+
     return { message: '예약이 취소되었습니다.' };
   }
 
@@ -232,7 +272,13 @@ export class RentalsService {
   ) {
     const { status: newStatus, memo } = updateDto;
 
-    const rental = await this.prisma.rental.findUnique({ where: { id } });
+    const rental = await this.prisma.rental.findUnique({
+      where: { id },
+      include: {
+        user: true,
+        rentalItems: { include: { item: true } },
+      },
+    });
     if (!rental) throw new NotFoundException('대여 건을 찾을 수 없습니다.');
 
     if (
@@ -256,10 +302,73 @@ export class RentalsService {
         },
       },
       include: {
+        user: true,
         rentalItems: { include: { item: true } },
       },
     });
 
+    // 상태 변경 알림 SMS 발송
+    const itemSummary =
+      updated.rentalItems.length > 0
+        ? `${updated.rentalItems[0].item.name} 외 ${updated.rentalItems.length - 1}건`
+        : '물품 없음';
+
+    await this.smsService.sendRentalStatusNotice(
+      updated.user.phoneNumber,
+      updated.user.name,
+      itemSummary,
+      newStatus,
+      memo,
+    );
+
     return updated;
+  }
+
+  // 6. 반납 안내 스케줄러 (매일 오전 10시)
+  @Cron('0 10 * * *')
+  async handleRentalReminder() {
+    console.log('[RentalsService] Running D-1 Return Reminder Scheduler...');
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    const dayAfterTomorrow = new Date(tomorrow);
+    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 1);
+
+    // 내일 반납인 대여 중(RENTED)인 건 조회
+    const rentalsDueTomorrow = await this.prisma.rental.findMany({
+      where: {
+        status: RentalStatus.RENTED,
+        endDate: {
+          gte: tomorrow,
+          lt: dayAfterTomorrow,
+        },
+      },
+      include: {
+        user: true,
+        rentalItems: { include: { item: true } },
+      },
+    });
+
+    console.log(
+      `[RentalsService] Found ${rentalsDueTomorrow.length} rentals due tomorrow.`,
+    );
+
+    for (const rental of rentalsDueTomorrow) {
+      const itemSummary =
+        rental.rentalItems.length > 0
+          ? `${rental.rentalItems[0].item.name} 외 ${rental.rentalItems.length - 1}건`
+          : '물품 없음';
+
+      const dueDateStr = rental.endDate.toISOString().split('T')[0];
+
+      await this.smsService.sendReturnReminder(
+        rental.user.phoneNumber,
+        rental.user.name,
+        itemSummary,
+        dueDateStr,
+      );
+    }
   }
 }

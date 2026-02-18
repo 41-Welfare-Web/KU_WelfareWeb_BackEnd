@@ -61,7 +61,71 @@ export class SmsService {
    * 인증번호 발송 편의 메소드
    */
   async sendVerificationCode(receiver: string, code: string): Promise<boolean> {
-    const message = `[RentalWeb] 인증번호는 [${code}] 입니다. 3분 내에 입력해주세요.`;
+    const message = `[RentalWeb] 인증번호는 [${code}] 입니다. 5분 내에 입력해주세요.`;
+    return this.sendSMS(receiver, message);
+  }
+
+  /**
+   * 대여 상태 변경 알림
+   */
+  async sendRentalStatusNotice(
+    receiver: string,
+    name: string,
+    itemSummary: string,
+    status: string,
+    memo?: string,
+  ): Promise<boolean> {
+    let statusText = status;
+    if (status === 'RESERVED') statusText = '예약 완료';
+    if (status === 'RENTED') statusText = '대여 중(수령 완료)';
+    if (status === 'RETURNED') statusText = '반납 완료';
+    if (status === 'CANCELED') statusText = '취소됨';
+
+    let message = `[RentalWeb] ${name}님, 대여 신청하신 [${itemSummary}]의 상태가 [${statusText}]로 변경되었습니다.`;
+    if (memo) {
+      message += `\n사유/메모: ${memo}`;
+    }
+    
+    return this.sendSMS(receiver, message);
+  }
+
+  /**
+   * 반납 예정일 안내 (D-1)
+   */
+  async sendReturnReminder(
+    receiver: string,
+    name: string,
+    itemSummary: string,
+    dueDate: string,
+  ): Promise<boolean> {
+    const message = `[RentalWeb] ${name}님, 대여 중인 [${itemSummary}]의 반납 예정일은 내일(${dueDate})입니다. 늦지 않게 반납 부탁드립니다.`;
+    return this.sendSMS(receiver, message);
+  }
+
+  /**
+   * 플로터 주문 상태 알림 (반려, 완료 등)
+   */
+  async sendPlotterStatusNotice(
+    receiver: string,
+    name: string,
+    status: string,
+    rejectionReason?: string,
+  ): Promise<boolean> {
+    let statusText = status;
+    if (status === 'PENDING') statusText = '주문 대기';
+    if (status === 'APPROVED') statusText = '주문 확정';
+    if (status === 'COMPLETED') statusText = '인쇄 완료';
+    if (status === 'REJECTED') statusText = '주문 반려';
+    if (status === 'PICKED_UP') statusText = '수령 완료';
+
+    let message = `[RentalWeb] ${name}님, 플로터 주문 상태가 [${statusText}]로 변경되었습니다.`;
+
+    if (status === 'REJECTED') {
+      message = `[RentalWeb] ${name}님, 플로터 주문이 반려되었습니다.\n사유: ${rejectionReason || '규정 미준수 등'}`;
+    } else if (status === 'COMPLETED') {
+      message = `[RentalWeb] ${name}님, 플로터 인쇄가 완료되었습니다. 학생회실에서 수령해 주세요!`;
+    }
+
     return this.sendSMS(receiver, message);
   }
 }

@@ -8,6 +8,11 @@ export class CreatePlotterOrderDto {
   @IsNotEmpty()
   purpose: string;
 
+  @ApiProperty({ example: '중앙동아리', description: '소속 단위' })
+  @IsString()
+  @IsNotEmpty()
+  department: string;
+
   @ApiProperty({ example: 'A0', description: '용지 크기 (A0, A1)' })
   @IsString()
   @IsNotEmpty()
@@ -18,12 +23,6 @@ export class CreatePlotterOrderDto {
   @IsInt()
   @IsNotEmpty()
   pageCount: number;
-
-  @ApiProperty({ example: true, description: '유료 서비스 여부' })
-  @Transform(({ value }) => value === 'true' || value === true)
-  @IsBoolean()
-  @IsNotEmpty()
-  isPaidService: boolean;
 }
 
 export class CreatePlotterOrderWithFilesDto extends CreatePlotterOrderDto {

@@ -17,6 +17,7 @@ import {
   CreatePlotterOrderDto,
   CreatePlotterOrderWithFilesDto,
 } from './dto/create-plotter-order.dto';
+import { PlotterPriceCheckDto } from './dto/plotter-price-check.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../auth/get-user.decorator';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -38,6 +39,13 @@ import {
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 export class PlotterController {
   constructor(private readonly plotterService: PlotterService) {}
+
+  @Post('calculate-price')
+  @ApiOperation({ summary: '플로터 예상 가격 계산 (실시간 미리보기용)' })
+  @ApiBody({ type: PlotterPriceCheckDto })
+  calculatePrice(@Body() dto: PlotterPriceCheckDto) {
+    return this.plotterService.calculateEstimatedPrice(dto);
+  }
 
   @Post('orders')
   @UseInterceptors(
