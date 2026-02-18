@@ -68,6 +68,7 @@
 | `start_date` | `date` | 대여 시작일 | Not Null |
 | `end_date` | `date` | 반납 예정일 | Not Null |
 | `status` | `varchar(20)` | 대여 상태 ('RESERVED', 'RENTED', 'RETURNED', 'CANCELED', 'OVERDUE') | Not Null, Default: 'RESERVED' |
+| `memo` | `text` | 비고 (수령인 불일치 등 관리자 기록) | |
 | `created_at` | `timestampz` | 예약 생성일 | Not Null, Default: `now()` |
 
 **6. `rental_items` (대여 품목)**
