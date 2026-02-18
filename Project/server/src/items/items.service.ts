@@ -19,13 +19,13 @@ export class ItemsService {
   async create(createItemDto: CreateItemDto) {
     const { categoryId, itemCode, name, description, imageUrl, managementType, totalQuantity } = createItemDto;
 
-    const category = await this.prisma.category.findUnique({
-      where: { id: categoryId },
+    const category = await this.prisma.category.findFirst({
+      where: { id: categoryId, deletedAt: null },
     });
     if (!category) throw new NotFoundException('존재하지 않는 카테고리입니다.');
 
     const existing = await this.prisma.item.findUnique({ where: { itemCode } });
-    if (existing) throw new ConflictException('이미 존재하는 물품 코드입니다.');
+    if (existing && !existing.deletedAt) throw new ConflictException('이미 존재하는 물품 코드입니다.');
 
     return this.prisma.item.create({
       data: {
@@ -49,7 +49,7 @@ export class ItemsService {
     sortBy: string = 'popularity',
     sortOrder: 'asc' | 'desc' = 'desc',
   ) {
-    const where: any = {};
+    const where: any = { deletedAt: null };
 
     if (search) {
       where.name = { contains: search, mode: 'insensitive' };
@@ -101,8 +101,8 @@ export class ItemsService {
   }
 
   async findOne(id: number) {
-    const item = await this.prisma.item.findUnique({
-      where: { id },
+    const item = await this.prisma.item.findFirst({
+      where: { id, deletedAt: null },
       include: { category: true, components: { include: { component: true } } },
     });
 
@@ -112,14 +112,14 @@ export class ItemsService {
   }
 
   async update(id: number, updateItemDto: UpdateItemDto) {
-    const item = await this.prisma.item.findUnique({ where: { id } });
+    const item = await this.prisma.item.findFirst({ where: { id, deletedAt: null } });
     if (!item) throw new NotFoundException('물품을 찾을 수 없습니다.');
 
     if (updateItemDto.itemCode && updateItemDto.itemCode !== item.itemCode) {
       const existing = await this.prisma.item.findUnique({
         where: { itemCode: updateItemDto.itemCode },
       });
-      if (existing)
+      if (existing && !existing.deletedAt)
         throw new ConflictException('이미 존재하는 물품 코드입니다.');
     }
 
@@ -131,8 +131,8 @@ export class ItemsService {
   }
 
   async remove(id: number) {
-    const item = await this.prisma.item.findUnique({
-      where: { id },
+    const item = await this.prisma.item.findFirst({
+      where: { id, deletedAt: null },
       include: { _count: { select: { rentalItems: true } } },
     });
 
@@ -144,14 +144,17 @@ export class ItemsService {
       );
     }
 
-    await this.prisma.item.delete({ where: { id } });
+    await this.prisma.item.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
     return { message: '물품이 삭제되었습니다.' };
   }
 
   // 6. 물품 미래 재고 조회 (캘린더용)
   async getAvailability(itemId: number, startDate: Date, endDate: Date) {
-    const item = await this.prisma.item.findUnique({
-      where: { id: itemId },
+    const item = await this.prisma.item.findFirst({
+      where: { id: itemId, deletedAt: null },
     });
     if (!item) throw new NotFoundException('물품을 찾을 수 없습니다.');
 
@@ -215,20 +218,20 @@ export class ItemsService {
   // 7. 개별 실물 목록 조회
   async findInstances(itemId: number) {
     return this.prisma.itemInstance.findMany({
-      where: { itemId },
+      where: { itemId, deletedAt: null },
       orderBy: { serialNumber: 'asc' },
     });
   }
 
   // 8. 개별 실물 등록
   async createInstance(itemId: number, dto: CreateItemInstanceDto) {
-    const item = await this.prisma.item.findUnique({ where: { id: itemId } });
+    const item = await this.prisma.item.findFirst({ where: { id: itemId, deletedAt: null } });
     if (!item) throw new NotFoundException('물품을 찾을 수 없습니다.');
 
     const existing = await this.prisma.itemInstance.findUnique({
       where: { serialNumber: dto.serialNumber },
     });
-    if (existing) throw new ConflictException('이미 존재하는 시리얼 번호입니다.');
+    if (existing && !existing.deletedAt) throw new ConflictException('이미 존재하는 시리얼 번호입니다.');
 
     return this.prisma.itemInstance.create({
       data: {
@@ -240,8 +243,8 @@ export class ItemsService {
 
   // 9. 개별 실물 수정
   async updateInstance(instanceId: number, dto: UpdateItemInstanceDto) {
-    const instance = await this.prisma.itemInstance.findUnique({
-      where: { id: instanceId },
+    const instance = await this.prisma.itemInstance.findFirst({
+      where: { id: instanceId, deletedAt: null },
     });
     if (!instance) throw new NotFoundException('실물을 찾을 수 없습니다.');
 
@@ -249,7 +252,7 @@ export class ItemsService {
       const existing = await this.prisma.itemInstance.findUnique({
         where: { serialNumber: dto.serialNumber },
       });
-      if (existing) throw new ConflictException('이미 존재하는 시리얼 번호입니다.');
+      if (existing && !existing.deletedAt) throw new ConflictException('이미 존재하는 시리얼 번호입니다.');
     }
 
     return this.prisma.itemInstance.update({
@@ -260,8 +263,8 @@ export class ItemsService {
 
   // 10. 개별 실물 삭제
   async removeInstance(instanceId: number) {
-    const instance = await this.prisma.itemInstance.findUnique({
-      where: { id: instanceId },
+    const instance = await this.prisma.itemInstance.findFirst({
+      where: { id: instanceId, deletedAt: null },
       include: { _count: { select: { rentalItems: true } } },
     });
     if (!instance) throw new NotFoundException('실물을 찾을 수 없습니다.');
@@ -270,7 +273,10 @@ export class ItemsService {
       throw new BadRequestException('대여 기록이 있는 실물은 삭제할 수 없습니다. 상태를 BROKEN으로 변경하세요.');
     }
 
-    await this.prisma.itemInstance.delete({ where: { id: instanceId } });
+    await this.prisma.itemInstance.update({
+      where: { id: instanceId },
+      data: { deletedAt: new Date() },
+    });
     return { message: '실물이 삭제되었습니다.' };
   }
 
@@ -281,8 +287,8 @@ export class ItemsService {
     }
 
     const [parent, component] = await Promise.all([
-      this.prisma.item.findUnique({ where: { id: parentId } }),
-      this.prisma.item.findUnique({ where: { id: dto.componentId } }),
+      this.prisma.item.findFirst({ where: { id: parentId, deletedAt: null } }),
+      this.prisma.item.findFirst({ where: { id: dto.componentId, deletedAt: null } }),
     ]);
 
     if (!parent || !component) {

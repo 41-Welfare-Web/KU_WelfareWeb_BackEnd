@@ -52,9 +52,9 @@ export class AuthService {
     const { phoneNumber } = dto;
 
     try {
-      // 1. 이미 가입된 번호인지 확인
-      const existingUser = await this.prisma.user.findUnique({
-        where: { phoneNumber },
+      // 1. 이미 가입된 번호인지 확인 (삭제되지 않은 유저만)
+      const existingUser = await this.prisma.user.findFirst({
+        where: { phoneNumber, deletedAt: null },
       });
       if (existingUser) {
         throw new ConflictException('이미 가입된 전화번호입니다.');
@@ -124,7 +124,7 @@ export class AuthService {
         target: phoneNumber,
         expiresAt: { gt: new Date() },
       },
-      orderBy: { createdAt: 'desc' }, // 가장 최근 것
+      orderBy: { createdAt: 'desc' },
     });
 
     if (!savedRecord) {
@@ -153,9 +153,10 @@ export class AuthService {
       );
     }
 
-    // 2. 중복 확인
+    // 2. 중복 확인 (삭제되지 않은 유저 중)
     const existingUser = await this.prisma.user.findFirst({
       where: {
+        deletedAt: null,
         OR: [{ username }, { studentId }, { phoneNumber }],
       },
     });
@@ -215,9 +216,9 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const { username, password } = loginDto;
 
-    // 1. 사용자 찾기
-    const user = await this.prisma.user.findUnique({
-      where: { username },
+    // 1. 사용자 찾기 (삭제되지 않은 유저만)
+    const user = await this.prisma.user.findFirst({
+      where: { username, deletedAt: null },
     });
 
     if (!user) {
@@ -226,7 +227,7 @@ export class AuthService {
       );
     }
 
-    // 2. 계정 잠금 확인 (FR-03)
+    // 2. 계정 잠금 확인
     if (user.lockUntil && user.lockUntil > new Date()) {
       const remainingMinutes = Math.ceil(
         (user.lockUntil.getTime() - new Date().getTime()) / 60000,
@@ -238,13 +239,11 @@ export class AuthService {
 
     // 3. 비밀번호 검증
     if (await bcrypt.compare(password, user.password)) {
-      // 로그인 성공 시 실패 횟수 초기화 및 잠금 해제
       await this.prisma.user.update({
         where: { id: user.id },
         data: { loginAttempts: 0, lockUntil: null },
       });
 
-      // 4. 토큰 발급
       const tokens = this.generateTokens(user);
       return {
         user: {
@@ -256,13 +255,12 @@ export class AuthService {
         ...tokens,
       };
     } else {
-      // 로그인 실패 시 횟수 증가 및 필요 시 잠금 처리
       const newAttempts = user.loginAttempts + 1;
       let lockUntil: Date | null = null;
 
       if (newAttempts >= 5) {
         lockUntil = new Date();
-        lockUntil.setMinutes(lockUntil.getMinutes() + 10); // 10분 잠금
+        lockUntil.setMinutes(lockUntil.getMinutes() + 10);
       }
 
       await this.prisma.user.update({
@@ -283,10 +281,9 @@ export class AuthService {
   async findUsername(dto: FindUsernameDto) {
     const { name, phoneNumber } = dto;
     const user = await this.prisma.user.findFirst({
-      where: { name, phoneNumber },
+      where: { name, phoneNumber, deletedAt: null },
     });
 
-    // 보안상 사용자가 존재하는지 여부를 명확히 알리지 않음
     if (user) {
       await this.smsService.sendSMS(
         phoneNumber,
@@ -304,11 +301,10 @@ export class AuthService {
   async requestPasswordReset(dto: PasswordResetRequestDto) {
     const { username, phoneNumber } = dto;
     const user = await this.prisma.user.findFirst({
-      where: { username, phoneNumber },
+      where: { username, phoneNumber, deletedAt: null },
     });
 
     if (user) {
-      // 24시간 내 발송 횟수 확인 (최대 5회)
       const oneDayAgo = new Date();
       oneDayAgo.setHours(oneDayAgo.getHours() - 24);
 
@@ -327,7 +323,7 @@ export class AuthService {
 
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       const expiresAt = new Date();
-      expiresAt.setMinutes(expiresAt.getMinutes() + 5); // 5분 유효
+      expiresAt.setMinutes(expiresAt.getMinutes() + 5);
 
       await this.prisma.verificationCode.create({
         data: {
@@ -350,11 +346,10 @@ export class AuthService {
   async confirmPasswordReset(dto: PasswordResetConfirmDto) {
     const { username, verificationCode, newPassword } = dto;
 
-    // 1. 해당 유저의 유효한 인증 코드 조회
     const savedRecord = await this.prisma.verificationCode.findFirst({
       where: {
         target: username,
-        expiresAt: { gt: new Date() }, // 만료되지 않은 것만 조회
+        expiresAt: { gt: new Date() },
       },
     });
 
@@ -364,15 +359,12 @@ export class AuthService {
       );
     }
 
-    // 2. 코드 일치 여부 확인
     if (savedRecord.code !== verificationCode) {
-      // 시도 횟수 증가
       const updatedRecord = await this.prisma.verificationCode.update({
         where: { id: savedRecord.id },
         data: { attempts: { increment: 1 } },
       });
 
-      // 5회 이상 실패 시 코드 무효화
       if (updatedRecord.attempts >= 5) {
         await this.prisma.verificationCode.delete({
           where: { id: savedRecord.id },
@@ -387,19 +379,17 @@ export class AuthService {
       );
     }
 
-    // 3. 코드 일치 시 비밀번호 변경 로직 진행
-    const user = await this.prisma.user.findUnique({ where: { username } });
+    const user = await this.prisma.user.findFirst({ where: { username, deletedAt: null } });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
     await this.prisma.user.update({
-      where: { username },
+      where: { id: user.id },
       data: { password: hashedPassword },
     });
 
-    // 사용 완료된 인증 코드 삭제
     await this.prisma.verificationCode.delete({
       where: { id: savedRecord.id },
     });
@@ -409,7 +399,6 @@ export class AuthService {
 
   // 로그아웃
   async logout(dto: LogoutDto) {
-    // Stateless JWT이므로 서버에서 할 일은 없으나, 추후 블랙리스트 등을 위해 인터페이스 유지
     return { message: 'Successfully logged out.' };
   }
 
@@ -419,8 +408,8 @@ export class AuthService {
 
     try {
       const payload = this.jwtService.verify(refreshToken);
-      const user = await this.prisma.user.findUnique({
-        where: { id: payload.sub },
+      const user = await this.prisma.user.findFirst({
+        where: { id: payload.sub, deletedAt: null },
       });
 
       if (!user) {
@@ -434,11 +423,10 @@ export class AuthService {
     }
   }
 
-  // 토큰 생성 (공통 함수)
   private generateTokens(user: any) {
     const payload = { username: user.username, sub: user.id, role: user.role };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' }); // 15분
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '14d' }); // 2주
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '14d' });
 
     return {
       accessToken,

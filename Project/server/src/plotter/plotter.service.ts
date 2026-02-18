@@ -84,7 +84,13 @@ export class PlotterService {
 
     const { purpose, paperSize, pageCount, department } = createOrderDto;
 
-    // 3. 가격 계산 및 유/무료 판별 로직 호출
+    // 3. 사용자 정보 조회 (삭제되지 않은 유저만)
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
+    });
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+
+    // 4. 가격 계산 및 유/무료 판별 로직 호출
     const { price: totalPrice, isFree } = await this.calculateEstimatedPrice({
       department,
       purpose,
@@ -151,7 +157,7 @@ export class PlotterService {
     status?: string,
   ) {
     const skip = (page - 1) * pageSize;
-    const where: any = {};
+    const where: any = { deletedAt: null };
 
     if (role === Role.ADMIN) {
       if (targetUserId) where.userId = targetUserId;
@@ -186,7 +192,9 @@ export class PlotterService {
   }
 
   async cancel(id: number, userId: string) {
-    const order = await this.prisma.plotterOrder.findUnique({ where: { id } });
+    const order = await this.prisma.plotterOrder.findFirst({
+      where: { id, deletedAt: null },
+    });
     if (!order) throw new NotFoundException('주문을 찾을 수 없습니다.');
 
     if (order.userId !== userId)
@@ -198,8 +206,11 @@ export class PlotterService {
       );
     }
 
-    await this.prisma.plotterOrder.delete({ where: { id } });
-    return { message: '주문이 취소(삭제)되었습니다.' };
+    await this.prisma.plotterOrder.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+    return { message: '주문이 취소되었습니다.' };
   }
 
   async updateStatus(
@@ -208,7 +219,6 @@ export class PlotterService {
     status: string,
     rejectionReason?: string,
   ) {
-    // Enum validation
     if (!Object.values(PlotterStatus).includes(status as PlotterStatus)) {
       throw new BadRequestException('유효하지 않은 상태 값입니다.');
     }
@@ -217,7 +227,9 @@ export class PlotterService {
       throw new BadRequestException('반려 시 사유를 입력해야 합니다.');
     }
 
-    const order = await this.prisma.plotterOrder.findUnique({ where: { id } });
+    const order = await this.prisma.plotterOrder.findFirst({
+      where: { id, deletedAt: null },
+    });
     if (!order) throw new NotFoundException('주문을 찾을 수 없습니다.');
 
     const updated = await this.prisma.plotterOrder.update({
@@ -238,7 +250,6 @@ export class PlotterService {
       include: { user: true },
     });
 
-    // 상태 변경 알림 SMS 발송
     await this.smsService.sendPlotterStatusNotice(
       updated.user.phoneNumber,
       updated.user.name,

@@ -17,8 +17,8 @@ export class UsersService {
 
   // 1. 내 정보 조회
   async findMe(userId: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
       select: {
         id: true,
         username: true,
@@ -39,7 +39,7 @@ export class UsersService {
     const { currentPassword, newPassword, phoneNumber, department } =
       updateUserDto;
 
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
     if (newPassword) {
@@ -55,8 +55,8 @@ export class UsersService {
     }
 
     if (phoneNumber && phoneNumber !== user.phoneNumber) {
-      const existing = await this.prisma.user.findUnique({
-        where: { phoneNumber },
+      const existing = await this.prisma.user.findFirst({
+        where: { phoneNumber, deletedAt: null },
       });
       if (existing)
         throw new ConflictException('이미 사용 중인 전화번호입니다.');
@@ -88,10 +88,10 @@ export class UsersService {
     return updatedUser;
   }
 
-  // 3. 회원 탈퇴
+  // 3. 회원 탈퇴 (Soft Delete)
   async deleteMe(userId: string, deleteUserDto: DeleteUserDto) {
     const { password } = deleteUserDto;
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
 
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
@@ -100,7 +100,10 @@ export class UsersService {
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
     }
 
-    await this.prisma.user.delete({ where: { id: userId } });
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { deletedAt: new Date() },
+    });
 
     return { message: '회원 탈퇴가 성공적으로 처리되었습니다.' };
   }
@@ -115,7 +118,7 @@ export class UsersService {
     sortOrder: 'asc' | 'desc' = 'desc',
   ) {
     const skip = (page - 1) * pageSize;
-    const where: any = {};
+    const where: any = { deletedAt: null };
 
     if (search) {
       where.OR = [
@@ -128,7 +131,6 @@ export class UsersService {
       where.role = role;
     }
 
-    // 정렬 필드 매핑 (API field -> Prisma field)
     let orderBy: any = {};
     const sortFieldMap: { [key: string]: string } = {
       name: 'name',
@@ -136,7 +138,6 @@ export class UsersService {
       createdAt: 'createdAt',
     };
 
-    // sortBy가 매핑에 없으면 기본값 createdAt 사용, 있으면 매핑된 필드 사용
     const prismaSortField = sortFieldMap[sortBy] || 'createdAt';
     orderBy = { [prismaSortField]: sortOrder };
 
@@ -177,7 +178,7 @@ export class UsersService {
       throw new BadRequestException('유효하지 않은 역할입니다.');
     }
 
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
     const updated = await this.prisma.user.update({
@@ -193,36 +194,35 @@ export class UsersService {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // 1) 진행 중인 대여 정보 (RENTED 상태)
     const activeRentalsCount = await this.prisma.rental.count({
       where: {
         userId,
         status: 'RENTED',
+        deletedAt: null,
       },
     });
 
-    // 2) 가장 가까운 반납 예정일
     const nearestReturn = await this.prisma.rental.findFirst({
       where: {
         userId,
         status: 'RENTED',
         endDate: { gte: today },
+        deletedAt: null,
       },
       orderBy: { endDate: 'asc' },
       select: { endDate: true },
     });
 
-    // 3) 진행 중인 플로터 주문 정보 (PENDING, CONFIRMED, PRINTED)
     const plotterOrdersCount = await this.prisma.plotterOrder.count({
       where: {
         userId,
         status: { in: ['PENDING', 'CONFIRMED', 'PRINTED'] },
+        deletedAt: null,
       },
     });
 
-    // 4) 최근 대여 내역 (상위 3건)
     const recentRentals = await this.prisma.rental.findMany({
-      where: { userId },
+      where: { userId, deletedAt: null },
       take: 3,
       orderBy: { createdAt: 'desc' },
       include: {
@@ -249,4 +249,3 @@ export class UsersService {
     };
   }
 }
-

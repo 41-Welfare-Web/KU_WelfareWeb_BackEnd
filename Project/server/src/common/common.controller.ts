@@ -12,6 +12,8 @@ import { FilesService } from './files.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ConfigurationsService } from '../configurations/configurations.service';
 import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { PrismaService } from '../prisma/prisma.service';
+import { SmsService } from '../sms/sms.service';
 
 @ApiTags('공통 (Common)')
 @Controller('common')
@@ -19,7 +21,30 @@ export class CommonController {
   constructor(
     private readonly filesService: FilesService,
     private readonly configService: ConfigurationsService,
+    private readonly prisma: PrismaService,
+    private readonly smsService: SmsService,
   ) {}
+
+  @Get('health')
+  @ApiOperation({ summary: '시스템 헬스체크 및 서비스 진단' })
+  async getHealth() {
+    const dbStatus = await this.prisma.$queryRaw`SELECT 1`
+      .then(() => 'UP')
+      .catch(() => 'DOWN');
+
+    const smsStatus = await this.smsService.checkStatus();
+    const storageStatus = await this.filesService.checkStatus();
+
+    return {
+      status: dbStatus === 'UP' ? 'OK' : 'ERROR',
+      timestamp: new Date().toISOString(),
+      services: {
+        database: dbStatus,
+        sms: smsStatus,
+        storage: storageStatus,
+      },
+    };
+  }
 
   @Get('metadata')
   @ApiOperation({ summary: '공통 메타데이터 조회 (소속 리스트, 무료 목적 등)' })

@@ -84,4 +84,14 @@ export class FilesService {
         console.warn(`[FilesService] Failed to parse file URL: ${fileUrl}`);
     }
   }
+
+  /**
+   * 서비스 상태 확인 (Health Check용)
+   */
+  async checkStatus() {
+    return {
+      status: this.supabase ? 'LIVE' : 'MOCK',
+      bucket: this.bucketName,
+    };
+  }
 }

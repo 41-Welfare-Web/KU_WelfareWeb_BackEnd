@@ -22,6 +22,7 @@ model User {
   role         Role     @default(USER)
   loginAttempts Int      @default(0) @map("login_attempts")
   lockUntil    DateTime? @map("lock_until") @db.Timestamptz
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamptz
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   rentals              Rental[]
@@ -42,6 +43,7 @@ enum Role {
 model Category {
   id    Int    @id @default(autoincrement())
   name  String @unique @db.VarChar(50)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz
 
   items Item[]
 
@@ -59,6 +61,7 @@ model Item {
   imageUrl       String?        @map("image_url") @db.Text
   managementType ManagementType @map("management_type")
   totalQuantity  Int?           @map("total_quantity")
+  deletedAt      DateTime?      @map("deleted_at") @db.Timestamptz
   createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz
 
   category      Category       @relation(fields: [categoryId], references: [id])
@@ -98,6 +101,7 @@ model ItemInstance {
   serialNumber String         @unique @map("serial_number") @db.VarChar(50)
   status       InstanceStatus @default(AVAILABLE)
   imageUrl     String?        @map("image_url") @db.Text
+  deletedAt    DateTime?      @map("deleted_at") @db.Timestamptz
   createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz
 
   item        Item         @relation(fields: [itemId], references: [id])
@@ -120,6 +124,7 @@ model Rental {
   endDate   DateTime     @map("end_date") @db.Date
   status    RentalStatus @default(RESERVED)
   memo      String?      @db.Text
+  deletedAt DateTime?    @map("deleted_at") @db.Timestamptz
   createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz
 
   user            User            @relation(fields: [userId], references: [id])
@@ -187,6 +192,7 @@ model PlotterOrder {
   pickupDate        DateTime      @map("pickup_date") @db.Date
   status            PlotterStatus @default(PENDING)
   rejectionReason   String?       @map("rejection_reason") @db.Text
+  deletedAt         DateTime?     @map("deleted_at") @db.Timestamptz
   createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz
 
   user                  User                  @relation(fields: [userId], references: [id])

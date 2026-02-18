@@ -128,4 +128,14 @@ export class SmsService {
 
     return this.sendSMS(receiver, message);
   }
+
+  /**
+   * 서비스 상태 확인 (Health Check용)
+   */
+  async checkStatus() {
+    return {
+      status: this.isMock ? 'MOCK' : 'LIVE',
+      senderNumber: this.senderNumber,
+    };
+  }
 }

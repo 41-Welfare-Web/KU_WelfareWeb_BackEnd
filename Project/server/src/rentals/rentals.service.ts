@@ -65,10 +65,9 @@ export class RentalsService {
     return this.prisma.$transaction(async (tx) => {
       const finalItemsToRent: { itemId: number; quantity: number }[] = [];
 
-      // 1. 모든 요청 품목에 대해 세트 구성 확인 및 목록 확장
       for (const reqItem of items) {
-        const itemWithComponents = await tx.item.findUnique({
-          where: { id: reqItem.itemId },
+        const itemWithComponents = await tx.item.findFirst({
+          where: { id: reqItem.itemId, deletedAt: null },
           include: { components: true },
         });
 
@@ -76,10 +75,8 @@ export class RentalsService {
           throw new NotFoundException(`물품(ID: ${reqItem.itemId})을 찾을 수 없습니다.`);
         }
 
-        // 메인 품목 추가
         finalItemsToRent.push({ itemId: reqItem.itemId, quantity: reqItem.quantity });
 
-        // 세트 구성품이 있다면 함께 추가
         if (itemWithComponents.components.length > 0) {
           for (const component of itemWithComponents.components) {
             finalItemsToRent.push({
@@ -90,10 +87,9 @@ export class RentalsService {
         }
       }
 
-      // 2. 최종 품목 리스트(메인+구성품)에 대해 재고 검증
       for (const finalItem of finalItemsToRent) {
-        const item = await tx.item.findUnique({
-          where: { id: finalItem.itemId },
+        const item = await tx.item.findFirst({
+          where: { id: finalItem.itemId, deletedAt: null },
         });
 
         if (!item) {
@@ -107,6 +103,7 @@ export class RentalsService {
             itemId: finalItem.itemId,
             rental: {
               status: { in: [RentalStatus.RESERVED, RentalStatus.RENTED] },
+              deletedAt: null,
               OR: [
                 {
                   startDate: { lte: end },
@@ -130,7 +127,6 @@ export class RentalsService {
         }
       }
 
-      // 3. 대여 건 생성
       const rental = await tx.rental.create({
         data: {
           userId,
@@ -183,7 +179,7 @@ export class RentalsService {
     pageSize: number = 10,
   ) {
     const skip = (page - 1) * pageSize;
-    const where: any = {};
+    const where: any = { deletedAt: null };
 
     if (role !== Role.ADMIN) {
       where.userId = userId;
@@ -222,8 +218,8 @@ export class RentalsService {
 
   // 3. 대여 상세 조회
   async findOne(id: number, userId: string, role: Role) {
-    const rental = await this.prisma.rental.findUnique({
-      where: { id },
+    const rental = await this.prisma.rental.findFirst({
+      where: { id, deletedAt: null },
       include: {
         user: { select: { name: true, studentId: true, phoneNumber: true } },
         rentalItems: { include: { item: true } },
@@ -245,8 +241,8 @@ export class RentalsService {
 
   // 4. 예약 취소
   async cancel(id: number, userId: string) {
-    const rental = await this.prisma.rental.findUnique({
-      where: { id },
+    const rental = await this.prisma.rental.findFirst({
+      where: { id, deletedAt: null },
       include: {
         user: true,
         rentalItems: { include: { item: true } },
@@ -299,8 +295,8 @@ export class RentalsService {
   ) {
     const { status: newStatus, memo } = updateDto;
 
-    const rental = await this.prisma.rental.findUnique({
-      where: { id },
+    const rental = await this.prisma.rental.findFirst({
+      where: { id, deletedAt: null },
       include: {
         user: true,
         rentalItems: { include: { item: true } },
@@ -355,8 +351,8 @@ export class RentalsService {
   async update(id: number, userId: string, updateDto: UpdateRentalDto) {
     const { startDate, endDate, items } = updateDto;
 
-    const rental = await this.prisma.rental.findUnique({
-      where: { id },
+    const rental = await this.prisma.rental.findFirst({
+      where: { id, deletedAt: null },
       include: { rentalItems: true },
     });
 
@@ -384,8 +380,8 @@ export class RentalsService {
     return this.prisma.$transaction(async (tx) => {
       if (items) {
         for (const reqItem of items) {
-          const item = await tx.item.findUnique({
-            where: { id: reqItem.itemId },
+          const item = await tx.item.findFirst({
+            where: { id: reqItem.itemId, deletedAt: null },
           });
           if (!item)
             throw new NotFoundException(`물품(ID: ${reqItem.itemId}) 없음`);
@@ -397,6 +393,7 @@ export class RentalsService {
               itemId: reqItem.itemId,
               rental: {
                 id: { not: id },
+                deletedAt: null,
                 status: { in: [RentalStatus.RESERVED, RentalStatus.RENTED] },
                 OR: [
                   {
@@ -473,10 +470,10 @@ export class RentalsService {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // 반납일이 오늘보다 이전인데 아직 대여 중인 건 조회
     const overdueRentals = await this.prisma.rental.findMany({
       where: {
         status: RentalStatus.RENTED,
+        deletedAt: null,
         endDate: {
           lt: today,
         },
@@ -496,7 +493,7 @@ export class RentalsService {
           status: RentalStatus.OVERDUE,
           rentalHistories: {
             create: {
-              changedBy: rental.userId, // 시스템 자동 처리지만 대상자 기준으로 기록
+              changedBy: rental.userId,
               oldStatus: RentalStatus.RENTED,
               newStatus: RentalStatus.OVERDUE,
               memo: '반납 기한 도래로 인한 시스템 자동 연체 처리',
@@ -510,7 +507,6 @@ export class RentalsService {
           ? `${rental.rentalItems[0].item.name} 외 ${rental.rentalItems.length - 1}건`
           : '물품 없음';
 
-      // 연체 안내 SMS 발송
       await this.smsService.sendSMS(
         rental.user.phoneNumber,
         `[RentalWeb] ${rental.user.name}님, [${itemSummary}]의 반납 기한이 지났습니다. 현재 연체 상태이오니 즉시 반납 부탁드립니다.`,
@@ -533,6 +529,7 @@ export class RentalsService {
     const rentalsDueTomorrow = await this.prisma.rental.findMany({
       where: {
         status: RentalStatus.RENTED,
+        deletedAt: null,
         endDate: {
           gte: tomorrow,
           lt: dayAfterTomorrow,
