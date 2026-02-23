@@ -62,3 +62,9 @@
 *   `PUT /api/items/instances/{instanceId}` (개별 실물 상태 수정 - **Admin**)
 *   `DELETE /api/items/instances/{instanceId}` (개별 실물 삭제 - 소프트 삭제 - **Admin**)
 *   `POST /api/common/upload` (공용 이미지 업로드)
+
+**8. 장바구니 (Cart)**
+*   `GET /api/cart` (내 장바구니 조회 - FR-12, FR-13)
+*   `POST /api/cart` (장바구니 물품 추가 - FR-11)
+*   `PUT /api/cart/{cartItemId}` (장바구니 항목 수정 - 수량/날짜 - FR-13, FR-14)
+*   `DELETE /api/cart/{cartItemId}` (장바구니 항목 제거 - FR-13)

@@ -30,6 +30,7 @@ model User {
   plotterOrders        PlotterOrder[]
   plotterOrderHistories PlotterOrderHistory[]
   auditLogs            AuditLog[]
+  cartItems            CartItem[]
 
   @@map("users")
 }
@@ -71,6 +72,7 @@ model Item {
   // 세트 구성 (Bundle)
   components    ItemComponent[] @relation("ParentItem")
   isPartOf      ItemComponent[] @relation("ComponentItem")
+  cartItems     CartItem[]
 
   @@map("items")
 }
@@ -271,4 +273,22 @@ model AuditLog {
   user User? @relation(fields: [userId], references: [id])
 
   @@map("audit_log")
+}
+
+// 14. Cart Items (장바구니)
+model CartItem {
+  id        Int       @id @default(autoincrement())
+  userId    String    @map("user_id") @db.Uuid
+  itemId    Int       @map("item_id")
+  quantity  Int       @default(1)
+  startDate DateTime? @map("start_date") @db.Date
+  endDate   DateTime? @map("end_date") @db.Date
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id])
+  item Item @relation(fields: [itemId], references: [id])
+
+  @@unique([userId, itemId])
+  @@map("cart_items")
 }

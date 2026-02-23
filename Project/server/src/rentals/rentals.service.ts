@@ -13,6 +13,7 @@ import { RentalStatus, Role } from '@prisma/client';
 import { ConfigurationsService } from '../configurations/configurations.service';
 import { HolidaysService } from '../holidays/holidays.service';
 import { SmsService } from '../sms/sms.service';
+import { CartService } from '../cart/cart.service';
 import { Cron } from '@nestjs/schedule';
 
 @Injectable()
@@ -22,6 +23,7 @@ export class RentalsService {
     private configService: ConfigurationsService,
     private holidaysService: HolidaysService,
     private smsService: SmsService,
+    private cartService: CartService,
   ) {}
 
   // 1. 대여 예약 생성
@@ -62,7 +64,7 @@ export class RentalsService {
       );
     }
 
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       const finalItemsToRent: { itemId: number; quantity: number }[] = [];
 
       for (const reqItem of items) {
@@ -169,6 +171,10 @@ export class RentalsService {
 
       return rental;
     });
+
+    await this.cartService.clearCart(userId);
+
+    return result;
   }
 
   // 2. 대여 목록 조회

@@ -1713,3 +1713,124 @@
 | `400 Bad Request` | `INVALID_INPUT` | `configValue`가 유효하지 않을 때 |
 | `404 Not Found` | `CONFIG_KEY_NOT_FOUND` | 존재하지 않는 `configKey`를 수정하려 할 때 |
 | (이 외 Admin API의 Error Responses 참조) | | |
+
+---
+
+### **8. 장바구니 (Cart)**
+
+> JWT 인증 필수. 모든 엔드포인트는 인증된 사용자 본인의 장바구니만 접근할 수 있습니다.
+> 재고 검증은 장바구니에서 수행하지 않습니다. 대여 확정(`POST /api/rentals`) 시점에 검증됩니다.
+
+---
+
+#### `GET /api/cart` — 내 장바구니 조회 (FR-12, FR-13)
+
+*   **Auth**: JWT 필수
+*   **Response** `200 OK`
+
+```json
+{
+  "items": [
+    {
+      "id": 1,
+      "userId": "uuid",
+      "itemId": 5,
+      "quantity": 2,
+      "startDate": null,
+      "endDate": null,
+      "createdAt": "2026-03-01T00:00:00Z",
+      "updatedAt": "2026-03-01T00:00:00Z",
+      "item": {
+        "id": 5,
+        "name": "삼각대",
+        "itemCode": "TRP-001",
+        "imageUrl": "https://...",
+        "category": { "id": 2, "name": "촬영장비" }
+      }
+    }
+  ],
+  "totalCount": 1,
+  "hasUnsetDates": true
+}
+```
+
+> `hasUnsetDates`: `startDate` 또는 `endDate`가 null인 항목이 하나라도 있으면 `true`.
+> 프론트엔드에서 대여 확정 버튼 비활성화 조건으로 사용할 수 있습니다.
+
+---
+
+#### `POST /api/cart` — 장바구니 물품 추가 (FR-11)
+
+*   **Auth**: JWT 필수
+*   **Request Body**
+
+```json
+{
+  "itemId": 5,
+  "quantity": 2
+}
+```
+
+> 날짜(`startDate`, `endDate`)는 이 API에서 받지 않습니다. 물품 선택 시점에만 호출하며, 날짜는 장바구니 페이지(`PUT /api/cart/{id}`)에서 별도로 설정합니다.
+> 동일 물품이 이미 장바구니에 있으면 **수량을 새 값으로 덮어씁니다(upsert)**.
+
+*   **Response** `201 Created` — 생성 또는 업데이트된 CartItem 객체
+
+*   **Error Responses**
+
+| HTTP Code | 설명 |
+| :--- | :--- |
+| `400 Bad Request` | `quantity`가 1 미만 |
+| `404 Not Found` | `itemId`에 해당하는 물품 없음 (삭제된 물품 포함) |
+
+---
+
+#### `PUT /api/cart/{cartItemId}` — 장바구니 항목 수정 (FR-13, FR-14)
+
+*   **Auth**: JWT 필수
+*   **Path Params**: `cartItemId` (integer)
+*   **Request Body** (모두 선택사항)
+
+```json
+{
+  "quantity": 1,
+  "startDate": "2026-03-05",
+  "endDate": "2026-03-07"
+}
+```
+
+> `startDate` 또는 `endDate`에 `null`을 명시적으로 전송하면 해당 날짜가 초기화됩니다.
+> `startDate`와 `endDate`는 함께 설정하거나 함께 초기화해야 합니다 (한쪽만 설정 불가).
+
+*   **Response** `200 OK` — 업데이트된 CartItem 객체
+
+*   **Error Responses**
+
+| HTTP Code | 설명 |
+| :--- | :--- |
+| `400 Bad Request` | 날짜 유효성 오류 (과거 날짜, 종료일 < 시작일, 한쪽만 설정 등) |
+| `403 Forbidden` | 타인의 장바구니 항목에 접근 시도 |
+| `404 Not Found` | `cartItemId`에 해당하는 항목 없음 |
+
+---
+
+#### `DELETE /api/cart/{cartItemId}` — 장바구니 항목 제거 (FR-13)
+
+*   **Auth**: JWT 필수
+*   **Path Params**: `cartItemId` (integer)
+*   **Response** `200 OK`
+
+```json
+{ "message": "장바구니에서 제거되었습니다." }
+```
+
+*   **Error Responses**
+
+| HTTP Code | 설명 |
+| :--- | :--- |
+| `403 Forbidden` | 타인의 장바구니 항목에 접근 시도 |
+| `404 Not Found` | `cartItemId`에 해당하는 항목 없음 |
+
+---
+
+> **대여 확정 연동**: `POST /api/rentals` 성공 시 해당 유저의 장바구니가 자동으로 비워집니다.
