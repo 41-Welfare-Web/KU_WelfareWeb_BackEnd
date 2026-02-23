@@ -1715,25 +1715,28 @@
 | (이 외 Admin API의 Error Responses 참조) | | |
 
 ---
-
 ### **8. 장바구니 (Cart)**
 
-> JWT 인증 필수. 모든 엔드포인트는 인증된 사용자 본인의 장바구니만 접근할 수 있습니다.
-> 재고 검증은 장바구니에서 수행하지 않습니다. 대여 확정(`POST /api/rentals`) 시점에 검증됩니다.
+# 내 장바구니 조회 (Get My Cart)
+
+`FR-12`, `FR-13` 요구사항에 따라, 현재 로그인한 사용자의 장바구니 목록을 조회합니다.
+
+## **ENDPOINT:** `GET /api/cart`
+**Description:** 로그인한 사용자의 장바구니 항목 전체를 반환합니다. 각 항목에는 물품 및 카테고리 정보가 포함됩니다. `hasUnsetDates` 필드로 날짜 미설정 항목 존재 여부를 확인할 수 있으며, 프론트엔드에서 대여 확정 버튼 비활성화 조건으로 활용할 수 있습니다.
+**Required Permissions:** JWT Required
 
 ---
 
-#### `GET /api/cart` — 내 장바구니 조회 (FR-12, FR-13)
+#### **Responses**
 
-*   **Auth**: JWT 필수
-*   **Response** `200 OK`
+*   **Success Response (`200 OK`)**
 
 ```json
 {
   "items": [
     {
       "id": 1,
-      "userId": "uuid",
+      "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "itemId": 5,
       "quantity": 2,
       "startDate": null,
@@ -1744,7 +1747,7 @@
         "id": 5,
         "name": "삼각대",
         "itemCode": "TRP-001",
-        "imageUrl": "https://...",
+        "imageUrl": "https://example.com/images/tripod.jpg",
         "category": { "id": 2, "name": "촬영장비" }
       }
     }
@@ -1753,16 +1756,28 @@
   "hasUnsetDates": true
 }
 ```
+* `items`: (array) 장바구니 항목 목록. 담은 순서(생성일 오름차순)로 반환됩니다.
+* `totalCount`: (integer) 장바구니 항목 총 개수.
+* `hasUnsetDates`: (boolean) `startDate` 또는 `endDate`가 null인 항목이 하나라도 있으면 `true`.
 
-> `hasUnsetDates`: `startDate` 또는 `endDate`가 null인 항목이 하나라도 있으면 `true`.
-> 프론트엔드에서 대여 확정 버튼 비활성화 조건으로 사용할 수 있습니다.
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | `accessToken`이 유효하지 않을 때 |
+
+---
+# 장바구니 물품 추가 (Add Item to Cart)
+
+`FR-11` 요구사항에 따라, 물품을 장바구니에 추가합니다.
+
+## **ENDPOINT:** `POST /api/cart`
+**Description:** 선택한 물품을 장바구니에 추가합니다. 날짜는 이 시점에 설정하지 않으며, 장바구니 페이지에서 `PUT /api/cart/{cartItemId}`로 별도 설정합니다. 동일한 물품이 이미 장바구니에 있을 경우 수량을 새 값으로 덮어씁니다(upsert). 재고 검증은 이 시점에 수행하지 않으며, 대여 확정(`POST /api/rentals`) 시점에 검증됩니다.
+**Required Permissions:** JWT Required
 
 ---
 
-#### `POST /api/cart` — 장바구니 물품 추가 (FR-11)
-
-*   **Auth**: JWT 필수
-*   **Request Body**
+#### **Request Body**
 
 ```json
 {
@@ -1770,26 +1785,64 @@
   "quantity": 2
 }
 ```
-
-> 날짜(`startDate`, `endDate`)는 이 API에서 받지 않습니다. 물품 선택 시점에만 호출하며, 날짜는 장바구니 페이지(`PUT /api/cart/{id}`)에서 별도로 설정합니다.
-> 동일 물품이 이미 장바구니에 있으면 **수량을 새 값으로 덮어씁니다(upsert)**.
-
-*   **Response** `201 Created` — 생성 또는 업데이트된 CartItem 객체
-
-*   **Error Responses**
-
-| HTTP Code | 설명 |
-| :--- | :--- |
-| `400 Bad Request` | `quantity`가 1 미만 |
-| `404 Not Found` | `itemId`에 해당하는 물품 없음 (삭제된 물품 포함) |
+* `itemId`: (integer, required) 장바구니에 담을 물품의 고유 ID.
+* `quantity`: (integer, required) 대여할 수량. 최소 1 이상이어야 합니다.
 
 ---
 
-#### `PUT /api/cart/{cartItemId}` — 장바구니 항목 수정 (FR-13, FR-14)
+#### **Responses**
 
-*   **Auth**: JWT 필수
-*   **Path Params**: `cartItemId` (integer)
-*   **Request Body** (모두 선택사항)
+*   **Success Response (`201 Created`)**
+
+```json
+{
+  "id": 1,
+  "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "itemId": 5,
+  "quantity": 2,
+  "startDate": null,
+  "endDate": null,
+  "createdAt": "2026-03-01T00:00:00Z",
+  "updatedAt": "2026-03-01T00:00:00Z",
+  "item": {
+    "id": 5,
+    "name": "삼각대",
+    "itemCode": "TRP-001",
+    "imageUrl": "https://example.com/images/tripod.jpg",
+    "category": { "id": 2, "name": "촬영장비" }
+  }
+}
+```
+* **Note:** 동일 물품이 이미 장바구니에 있던 경우에도 `201 Created`를 반환하며, 수량이 새 값으로 갱신됩니다.
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `400 Bad Request` | `INVALID_INPUT` | `quantity`가 1 미만이거나 유효하지 않을 때 |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | `accessToken`이 유효하지 않을 때 |
+| `404 Not Found` | `ITEM_NOT_FOUND` | 해당 `itemId`의 물품이 없거나 삭제된 상태일 때 |
+
+---
+# 장바구니 항목 수정 (Update Cart Item)
+
+`FR-13`, `FR-14` 요구사항에 따라, 장바구니 항목의 수량 또는 대여 날짜를 수정합니다.
+
+## **ENDPOINT:** `PUT /api/cart/{cartItemId}`
+**Description:** 장바구니 페이지에서 수량 변경 또는 날짜 설정 시 호출합니다. 모든 필드는 선택사항이며, 전송한 필드만 업데이트됩니다. `startDate` 또는 `endDate`에 `null`을 명시적으로 전송하면 해당 날짜가 초기화됩니다. `startDate`와 `endDate`는 반드시 함께 설정하거나 함께 초기화해야 합니다.
+**Required Permissions:** JWT Required
+
+---
+
+#### **Path Parameters**
+
+| 파라미터 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `cartItemId` | `integer` | 수정할 장바구니 항목의 고유 ID |
+
+---
+
+#### **Request Body**
 
 ```json
 {
@@ -1798,39 +1851,81 @@
   "endDate": "2026-03-07"
 }
 ```
-
-> `startDate` 또는 `endDate`에 `null`을 명시적으로 전송하면 해당 날짜가 초기화됩니다.
-> `startDate`와 `endDate`는 함께 설정하거나 함께 초기화해야 합니다 (한쪽만 설정 불가).
-
-*   **Response** `200 OK` — 업데이트된 CartItem 객체
-
-*   **Error Responses**
-
-| HTTP Code | 설명 |
-| :--- | :--- |
-| `400 Bad Request` | 날짜 유효성 오류 (과거 날짜, 종료일 < 시작일, 한쪽만 설정 등) |
-| `403 Forbidden` | 타인의 장바구니 항목에 접근 시도 |
-| `404 Not Found` | `cartItemId`에 해당하는 항목 없음 |
+* `quantity`: (integer, optional) 변경할 수량. 최소 1 이상이어야 합니다.
+* `startDate`: (string, optional, nullable) 변경할 대여 시작일. `YYYY-MM-DD` 형식. `null` 전송 시 날짜 초기화.
+* `endDate`: (string, optional, nullable) 변경할 반납일. `YYYY-MM-DD` 형식. `null` 전송 시 날짜 초기화.
 
 ---
 
-#### `DELETE /api/cart/{cartItemId}` — 장바구니 항목 제거 (FR-13)
+#### **Responses**
 
-*   **Auth**: JWT 필수
-*   **Path Params**: `cartItemId` (integer)
-*   **Response** `200 OK`
+*   **Success Response (`200 OK`)**
 
 ```json
-{ "message": "장바구니에서 제거되었습니다." }
+{
+  "id": 1,
+  "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "itemId": 5,
+  "quantity": 1,
+  "startDate": "2026-03-05T00:00:00.000Z",
+  "endDate": "2026-03-07T00:00:00.000Z",
+  "createdAt": "2026-03-01T00:00:00Z",
+  "updatedAt": "2026-03-02T10:00:00Z",
+  "item": {
+    "id": 5,
+    "name": "삼각대",
+    "itemCode": "TRP-001",
+    "imageUrl": "https://example.com/images/tripod.jpg",
+    "category": { "id": 2, "name": "촬영장비" }
+  }
+}
 ```
 
 *   **Error Responses**
 
-| HTTP Code | 설명 |
-| :--- | :--- |
-| `403 Forbidden` | 타인의 장바구니 항목에 접근 시도 |
-| `404 Not Found` | `cartItemId`에 해당하는 항목 없음 |
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `400 Bad Request` | `INVALID_INPUT` | 날짜 유효성 오류 (과거 날짜, 반납일 < 시작일, 한쪽만 설정 등) |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | `accessToken`이 유효하지 않을 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 타인의 장바구니 항목에 접근하려 할 때 |
+| `404 Not Found` | `CART_ITEM_NOT_FOUND` | 해당 `cartItemId`의 항목이 없을 때 |
+
+---
+# 장바구니 항목 제거 (Remove Cart Item)
+
+`FR-13` 요구사항에 따라, 장바구니에서 특정 항목을 제거합니다.
+
+## **ENDPOINT:** `DELETE /api/cart/{cartItemId}`
+**Description:** `cartItemId`에 해당하는 장바구니 항목을 영구 삭제합니다. 본인의 항목만 삭제할 수 있습니다.
+**Required Permissions:** JWT Required
 
 ---
 
-> **대여 확정 연동**: `POST /api/rentals` 성공 시 해당 유저의 장바구니가 자동으로 비워집니다.
+#### **Path Parameters**
+
+| 파라미터 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `cartItemId` | `integer` | 제거할 장바구니 항목의 고유 ID |
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "message": "장바구니에서 제거되었습니다."
+}
+```
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | `accessToken`이 유효하지 않을 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 타인의 장바구니 항목에 접근하려 할 때 |
+| `404 Not Found` | `CART_ITEM_NOT_FOUND` | 해당 `cartItemId`의 항목이 없을 때 |
+
+---
+* **Note:** `POST /api/rentals`로 대여가 확정되면 해당 사용자의 장바구니 전체가 자동으로 초기화됩니다.
