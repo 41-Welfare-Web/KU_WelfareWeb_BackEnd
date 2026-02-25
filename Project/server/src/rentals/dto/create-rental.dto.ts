@@ -20,26 +20,20 @@ export class RentalItemDto {
   @IsNotEmpty()
   @Min(1)
   quantity: number;
-}
 
-export class CreateRentalDto {
-  @ApiProperty({
-    example: '2026-03-01',
-    description: '대여 시작일 (YYYY-MM-DD)',
-  })
+  @ApiProperty({ example: '2026-06-02', description: '대여 시작일 (YYYY-MM-DD)' })
   @IsDateString()
   @IsNotEmpty()
   startDate: string;
 
-  @ApiProperty({
-    example: '2026-03-03',
-    description: '반납 예정일 (YYYY-MM-DD)',
-  })
+  @ApiProperty({ example: '2026-06-04', description: '반납 예정일 (YYYY-MM-DD)' })
   @IsDateString()
   @IsNotEmpty()
   endDate: string;
+}
 
-  @ApiProperty({ type: [RentalItemDto], description: '대여 물품 목록' })
+export class CreateRentalDto {
+  @ApiProperty({ type: [RentalItemDto], description: '대여 물품 목록 (각 품목별 날짜 포함)' })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => RentalItemDto)

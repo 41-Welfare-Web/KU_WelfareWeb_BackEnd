@@ -1432,7 +1432,7 @@
 `FR-15` 요구사항에 따라, 사용자가 장바구니의 물품들을 최종적으로 대여 예약합니다.
 
 ## **ENDPOINT:** `POST /api/rentals`
-**Description:** 대여할 물품 목록과 대여 기간을 받아 새로운 대여 예약을 생성합니다.
+**Description:** 대여할 물품 목록을 받아 새로운 대여 예약을 생성합니다. 날짜가 다른 품목들은 자동으로 그룹핑되어 그룹당 1건의 rental이 생성됩니다.
 **Required Permissions:** Authenticated Users
 
 ---
@@ -1441,38 +1441,52 @@
 
 ```json
 {
-  "startDate": "2024-08-01",
-  "endDate": "2024-08-05",
   "items": [
-    { "itemId": 1, "quantity": 1 },
-    { "itemId": 5, "quantity": 2 }
+    { "itemId": 1, "quantity": 1, "startDate": "2026-06-02", "endDate": "2026-06-04" },
+    { "itemId": 5, "quantity": 2, "startDate": "2026-06-09", "endDate": "2026-06-11" }
   ]
 }
 ```
-* `startDate`: (string, required) 대여 시작일 (YYYY-MM-DD)
-* `endDate`: (string, required) 반납 예정일 (YYYY-MM-DD)
 * `items`: (array, required) 대여할 물품 목록
     * `itemId`: (integer, required) 물품 ID
     * `quantity`: (integer, required) 대여 수량
+    * `startDate`: (string, required) 해당 품목의 대여 시작일 (YYYY-MM-DD)
+    * `endDate`: (string, required) 해당 품목의 반납 예정일 (YYYY-MM-DD)
+
+> **Note:** 동일한 `startDate`/`endDate`를 가진 품목들은 하나의 rental로 묶입니다. 날짜가 다른 품목들은 각각 별도의 rental로 생성됩니다.
 
 ---
 
 #### **Responses**
 
 *   **Success Response (`201 Created`)**
-    *   생성된 대여 정보(`rental`)와 포함된 품목(`rentalItems`) 정보를 반환합니다.
+    *   생성된 대여 목록(`rentals`)을 반환합니다. 날짜 그룹 수만큼 rental 객체가 포함됩니다.
 
 ```json
 {
-  "id": 101,
-  "userId": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
-  "startDate": "2024-08-01",
-  "endDate": "2024-08-05",
-  "status": "RESERVED",
-  "createdAt": "2024-07-20T10:00:00Z",
-  "rentalItems": [
-    { "itemId": 1, "name": "DSLR 카메라", "quantity": 1 },
-    { "itemId": 5, "name": "삼각대", "quantity": 2 }
+  "rentals": [
+    {
+      "id": 101,
+      "userId": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+      "startDate": "2026-06-02",
+      "endDate": "2026-06-04",
+      "status": "RESERVED",
+      "createdAt": "2026-05-20T10:00:00Z",
+      "rentalItems": [
+        { "itemId": 1, "name": "DSLR 카메라", "quantity": 1 }
+      ]
+    },
+    {
+      "id": 102,
+      "userId": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+      "startDate": "2026-06-09",
+      "endDate": "2026-06-11",
+      "status": "RESERVED",
+      "createdAt": "2026-05-20T10:00:00Z",
+      "rentalItems": [
+        { "itemId": 5, "name": "삼각대", "quantity": 2 }
+      ]
+    }
   ]
 }
 ```
@@ -1481,7 +1495,7 @@
 
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
-| `400 Bad Request` | `INVALID_DATE_RANGE` | 대여 기간이 유효하지 않을 때 (예: 시작일이 반납일보다 늦음) |
+| `400 Bad Request` | `INVALID_DATE_RANGE` | 품목별 대여 기간이 유효하지 않을 때 (예: 시작일이 반납일보다 늦음, 과거 날짜) |
 | `400 Bad Request` | `RENTAL_PERIOD_EXCEEDED` | `FR-14`에 따라 최대 예약 가능 기간(2개월)을 초과했을 때 |
 | `400 Bad Request` | `RENTAL_ON_HOLIDAY` | `FR-14`에 따라 휴무일에 대여/반납을 시도할 때 |
 | `409 Conflict` | `INSUFFICIENT_STOCK` | 요청한 기간에 재고가 부족할 때 |
@@ -1502,15 +1516,13 @@
 ```json
 {
   "targetUserId": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
-  "startDate": "2024-08-01",
-  "endDate": "2024-08-05",
   "items": [
-    { "itemId": 1, "quantity": 1 }
+    { "itemId": 1, "quantity": 1, "startDate": "2026-06-02", "endDate": "2026-06-04" }
   ]
 }
 ```
 * `targetUserId`: (uuid, required) 대여를 신청할 사용자의 UUID.
-* `startDate`, `endDate`, `items`: `POST /api/rentals`의 Request Body와 동일.
+* `items`: `POST /api/rentals`의 Request Body와 동일 (품목별 날짜 포함).
 
 ---
 
@@ -1629,6 +1641,7 @@
 
 #### **Request Body**
 *   `POST /api/rentals`의 Request Body와 동일하며, 모든 필드는 선택적입니다.
+*   **단, 수정 시 `items` 배열의 모든 품목은 동일한 `startDate`/`endDate`를 가져야 합니다.** 날짜가 다른 경우 취소 후 재신청이 필요합니다.
 
 ---
 

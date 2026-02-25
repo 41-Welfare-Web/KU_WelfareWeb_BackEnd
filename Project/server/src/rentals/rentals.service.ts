@@ -6,7 +6,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateRentalDto } from './dto/create-rental.dto';
+import { CreateRentalDto, RentalItemDto } from './dto/create-rental.dto';
 import { UpdateRentalStatusDto } from './dto/update-rental-status.dto';
 import { UpdateRentalDto } from './dto/update-rental.dto';
 import { RentalStatus, Role } from '@prisma/client';
@@ -26,29 +26,13 @@ export class RentalsService {
     private cartService: CartService,
   ) {}
 
-  // 1. 대여 예약 생성
+  // 1. 대여 예약 생성 (날짜별 그룹핑 → 다중 rental 생성)
   async create(userId: string, createRentalDto: CreateRentalDto, actorId?: string) {
-    const { startDate, endDate, items } = createRentalDto;
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
+    const { items } = createRentalDto;
     const actualActorId = actorId || userId;
 
-    if (start > end) {
-      throw new BadRequestException('종료일이 시작일보다 빠를 수 없습니다.');
-    }
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if (start < today) {
-      throw new BadRequestException('과거 날짜로 예약할 수 없습니다.');
-    }
-
-    if (await this.holidaysService.isHoliday(start)) {
-      throw new BadRequestException('대여 시작일이 휴무일(주말 포함)입니다.');
-    }
-    if (await this.holidaysService.isHoliday(end)) {
-      throw new BadRequestException('반납일이 휴무일(주말 포함)입니다.');
-    }
 
     const maxMonthsStr = await this.configService.getValue(
       'rental_max_period_months',
@@ -58,123 +42,170 @@ export class RentalsService {
     const maxDate = new Date(today);
     maxDate.setMonth(maxDate.getMonth() + maxMonths);
 
-    if (end > maxDate) {
-      throw new BadRequestException(
-        `최대 ${maxMonths}개월까지만 예약할 수 있습니다.`,
-      );
+    // 1) 모든 품목 날짜 사전 검증
+    for (const item of items) {
+      const start = new Date(item.startDate);
+      const end = new Date(item.endDate);
+
+      if (start > end) {
+        throw new BadRequestException(
+          `품목(ID: ${item.itemId}): 종료일이 시작일보다 빠를 수 없습니다.`,
+        );
+      }
+      if (start < today) {
+        throw new BadRequestException(
+          `품목(ID: ${item.itemId}): 과거 날짜로 예약할 수 없습니다.`,
+        );
+      }
+      if (await this.holidaysService.isHoliday(start)) {
+        throw new BadRequestException(
+          `품목(ID: ${item.itemId}): 대여 시작일이 휴무일(주말 포함)입니다.`,
+        );
+      }
+      if (await this.holidaysService.isHoliday(end)) {
+        throw new BadRequestException(
+          `품목(ID: ${item.itemId}): 반납일이 휴무일(주말 포함)입니다.`,
+        );
+      }
+      if (end > maxDate) {
+        throw new BadRequestException(
+          `품목(ID: ${item.itemId}): 최대 ${maxMonths}개월까지만 예약할 수 있습니다.`,
+        );
+      }
     }
 
-    const result = await this.prisma.$transaction(async (tx) => {
-      const finalItemsToRent: { itemId: number; quantity: number }[] = [];
+    // 2) 날짜 기준 그룹핑
+    const groups = new Map<string, RentalItemDto[]>();
+    for (const item of items) {
+      const key = `${item.startDate}__${item.endDate}`;
+      if (!groups.has(key)) {
+        groups.set(key, []);
+      }
+      groups.get(key)!.push(item);
+    }
 
-      for (const reqItem of items) {
-        const itemWithComponents = await tx.item.findFirst({
-          where: { id: reqItem.itemId, deletedAt: null },
-          include: { components: true },
-        });
+    // 3) 그룹별 rental 생성
+    const createdRentals: any[] = [];
 
-        if (!itemWithComponents) {
-          throw new NotFoundException(`물품(ID: ${reqItem.itemId})을 찾을 수 없습니다.`);
-        }
+    for (const [key, groupItems] of groups) {
+      const [startDate, endDate] = key.split('__');
+      const start = new Date(startDate);
+      const end = new Date(endDate);
 
-        finalItemsToRent.push({ itemId: reqItem.itemId, quantity: reqItem.quantity });
+      const rental = await this.prisma.$transaction(async (tx) => {
+        const finalItemsToRent: { itemId: number; quantity: number }[] = [];
 
-        if (itemWithComponents.components.length > 0) {
-          for (const component of itemWithComponents.components) {
-            finalItemsToRent.push({
-              itemId: component.componentId,
-              quantity: component.quantity * reqItem.quantity,
-            });
+        for (const reqItem of groupItems) {
+          const itemWithComponents = await tx.item.findFirst({
+            where: { id: reqItem.itemId, deletedAt: null },
+            include: { components: true },
+          });
+
+          if (!itemWithComponents) {
+            throw new NotFoundException(`물품(ID: ${reqItem.itemId})을 찾을 수 없습니다.`);
+          }
+
+          finalItemsToRent.push({ itemId: reqItem.itemId, quantity: reqItem.quantity });
+
+          if (itemWithComponents.components.length > 0) {
+            for (const component of itemWithComponents.components) {
+              finalItemsToRent.push({
+                itemId: component.componentId,
+                quantity: component.quantity * reqItem.quantity,
+              });
+            }
           }
         }
-      }
 
-      for (const finalItem of finalItemsToRent) {
-        const item = await tx.item.findFirst({
-          where: { id: finalItem.itemId, deletedAt: null },
-        });
+        for (const finalItem of finalItemsToRent) {
+          const item = await tx.item.findFirst({
+            where: { id: finalItem.itemId, deletedAt: null },
+          });
 
-        if (!item) {
-          throw new NotFoundException(`물품(ID: ${finalItem.itemId})을 찾을 수 없습니다.`);
+          if (!item) {
+            throw new NotFoundException(`물품(ID: ${finalItem.itemId})을 찾을 수 없습니다.`);
+          }
+
+          const totalQty = item.totalQuantity || 1;
+
+          const overlappingRentals = await tx.rentalItem.findMany({
+            where: {
+              itemId: finalItem.itemId,
+              rental: {
+                status: { in: [RentalStatus.RESERVED, RentalStatus.RENTED] },
+                deletedAt: null,
+                OR: [
+                  {
+                    startDate: { lte: end },
+                    endDate: { gte: start },
+                  },
+                ],
+              },
+            },
+            select: { quantity: true },
+          });
+
+          const reservedQty = overlappingRentals.reduce(
+            (sum, r) => sum + r.quantity,
+            0,
+          );
+
+          if (totalQty - reservedQty < finalItem.quantity) {
+            throw new ConflictException(
+              `'${item.name}'의 재고가 부족합니다. (남은 수량: ${totalQty - reservedQty})`,
+            );
+          }
         }
 
-        const totalQty = item.totalQuantity || 1;
-
-        const overlappingRentals = await tx.rentalItem.findMany({
-          where: {
-            itemId: finalItem.itemId,
-            rental: {
-              status: { in: [RentalStatus.RESERVED, RentalStatus.RENTED] },
-              deletedAt: null,
-              OR: [
-                {
-                  startDate: { lte: end },
-                  endDate: { gte: start },
-                },
-              ],
+        const created = await tx.rental.create({
+          data: {
+            userId,
+            startDate: start,
+            endDate: end,
+            status: RentalStatus.RESERVED,
+            rentalItems: {
+              create: finalItemsToRent.map((i) => ({
+                itemId: i.itemId,
+                quantity: i.quantity,
+              })),
+            },
+            rentalHistories: {
+              create: {
+                changedBy: actualActorId,
+                newStatus: RentalStatus.RESERVED,
+                memo: actorId && actorId !== userId ? '관리자 대리 예약 생성' : '대여 예약 생성',
+              },
             },
           },
-          select: { quantity: true },
+          include: {
+            user: true,
+            rentalItems: {
+              include: { item: true },
+            },
+          },
         });
 
-        const reservedQty = overlappingRentals.reduce(
-          (sum, r) => sum + r.quantity,
-          0,
+        const itemSummary =
+          created.rentalItems.length > 0
+            ? `${created.rentalItems[0].item.name} 외 ${created.rentalItems.length - 1}건`
+            : '물품 없음';
+
+        await this.smsService.sendRentalStatusNotice(
+          created.user.phoneNumber,
+          created.user.name,
+          itemSummary,
+          RentalStatus.RESERVED,
         );
 
-        if (totalQty - reservedQty < finalItem.quantity) {
-          throw new ConflictException(
-            `'${item.name}'의 재고가 부족합니다. (남은 수량: ${totalQty - reservedQty})`,
-          );
-        }
-      }
-
-      const rental = await tx.rental.create({
-        data: {
-          userId,
-          startDate: start,
-          endDate: end,
-          status: RentalStatus.RESERVED,
-          rentalItems: {
-            create: finalItemsToRent.map((i) => ({
-              itemId: i.itemId,
-              quantity: i.quantity,
-            })),
-          },
-          rentalHistories: {
-            create: {
-              changedBy: actualActorId,
-              newStatus: RentalStatus.RESERVED,
-              memo: actorId && actorId !== userId ? '관리자 대리 예약 생성' : '대여 예약 생성',
-            },
-          },
-        },
-        include: {
-          user: true,
-          rentalItems: {
-            include: { item: true },
-          },
-        },
+        return created;
       });
 
-      const itemSummary =
-        rental.rentalItems.length > 0
-          ? `${rental.rentalItems[0].item.name} 외 ${rental.rentalItems.length - 1}건`
-          : '물품 없음';
-
-      await this.smsService.sendRentalStatusNotice(
-        rental.user.phoneNumber,
-        rental.user.name,
-        itemSummary,
-        RentalStatus.RESERVED,
-      );
-
-      return rental;
-    });
+      createdRentals.push(rental);
+    }
 
     await this.cartService.clearCart(userId);
 
-    return result;
+    return { rentals: createdRentals };
   }
 
   // 2. 대여 목록 조회
@@ -206,7 +237,7 @@ export class RentalsService {
         take: pageSize,
         orderBy: { createdAt: 'desc' },
         include: {
-          user: { select: { name: true, studentId: true, phoneNumber: true, department: true } },
+          user: { select: { name: true, studentId: true, phoneNumber: true, departmentType: true, departmentName: true } },
           rentalItems: { include: { item: { select: { name: true } } } },
         },
       }),
@@ -235,7 +266,7 @@ export class RentalsService {
     const rental = await this.prisma.rental.findFirst({
       where: { id, deletedAt: null },
       include: {
-        user: { select: { name: true, studentId: true, phoneNumber: true, department: true } },
+        user: { select: { name: true, studentId: true, phoneNumber: true, departmentType: true, departmentName: true } },
         rentalItems: { include: { item: true } },
         rentalHistories: {
           orderBy: { changedAt: 'desc' },
@@ -361,9 +392,9 @@ export class RentalsService {
     return updated;
   }
 
-  // 6. 예약 내용 수정 (날짜, 수량 변경)
+  // 6. 예약 내용 수정 (날짜, 수량 변경) — 단일 rental 수정, items 각각 동일 날짜여야 함
   async update(id: number, userId: string, updateDto: UpdateRentalDto) {
-    const { startDate, endDate, items } = updateDto;
+    const { items } = updateDto;
 
     const rental = await this.prisma.rental.findFirst({
       where: { id, deletedAt: null },
@@ -377,17 +408,37 @@ export class RentalsService {
       throw new BadRequestException('예약 상태일 때만 수정할 수 있습니다.');
     }
 
-    const start = startDate ? new Date(startDate) : rental.startDate;
-    const end = endDate ? new Date(endDate) : rental.endDate;
+    // items가 있을 경우 날짜 추출 및 단일 그룹 검증
+    let start: Date = rental.startDate;
+    let end: Date = rental.endDate;
+
+    if (items && items.length > 0) {
+      const firstStartDate = items[0].startDate;
+      const firstEndDate = items[0].endDate;
+
+      if (firstStartDate || firstEndDate) {
+        // 모든 items의 날짜가 동일해야 함
+        for (const item of items) {
+          if (item.startDate !== firstStartDate || item.endDate !== firstEndDate) {
+            throw new BadRequestException(
+              '예약 수정 시 모든 품목의 날짜는 동일해야 합니다. 날짜가 다른 경우 취소 후 재신청하세요.',
+            );
+          }
+        }
+
+        if (firstStartDate) start = new Date(firstStartDate);
+        if (firstEndDate) end = new Date(firstEndDate);
+      }
+    }
 
     if (start > end) {
       throw new BadRequestException('종료일이 시작일보다 빠를 수 없습니다.');
     }
 
-    if (startDate && (await this.holidaysService.isHoliday(start))) {
+    if (items?.[0]?.startDate && (await this.holidaysService.isHoliday(start))) {
       throw new BadRequestException('수정하려는 시작일이 휴무일입니다.');
     }
-    if (endDate && (await this.holidaysService.isHoliday(end))) {
+    if (items?.[0]?.endDate && (await this.holidaysService.isHoliday(end))) {
       throw new BadRequestException('수정하려는 반납일이 휴무일입니다.');
     }
 

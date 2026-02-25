@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ConfigurationsService } from '../configurations/configurations.service';
 import { HolidaysService } from '../holidays/holidays.service';
 import { SmsService } from '../sms/sms.service';
+import { CartService } from '../cart/cart.service';
 import { RentalStatus } from '@prisma/client';
 import { BadRequestException, ConflictException } from '@nestjs/common';
 
@@ -46,6 +47,7 @@ describe('RentalsService', () => {
         { provide: ConfigurationsService, useValue: { getValue: jest.fn().mockResolvedValue('2') } },
         { provide: HolidaysService, useValue: { isHoliday: jest.fn().mockResolvedValue(false) } },
         { provide: SmsService, useValue: mockSmsService },
+        { provide: CartService, useValue: { clearCart: jest.fn().mockResolvedValue(undefined) } },
       ],
     }).compile();
 
@@ -57,9 +59,7 @@ describe('RentalsService', () => {
   it('should create a bundle rental automatically including components', async () => {
     const userId = 'user-uuid';
     const dto = {
-      startDate: '2026-03-01',
-      endDate: '2026-03-03',
-      items: [{ itemId: 1, quantity: 1 }],
+      items: [{ itemId: 1, quantity: 1, startDate: '2026-03-01', endDate: '2026-03-03' }],
     };
 
     // Mock: 메인 물품(ID: 1)은 구성품(ID: 2) 1개를 가지고 있음
@@ -92,9 +92,7 @@ describe('RentalsService', () => {
   it('should throw ConflictException if a component stock is insufficient', async () => {
     const userId = 'user-uuid';
     const dto = {
-      startDate: '2026-03-01',
-      endDate: '2026-03-03',
-      items: [{ itemId: 1, quantity: 1 }],
+      items: [{ itemId: 1, quantity: 1, startDate: '2026-03-01', endDate: '2026-03-03' }],
     };
 
     // Mock: 카메라는 재고가 있으나 삼각대는 재고가 0인 상황
