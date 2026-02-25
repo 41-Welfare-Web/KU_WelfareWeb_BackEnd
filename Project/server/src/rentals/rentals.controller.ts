@@ -20,7 +20,7 @@ import { GetUser } from '../auth/get-user.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '@prisma/client';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('대여 (Rentals)')
 @ApiBearerAuth()
@@ -48,16 +48,24 @@ export class RentalsController {
 
   @Get()
   @ApiOperation({ summary: '대여 목록 조회' })
+  @ApiQuery({ name: 'page', required: false, description: '페이지 번호 (기본값: 1)' })
+  @ApiQuery({ name: 'pageSize', required: false, description: '페이지 크기 (기본값: 10)' })
+  @ApiQuery({ name: 'userId', required: false, description: '특정 사용자 ID로 필터링 (관리자 전용)' })
+  @ApiQuery({ name: 'status', required: false, description: '대여 상태 필터 (RESERVED, RENTED, RETURNED, CANCELLED, OVERDUE)' })
   findAll(
     @GetUser() user: any,
     @Query('page') page: string = '1',
     @Query('pageSize') pageSize: string = '10',
+    @Query('userId') targetUserId?: string,
+    @Query('status') status?: string,
   ) {
     return this.rentalsService.findAll(
       user.userId,
       user.role,
       +page,
       +pageSize,
+      targetUserId,
+      status,
     );
   }
 

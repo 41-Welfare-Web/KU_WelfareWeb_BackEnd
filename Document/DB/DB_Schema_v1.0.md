@@ -4,20 +4,21 @@
 
 **1. `users` (사용자)**
 
-사용자 계정 정보를 저장합니다. Supabase의 `auth.users` 테이블과 `id`로 연결되는 프로필 테이블입니다.
+사용자 계정 정보를 저장합니다. Supabase Auth를 사용하지 않고 자체 JWT 인증(bcrypt 비밀번호 해싱)을 사용합니다.
 
 | 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
 | :--- | :--- | :--- | :--- |
-| `id` | `uuid` | 사용자 고유 ID | **Primary Key**, `auth.users.id`와 연결 |
+| `id` | `uuid` | 사용자 고유 ID | **Primary Key** |
 | `name` | `varchar(30)` | 실제 이름 (동명이인 가능) | Not Null |
 | `username` | `varchar(20)` | 로그인 아이디 | **Unique**, Not Null |
-| `password` | `varchar(255)` | 암호화된 비밀번호 | Not Null |
+| `password` | `varchar(255)` | bcrypt 해싱된 비밀번호 | Not Null |
 | `student_id` | `varchar(20)` | 학번 | **Unique**, Not Null |
 | `phone_number` | `varchar(20)` | 전화번호 | **Unique**, Not Null |
 | `department` | `varchar(50)` | 소속 단위(학과, 동아리 등) | Not Null |
 | `role` | `varchar(10)` | 사용자 역할 ('USER', 'ADMIN') | Not Null, Default: 'USER' |
 | `login_attempts` | `integer` | 로그인 실패 횟수 | Not Null, Default: 0 |
 | `lock_until` | `timestampz` | 계정 잠금 만료 시간 | Nullable |
+| `deleted_at` | `timestampz` | 소프트 삭제 시간 (NULL = 정상) | Nullable |
 | `created_at` | `timestampz` | 생성일 | Not Null, Default: `now()` |
 
 **2. `categories` (물품 카테고리)**
@@ -26,6 +27,7 @@
 | :--- | :--- | :--- | :--- |
 | `id` | `serial` | 카테고리 ID | **Primary Key** |
 | `name` | `varchar(50)` | 카테고리명 | **Unique**, Not Null |
+| `deleted_at` | `timestampz` | 소프트 삭제 시간 (NULL = 정상) | Nullable |
 
 **3. `items` (물품 종류)**
 
@@ -42,6 +44,7 @@
 | `image_url` | `text` | 대표 이미지 URL | |
 | `management_type` | `varchar(20)` | 관리 방식 ('INDIVIDUAL', 'BULK') | Not Null |
 | `total_quantity` | `integer` | 총 보유 수량 (BULK 타입 전용) | |
+| `deleted_at` | `timestampz` | 소프트 삭제 시간 (NULL = 정상) | Nullable |
 | `created_at` | `timestampz` | 생성일 | Not Null, Default: `now()` |
 
 **3-1. `item_components` (세트 구성)**
@@ -66,6 +69,7 @@
 | `serial_number` | `varchar(50)` | 자산 관리 번호 (예: 'MIC-01-01') | **Unique**, Not Null |
 | `status` | `varchar(20)` | 상태 ('AVAILABLE', 'RENTED', 'BROKEN') | Not Null, Default: 'AVAILABLE' |
 | `image_url` | `text` | 개별 품목 실물 이미지 URL | |
+| `deleted_at` | `timestampz` | 소프트 삭제 시간 (NULL = 정상) | Nullable |
 | `created_at` | `timestampz` | 최초 등록일 | Not Null, Default: `now()` |
 
 **5. `rentals` (대여 예약)**
@@ -80,6 +84,7 @@
 | `end_date` | `date` | 반납 예정일 | Not Null |
 | `status` | `varchar(20)` | 대여 상태 ('RESERVED', 'RENTED', 'RETURNED', 'CANCELED', 'OVERDUE') | Not Null, Default: 'RESERVED' |
 | `memo` | `text` | 비고 (수령인 불일치 등 관리자 기록) | |
+| `deleted_at` | `timestampz` | 소프트 삭제 시간 (NULL = 정상) | Nullable |
 | `created_at` | `timestampz` | 예약 생성일 | Not Null, Default: `now()` |
 
 **6. `rental_items` (대여 품목)**
@@ -127,6 +132,7 @@
 | `pickup_date` | `date` | 수령 예정일 | Not Null |
 | `status` | `varchar(20)` | 주문 상태 ('PENDING', 'CONFIRMED', 'PRINTED', 'REJECTED', 'COMPLETED') | Not Null, Default: 'PENDING' |
 | `rejection_reason` | `text` | 반려 사유 | |
+| `deleted_at` | `timestampz` | 소프트 삭제 시간 (NULL = 정상) | Nullable |
 | `created_at` | `timestampz` | 신청일 | Not Null, Default: `now()` |
 
 **9. `plotter_order_history` (플로터 주문 이력)**
@@ -189,5 +195,5 @@ SMS 인증 및 비밀번호 찾기 시 발급되는 임시 코드를 관리합�
 | `target_type` | `varchar(50)` | 활동의 대상이 된 테이블 (예: 'items', 'rentals') | |
 | `target_id` | `text` | 활동 대상의 ID | |
 | `details` | `jsonb` | 변경 전/후 데이터 등 상세 정보 | |
-| `ip_address` | `inet` | 활동을 수행한 곳의 IP 주소 | |
+| `ip_address` | `varchar(45)` | 활동을 수행한 곳의 IP 주소 (IPv6 지원) | |
 | `created_at` | `timestampz` | 활동 발생 시간 | Not Null, Default: `now()` |

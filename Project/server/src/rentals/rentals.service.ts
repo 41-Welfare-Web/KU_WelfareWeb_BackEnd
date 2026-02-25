@@ -183,12 +183,20 @@ export class RentalsService {
     role: Role,
     page: number = 1,
     pageSize: number = 10,
+    targetUserId?: string,
+    status?: string,
   ) {
     const skip = (page - 1) * pageSize;
     const where: any = { deletedAt: null };
 
     if (role !== Role.ADMIN) {
       where.userId = userId;
+    } else if (targetUserId) {
+      where.userId = targetUserId;
+    }
+
+    if (status) {
+      where.status = status as RentalStatus;
     }
 
     const [rentals, total] = await this.prisma.$transaction([

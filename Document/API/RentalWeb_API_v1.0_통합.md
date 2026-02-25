@@ -532,6 +532,48 @@
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
 
 ---
+# 사용자 대시보드 조회 (Get User Dashboard)
+
+로그인된 사용자의 현재 대여 현황 요약 정보를 조회합니다.
+
+## **ENDPOINT:** `GET /api/users/me/dashboard`
+**Description:** 현재 활성 대여 건수, 가장 가까운 반납일, 활성 플로터 주문 건수, 최근 대여 목록을 한 번에 반환합니다.
+**Required Permissions:** Authenticated Users
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "activeRentalsCount": 2,
+  "nearestReturnDate": "2024-08-05T00:00:00.000Z",
+  "activePlotterOrdersCount": 1,
+  "recentRentals": [
+    {
+      "id": 101,
+      "status": "RENTED",
+      "startDate": "2024-08-01T00:00:00.000Z",
+      "endDate": "2024-08-05T00:00:00.000Z",
+      "itemSummary": "DSLR 카메라 외 1건"
+    }
+  ]
+}
+```
+* `activeRentalsCount`: 현재 `RENTED` 상태인 대여 건수.
+* `nearestReturnDate`: 활성 대여 중 가장 가까운 반납 예정일. 활성 대여가 없으면 `null`.
+* `activePlotterOrdersCount`: `PENDING`, `CONFIRMED`, `PRINTED` 상태인 플로터 주문 건수.
+* `recentRentals`: 최근 3건의 대여 기록.
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | `accessToken`이 유효하지 않을 때 |
+| `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
+
 ---
 # 전체 사용자 목록 조회 (Get All Users)
 
@@ -896,6 +938,318 @@
 | `409 Conflict` | `ITEM_IN_USE` | 해당 물품과 연결된 대여 기록이 있어 삭제할 수 없을 때 |
 
 ---
+# 물품 날짜별 재고 조회 (Get Item Availability)
+
+물품의 날짜 범위별 가용 재고를 조회합니다. 대여 예약 화면의 캘린더용입니다.
+
+## **ENDPOINT:** `GET /api/items/{itemId}/availability`
+**Description:** 시작일부터 종료일까지의 각 날짜별로 가용 수량을 반환합니다. 로그인 불필요.
+**Required Permissions:** All Users
+
+---
+
+#### **Path Parameters**
+
+| 파라미터 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `itemId` | `integer` | 조회할 물품의 고유 ID |
+
+#### **Query Parameters**
+
+| 파라미터 | 타입 | 필수 여부 | 설명 |
+| :--- | :--- | :--- | :--- |
+| `startDate` | `string` | 필수 | 조회 시작일 (YYYY-MM-DD) |
+| `endDate` | `string` | 필수 | 조회 종료일 (YYYY-MM-DD) |
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+[
+  { "date": "2024-08-01", "availableQuantity": 3, "totalQuantity": 5 },
+  { "date": "2024-08-02", "availableQuantity": 2, "totalQuantity": 5 },
+  { "date": "2024-08-03", "availableQuantity": 5, "totalQuantity": 5 }
+]
+```
+* `availableQuantity`: 해당 날짜에 대여 가능한 수량.
+* `totalQuantity`: 전체 보유 수량.
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `404 Not Found` | `ITEM_NOT_FOUND` | 해당 `itemId`의 물품이 없을 때 |
+
+---
+# 개별 실물 목록 조회 (Get Item Instances)
+
+`INDIVIDUAL` 관리 방식 물품의 개별 실물(인스턴스) 목록을 조회합니다.
+
+## **ENDPOINT:** `GET /api/items/{itemId}/instances`
+**Description:** 해당 물품의 모든 개별 실물을 `serialNumber` 오름차순으로 반환합니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Path Parameters**
+
+| 파라미터 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `itemId` | `integer` | 조회할 물품의 고유 ID |
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+[
+  {
+    "id": 1,
+    "itemId": 1,
+    "serialNumber": "CAM-001-01",
+    "status": "AVAILABLE",
+    "imageUrl": null,
+    "createdAt": "2024-01-10T10:00:00Z"
+  },
+  {
+    "id": 2,
+    "itemId": 1,
+    "serialNumber": "CAM-001-02",
+    "status": "RENTED",
+    "imageUrl": "https://example.com/images/cam02.jpg",
+    "createdAt": "2024-01-10T10:00:00Z"
+  }
+]
+```
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
+
+---
+# 개별 실물 등록 (Create Item Instance)
+
+`INDIVIDUAL` 관리 방식 물품에 새로운 개별 실물을 등록합니다.
+
+## **ENDPOINT:** `POST /api/items/{itemId}/instances`
+**Description:** 자산 관리 번호(시리얼 번호)를 부여하여 새 실물을 등록합니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Path Parameters**
+
+| 파라미터 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `itemId` | `integer` | 실물을 등록할 물품의 고유 ID |
+
+---
+
+#### **Request Body**
+
+```json
+{
+  "serialNumber": "CAM-001-03",
+  "status": "AVAILABLE",
+  "imageUrl": "https://example.com/images/cam03.jpg"
+}
+```
+* `serialNumber`: (string, required, unique) 자산 관리 번호.
+* `status`: (string, optional) 초기 상태. `AVAILABLE`, `RENTED`, `BROKEN` 중 하나. (기본값: `AVAILABLE`)
+* `imageUrl`: (string, optional) 개별 실물 이미지 URL.
+
+---
+
+#### **Responses**
+
+*   **Success Response (`201 Created`)**
+    *   생성된 실물 정보를 반환합니다. (목록 조회 응답의 단건과 동일)
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
+| `409 Conflict` | `DUPLICATE_SERIAL_NUMBER` | `serialNumber`가 이미 존재할 때 |
+
+---
+# 개별 실물 수정 (Update Item Instance)
+
+등록된 개별 실물의 정보를 수정합니다.
+
+## **ENDPOINT:** `PUT /api/items/instances/{instanceId}`
+**Description:** 실물의 상태, 시리얼 번호, 이미지를 수정합니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Path Parameters**
+
+| 파라미터 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `instanceId` | `integer` | 수정할 실물의 고유 ID |
+
+---
+
+#### **Request Body**
+*   모든 필드는 선택적(optional)입니다.
+
+```json
+{
+  "serialNumber": "CAM-001-03",
+  "status": "BROKEN",
+  "imageUrl": "https://example.com/images/cam03_new.jpg"
+}
+```
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+    *   수정된 실물 정보를 반환합니다.
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
+| `404 Not Found` | `INSTANCE_NOT_FOUND` | 해당 `instanceId`의 실물이 없을 때 |
+
+---
+# 개별 실물 삭제 (Delete Item Instance)
+
+등록된 개별 실물을 소프트 삭제합니다.
+
+## **ENDPOINT:** `DELETE /api/items/instances/{instanceId}`
+**Description:** 실물을 시스템에서 삭제 처리합니다. (소프트 삭제)
+**Required Permissions:** Admin Only
+
+---
+
+#### **Path Parameters**
+
+| 파라미터 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `instanceId` | `integer` | 삭제할 실물의 고유 ID |
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{ "message": "실물이 삭제되었습니다." }
+```
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
+| `404 Not Found` | `INSTANCE_NOT_FOUND` | 해당 `instanceId`의 실물이 없을 때 |
+
+---
+# 세트 구성품 추가 (Add Item Component)
+
+물품을 다른 물품의 세트 구성품으로 등록합니다.
+
+## **ENDPOINT:** `POST /api/items/{itemId}/components`
+**Description:** `itemId` 물품을 부모(세트)로, 지정한 물품을 구성품으로 연결합니다. 동일한 조합이 이미 존재하면 수량을 업데이트합니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Path Parameters**
+
+| 파라미터 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `itemId` | `integer` | 부모(세트) 물품의 고유 ID |
+
+---
+
+#### **Request Body**
+
+```json
+{
+  "componentId": 3,
+  "quantity": 2
+}
+```
+* `componentId`: (integer, required) 구성품으로 추가할 물품의 ID.
+* `quantity`: (integer, required) 세트 내 포함 수량. (최소 1)
+
+---
+
+#### **Responses**
+
+*   **Success Response (`201 Created`)**
+
+```json
+{
+  "parentId": 1,
+  "componentId": 3,
+  "quantity": 2
+}
+```
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
+| `404 Not Found` | `ITEM_NOT_FOUND` | 부모 또는 구성품 물품이 없을 때 |
+
+---
+# 세트 구성품 삭제 (Remove Item Component)
+
+세트에서 특정 구성품 연결을 제거합니다.
+
+## **ENDPOINT:** `DELETE /api/items/{itemId}/components/{componentId}`
+**Description:** 부모 물품과 구성품 물품 간의 세트 연결을 끊습니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Path Parameters**
+
+| 파라미터 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `itemId` | `integer` | 부모(세트) 물품의 고유 ID |
+| `componentId` | `integer` | 제거할 구성품 물품의 고유 ID |
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{ "message": "구성품이 세트에서 제외되었습니다." }
+```
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
+| `404 Not Found` | `COMPONENT_NOT_FOUND` | 해당 구성품 연결이 없을 때 |
+
+---
 # 카테고리 목록 조회 (Get All Categories)
 
 물품을 분류하는 데 사용되는 모든 카테고리 목록을 조회합니다.
@@ -1095,6 +1449,48 @@
 | `409 Conflict` | `INSUFFICIENT_STOCK` | 요청한 기간에 재고가 부족할 때 |
 
 ---
+# 사용자 대여 대리 신청 (Create Rental By Admin)
+
+관리자가 특정 사용자를 대신하여 대여 예약을 생성합니다.
+
+## **ENDPOINT:** `POST /api/rentals/admin`
+**Description:** 관리자가 `targetUserId`를 지정하여 해당 사용자의 대여 예약을 생성합니다. 이력에 "관리자 대리 예약 생성"으로 기록됩니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Request Body**
+
+```json
+{
+  "targetUserId": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+  "startDate": "2024-08-01",
+  "endDate": "2024-08-05",
+  "items": [
+    { "itemId": 1, "quantity": 1 }
+  ]
+}
+```
+* `targetUserId`: (uuid, required) 대여를 신청할 사용자의 UUID.
+* `startDate`, `endDate`, `items`: `POST /api/rentals`의 Request Body와 동일.
+
+---
+
+#### **Responses**
+
+*   **Success Response (`201 Created`)**
+    *   생성된 대여 정보를 반환합니다. (`POST /api/rentals` 성공 응답과 동일)
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
+| `404 Not Found` | `USER_NOT_FOUND` | `targetUserId`에 해당하는 사용자가 없을 때 |
+| (이 외 Create Rental의 Error Responses 참조) | | |
+
+---
 # 대여 목록 조회 (Get Rentals)
 
 사용자 또는 관리자가 대여 목록을 조회합니다.
@@ -1289,6 +1685,55 @@
 ---
 ### **5. 플로터 (Plotter)**
 
+# 플로터 가격 계산 (Calculate Plotter Price)
+
+주문 전에 인쇄 비용을 미리 계산합니다.
+
+## **ENDPOINT:** `POST /api/plotter/calculate-price`
+**Description:** 부서, 목적, 용지 크기, 장수를 기반으로 무료/유료 여부와 예상 금액을 반환합니다. 로그인 불필요.
+**Required Permissions:** All Users
+
+---
+
+#### **Request Body**
+
+```json
+{
+  "department": "컴퓨터공학과",
+  "purpose": "졸업 작품 포스터",
+  "paperSize": "A0",
+  "pageCount": 1
+}
+```
+* `department`: (string, required) 소속 단위.
+* `purpose`: (string, required) 인쇄 목적.
+* `paperSize`: (string, required) 용지 크기. (예: `A0`, `A1`)
+* `pageCount`: (integer, required) 인쇄 장수.
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "price": 5000,
+  "isFree": false,
+  "message": "인쇄 비용은 총 5,000원입니다. 입금 확인증(영수증) 업로드가 필요합니다."
+}
+```
+* **무료인 경우:** `{ "price": 0, "isFree": true, "message": "..." }`
+* `isFree`: 무료 인쇄 대상 여부. 무료이면 `POST /api/plotter/orders` 시 `paymentReceiptImage` 불필요.
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `400 Bad Request` | `INVALID_INPUT` | 필수 필드 누락 또는 유효하지 않은 값 |
+| `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
+
+---
 # 플로터 주문 신청 (Create Plotter Order)
 
 `FR-27`, `FR-28` 요구사항에 따라, 사용자가 플로터 인쇄를 주문 신청합니다.
@@ -1584,7 +2029,38 @@
 
 ---
 # 휴무일 삭제 (Delete Holiday)
-... (생략) ...
+
+`FR-31` 요구사항에 따라, 관리자가 등록된 휴무일을 삭제합니다.
+
+## **ENDPOINT:** `DELETE /api/admin/holidays/{id}`
+**Description:** `id`에 해당하는 휴무일을 시스템에서 삭제합니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Path Parameters**
+
+| 파라미터 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `id` | `integer` | 삭제할 휴무일의 고유 ID |
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{ "message": "휴무일이 삭제되었습니다." }
+```
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
+| `404 Not Found` | `HOLIDAY_NOT_FOUND` | 해당 `id`의 휴무일이 없을 때 |
 
 ---
 # 이미지 업로드 (Upload Image)
@@ -1715,6 +2191,7 @@
 | (이 외 Admin API의 Error Responses 참조) | | |
 
 ---
+<<<<<<< Updated upstream
 ### **8. 장바구니 (Cart)**
 
 # 내 장바구니 조회 (Get My Cart)
@@ -1724,6 +2201,17 @@
 ## **ENDPOINT:** `GET /api/cart`
 **Description:** 로그인한 사용자의 장바구니 항목 전체를 반환합니다. 각 항목에는 물품 및 카테고리 정보가 포함됩니다. `hasUnsetDates` 필드로 날짜 미설정 항목 존재 여부를 확인할 수 있으며, 프론트엔드에서 대여 확정 버튼 비활성화 조건으로 활용할 수 있습니다.
 **Required Permissions:** JWT Required
+=======
+### **7. 공통 (Common)**
+
+# 헬스체크 (Health Check)
+
+서버 및 연결된 외부 서비스의 상태를 확인합니다.
+
+## **ENDPOINT:** `GET /api/common/health`
+**Description:** DB, SMS(Solapi), Storage(Supabase)의 연결 상태를 진단하여 반환합니다.
+**Required Permissions:** All Users
+>>>>>>> Stashed changes
 
 ---
 
@@ -1733,6 +2221,7 @@
 
 ```json
 {
+<<<<<<< Updated upstream
   "items": [
     {
       "id": 1,
@@ -1854,6 +2343,30 @@
 * `quantity`: (integer, optional) 변경할 수량. 최소 1 이상이어야 합니다.
 * `startDate`: (string, optional, nullable) 변경할 대여 시작일. `YYYY-MM-DD` 형식. `null` 전송 시 날짜 초기화.
 * `endDate`: (string, optional, nullable) 변경할 반납일. `YYYY-MM-DD` 형식. `null` 전송 시 날짜 초기화.
+=======
+  "status": "OK",
+  "timestamp": "2024-07-22T11:00:00.000Z",
+  "services": {
+    "database": "UP",
+    "sms": "UP",
+    "storage": "UP"
+  }
+}
+```
+* `status`: 전체 상태. DB가 `DOWN`이면 `ERROR`, 나머지는 `OK`.
+* `services.database`: DB 연결 상태. `UP` 또는 `DOWN`.
+* `services.sms`: Solapi SMS 서비스 상태. `UP`, `DOWN`, `NOT_CONFIGURED` 중 하나.
+* `services.storage`: Supabase Storage 상태. `UP`, `DOWN`, `NOT_CONFIGURED` 중 하나.
+
+---
+# 공통 메타데이터 조회 (Get Metadata)
+
+플로터 신청 화면 등에 필요한 공통 데이터를 조회합니다.
+
+## **ENDPOINT:** `GET /api/common/metadata`
+**Description:** `configurations` 테이블에 저장된 소속 리스트, 무료 목적, 플로터 가격 등 공통 데이터를 반환합니다. 로그인 불필요.
+**Required Permissions:** All Users
+>>>>>>> Stashed changes
 
 ---
 
@@ -1863,6 +2376,7 @@
 
 ```json
 {
+<<<<<<< Updated upstream
   "id": 1,
   "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "itemId": 5,
@@ -1906,6 +2420,36 @@
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
 | `cartItemId` | `integer` | 제거할 장바구니 항목의 고유 ID |
+=======
+  "departments": ["컴퓨터공학과", "전자공학과", "총학생회"],
+  "freePurposes": ["수업 자료", "동아리 활동"],
+  "prices": {
+    "a0": 5000,
+    "a1": 3000
+  }
+}
+```
+* `departments`: 플로터 신청 시 선택 가능한 소속 목록.
+* `freePurposes`: 해당 목적이면 무료 인쇄 대상인 목적 목록.
+* `prices`: 용지 크기별 인쇄 단가 (원).
+
+---
+# 이미지 업로드 - 공용 (Upload Image)
+
+로그인된 사용자가 이미지를 업로드합니다. (플로터 입금 영수증 등 용도)
+
+## **ENDPOINT:** `POST /api/common/upload`
+**Description:** 이미지 파일을 받아 Supabase Storage의 `common` 폴더에 저장하고 공용 URL을 반환합니다.
+**Required Permissions:** Authenticated Users
+
+---
+
+#### **Request Body (multipart/form-data)**
+
+| 필드명 | 타입 | 필수 여부 | 설명 |
+| :--- | :--- | :--- | :--- |
+| `file` | `file` | 필수 | 이미지 파일 (jpg, png, webp 지원, 크기 제한 없음) |
+>>>>>>> Stashed changes
 
 ---
 
@@ -1915,7 +2459,11 @@
 
 ```json
 {
+<<<<<<< Updated upstream
   "message": "장바구니에서 제거되었습니다."
+=======
+  "url": "https://[supabase-url]/storage/v1/object/public/rental-web/common/[uuid].png"
+>>>>>>> Stashed changes
 }
 ```
 
@@ -1923,9 +2471,15 @@
 
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
+<<<<<<< Updated upstream
 | `401 Unauthorized` | `NOT_AUTHENTICATED` | `accessToken`이 유효하지 않을 때 |
 | `403 Forbidden` | `NO_PERMISSION` | 타인의 장바구니 항목에 접근하려 할 때 |
 | `404 Not Found` | `CART_ITEM_NOT_FOUND` | 해당 `cartItemId`의 항목이 없을 때 |
 
 ---
 * **Note:** `POST /api/rentals`로 대여가 확정되면 해당 사용자의 장바구니 전체가 자동으로 초기화됩니다.
+=======
+| `400 Bad Request` | `FILE_REQUIRED` | 파일이 없을 때 |
+| `400 Bad Request` | `INVALID_FILE_TYPE` | 이미지 파일(jpg, png, webp)이 아닐 때 |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
+>>>>>>> Stashed changes
