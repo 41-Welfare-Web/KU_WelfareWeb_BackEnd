@@ -206,7 +206,7 @@ export class RentalsService {
         take: pageSize,
         orderBy: { createdAt: 'desc' },
         include: {
-          user: { select: { name: true, studentId: true, phoneNumber: true } },
+          user: { select: { name: true, studentId: true, phoneNumber: true, department: true } },
           rentalItems: { include: { item: { select: { name: true } } } },
         },
       }),
@@ -235,7 +235,7 @@ export class RentalsService {
     const rental = await this.prisma.rental.findFirst({
       where: { id, deletedAt: null },
       include: {
-        user: { select: { name: true, studentId: true, phoneNumber: true } },
+        user: { select: { name: true, studentId: true, phoneNumber: true, department: true } },
         rentalItems: { include: { item: true } },
         rentalHistories: {
           orderBy: { changedAt: 'desc' },

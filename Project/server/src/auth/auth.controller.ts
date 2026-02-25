@@ -11,6 +11,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { FindUsernameDto } from './dto/find-username.dto';
 import { PasswordResetRequestDto } from './dto/password-reset-request.dto';
+import { PasswordResetVerifyDto } from './dto/password-reset-verify.dto';
 import { PasswordResetConfirmDto } from './dto/password-reset-confirm.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -71,9 +72,16 @@ export class AuthController {
     return this.authService.requestPasswordReset(dto);
   }
 
+  @Post('password-reset/verify')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: '비밀번호 재설정 코드 검증 → resetToken 발급' })
+  async verifyPasswordReset(@Body() dto: PasswordResetVerifyDto) {
+    return this.authService.verifyPasswordReset(dto);
+  }
+
   @Post('password-reset/confirm')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: '비밀번호 재설정 확정' })
+  @ApiOperation({ summary: '비밀번호 재설정 확정 (resetToken + 새 비밀번호)' })
   async confirmPasswordReset(@Body() dto: PasswordResetConfirmDto) {
     return this.authService.confirmPasswordReset(dto);
   }

@@ -222,12 +222,12 @@
 ```
 
 ---
-# 비밀번호 재설정 확정 (Confirm Password Reset)
+# 비밀번호 재설정 코드 검증 (Verify Password Reset)
 
-`FR-04` 요구사항에 따라, 인증 코드를 이용해 비밀번호를 최종 변경합니다.
+`FR-04` 요구사항에 따라, SMS 인증 코드의 유효성을 검증하고 비밀번호 변경에 사용할 `resetToken`을 발급합니다.
 
-## **ENDPOINT:** `POST /api/auth/password-reset/confirm`
-**Description:** SMS로 발급받은 인증 코드가 유효한지 확인하고, 유효할 경우 새 비밀번호로 변경합니다.
+## **ENDPOINT:** `POST /api/auth/password-reset/verify`
+**Description:** SMS로 발급받은 인증 코드가 유효한지 확인하고, 성공 시 비밀번호 변경용 단기 토큰(`resetToken`)을 반환합니다. 코드는 1회 사용 후 즉시 삭제됩니다.
 **Required Permissions:** All Users
 
 ---
@@ -237,12 +237,52 @@
 ```json
 {
   "username": "testuser",
-  "verificationCode": "123456",
-  "newPassword": "newPassword123!"
+  "verificationCode": "123456"
 }
 ```
 * `username`: (string, required) 아이디.
 * `verificationCode`: (string, required) SMS로 수신한 인증 코드.
+
+---
+
+##### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "resetToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+* `resetToken`: 비밀번호 변경 시 사용하는 JWT. **유효기간 10분**.
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `400 Bad Request` | `INVALID_VERIFICATION_CODE` | 인증 코드가 일치하지 않거나 만료되었을 때 |
+| `400 Bad Request` | `TOO_MANY_ATTEMPTS` | 인증 5회 실패로 코드 삭제 후 재요청 필요 |
+
+---
+# 비밀번호 재설정 확정 (Confirm Password Reset)
+
+`FR-04` 요구사항에 따라, `resetToken`과 새 비밀번호를 받아 비밀번호를 최종 변경합니다.
+
+## **ENDPOINT:** `POST /api/auth/password-reset/confirm`
+**Description:** verify 단계에서 발급받은 `resetToken`을 검증하고, 유효할 경우 새 비밀번호로 변경합니다.
+**Required Permissions:** All Users
+
+---
+
+##### **Request Body**
+
+```json
+{
+  "resetToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "newPassword": "newPassword123!"
+}
+```
+* `resetToken`: (string, required) verify 단계에서 발급받은 토큰. 10분 유효.
 * `newPassword`: (string, required) 새 비밀번호. 비밀번호 정책을 따라야 함.
 
 ---
@@ -261,7 +301,7 @@
 
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
-| `400 Bad Request` | `INVALID_VERIFICATION_CODE` | 인증 코드가 일치하지 않거나 만료되었을 때 |
+| `400 Bad Request` | `INVALID_RESET_TOKEN` | `resetToken`이 유효하지 않거나 만료되었을 때 |
 | `400 Bad Request` | `INVALID_PASSWORD` | 새 비밀번호가 유효성 규칙에 맞지 않을 때 |
 | `404 Not Found` | `USER_NOT_FOUND` | 해당 `username`의 사용자가 없을 때 |
 
@@ -1526,7 +1566,7 @@
   "rentals": [
     {
       "id": 101,
-      "user": { "name": "김테스트", "studentId": "202412345" },
+      "user": { "name": "김테스트", "studentId": "202412345", "phoneNumber": "01012345678", "department": "컴퓨터공학과" },
       "startDate": "2024-08-01",
       "endDate": "2024-08-05",
       "status": "RESERVED",

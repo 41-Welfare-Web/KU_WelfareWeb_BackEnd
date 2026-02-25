@@ -13,6 +13,7 @@ import { SignupVerificationCheckDto } from './dto/signup-verification-check.dto'
 import { LoginDto } from './dto/login.dto';
 import { FindUsernameDto } from './dto/find-username.dto';
 import { PasswordResetRequestDto } from './dto/password-reset-request.dto';
+import { PasswordResetVerifyDto } from './dto/password-reset-verify.dto';
 import { PasswordResetConfirmDto } from './dto/password-reset-confirm.dto';
 import { LogoutDto } from './dto/logout.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -342,9 +343,9 @@ export class AuthService {
     };
   }
 
-  // 비밀번호 재설정 확정
-  async confirmPasswordReset(dto: PasswordResetConfirmDto) {
-    const { username, verificationCode, newPassword } = dto;
+  // 비밀번호 재설정 코드 검증 → resetToken 발급
+  async verifyPasswordReset(dto: PasswordResetVerifyDto) {
+    const { username, verificationCode } = dto;
 
     const savedRecord = await this.prisma.verificationCode.findFirst({
       where: {
@@ -379,6 +380,37 @@ export class AuthService {
       );
     }
 
+    // 코드 검증 성공 — 단일 사용 보장을 위해 레코드 삭제
+    await this.prisma.verificationCode.delete({
+      where: { id: savedRecord.id },
+    });
+
+    // resetToken 발급 (10분 유효)
+    const resetToken = this.jwtService.sign(
+      { sub: username, type: 'password_reset' },
+      { expiresIn: '10m' },
+    );
+
+    return { resetToken };
+  }
+
+  // 비밀번호 재설정 확정
+  async confirmPasswordReset(dto: PasswordResetConfirmDto) {
+    const { resetToken, newPassword } = dto;
+
+    let username: string;
+    try {
+      const payload = this.jwtService.verify(resetToken);
+      if (payload.type !== 'password_reset') {
+        throw new Error('invalid type');
+      }
+      username = payload.sub;
+    } catch {
+      throw new BadRequestException(
+        '유효하지 않거나 만료된 재설정 토큰입니다. 처음부터 다시 시도해주세요.',
+      );
+    }
+
     const user = await this.prisma.user.findFirst({ where: { username, deletedAt: null } });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
@@ -388,10 +420,6 @@ export class AuthService {
     await this.prisma.user.update({
       where: { id: user.id },
       data: { password: hashedPassword },
-    });
-
-    await this.prisma.verificationCode.delete({
-      where: { id: savedRecord.id },
     });
 
     return { message: '비밀번호가 성공적으로 변경되었습니다.' };
