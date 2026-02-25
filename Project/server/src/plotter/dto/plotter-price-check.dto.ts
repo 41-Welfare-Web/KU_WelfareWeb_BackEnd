@@ -3,11 +3,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
 export class PlotterPriceCheckDto {
-  @ApiProperty({ example: '중앙동아리', description: '소속 단위' })
-  @IsString()
-  @IsNotEmpty()
-  department: string;
-
   @ApiProperty({ example: '예산안 출력', description: '인쇄 목적' })
   @IsString()
   @IsNotEmpty()

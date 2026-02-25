@@ -8,11 +8,6 @@ export class CreatePlotterOrderDto {
   @IsNotEmpty()
   purpose: string;
 
-  @ApiProperty({ example: '중앙동아리', description: '소속 단위' })
-  @IsString()
-  @IsNotEmpty()
-  department: string;
-
   @ApiProperty({ example: 'A0', description: '용지 크기 (A0, A1)' })
   @IsString()
   @IsNotEmpty()

@@ -24,8 +24,15 @@ export class PlotterService {
   ) {}
 
   // 가격 및 무료 여부 계산 (공통 로직)
-  async calculateEstimatedPrice(dto: PlotterPriceCheckDto) {
-    const { department, purpose, paperSize, pageCount } = dto;
+  async calculateEstimatedPrice(dto: PlotterPriceCheckDto, userId: string) {
+    const { purpose, paperSize, pageCount } = dto;
+
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
+    });
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+
+    const departmentType = user.departmentType;
 
     const unitPriceStr = await this.configService.getValue(
       `plotter_price_${paperSize.toLowerCase()}`,
@@ -41,13 +48,13 @@ export class PlotterService {
     const freeDepts = freeDeptsStr.split(',').map((d) => d.trim());
     const freePurposes = freePurposesStr.split(',').map((p) => p.trim());
 
-    const isFreeDept = freeDepts.includes(department);
+    const isFreeDept = freeDepts.includes(departmentType);
     const isFreePurpose = freePurposes.includes(purpose);
 
     let message = `인쇄 비용은 총 ${totalPrice.toLocaleString()}원입니다.`;
     if (isFreeDept && isFreePurpose) {
       totalPrice = 0;
-      message = `${department} 소속 및 ${purpose} 목적으로 인해 무료 인쇄 대상입니다.`;
+      message = `${departmentType} 소속 및 ${purpose} 목적으로 인해 무료 인쇄 대상입니다.`;
     } else if (totalPrice > 0) {
       message += ' 입금 확인증(영수증) 업로드가 필요합니다.';
     }
@@ -82,21 +89,20 @@ export class PlotterService {
       );
     }
 
-    const { purpose, paperSize, pageCount, department } = createOrderDto;
+    const { purpose, paperSize, pageCount } = createOrderDto;
 
-    // 3. 사용자 정보 조회 (삭제되지 않은 유저만)
+    // 3. 가격 계산 및 유/무료 판별 로직 호출 (user 조회 포함)
+    const { price: totalPrice, isFree } = await this.calculateEstimatedPrice({
+      purpose,
+      paperSize,
+      pageCount,
+    }, userId);
+
+    // 사용자 정보 조회 (SMS 발송 등에 필요)
     const user = await this.prisma.user.findFirst({
       where: { id: userId, deletedAt: null },
     });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
-
-    // 4. 가격 계산 및 유/무료 판별 로직 호출
-    const { price: totalPrice, isFree } = await this.calculateEstimatedPrice({
-      department,
-      purpose,
-      paperSize,
-      pageCount,
-    });
 
     const isPaid = totalPrice > 0;
 
@@ -141,7 +147,7 @@ export class PlotterService {
         status: PlotterStatus.PENDING,
       },
       include: {
-        user: { select: { name: true, studentId: true, department: true } },
+        user: { select: { name: true, studentId: true, departmentType: true, departmentName: true } },
       },
     });
 

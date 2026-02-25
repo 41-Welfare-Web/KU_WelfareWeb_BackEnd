@@ -20,7 +20,10 @@ describe('PlotterService', () => {
           provide: PrismaService,
           useValue: {
             plotterOrder: { create: jest.fn().mockResolvedValue({ id: 1 }) },
-            user: { findUnique: jest.fn().mockResolvedValue({ id: 'user-id', department: '중앙동아리', name: '테스터', phoneNumber: '01012341234' }) },
+            user: {
+              findFirst: jest.fn().mockResolvedValue({ id: 'user-id', departmentType: '중앙동아리', name: '테스터', phoneNumber: '01012341234' }),
+              findUnique: jest.fn().mockResolvedValue({ id: 'user-id', departmentType: '중앙동아리', name: '테스터', phoneNumber: '01012341234' }),
+            },
           },
         },
         {
@@ -75,7 +78,6 @@ describe('PlotterService', () => {
 
     const dto = {
       purpose: '예산안 출력',
-      department: '중앙동아리',
       paperSize: 'A0',
       pageCount: 1,
     } as any;

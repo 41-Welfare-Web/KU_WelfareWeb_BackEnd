@@ -43,8 +43,8 @@ export class PlotterController {
   @Post('calculate-price')
   @ApiOperation({ summary: '플로터 예상 가격 계산 (실시간 미리보기용)' })
   @ApiBody({ type: PlotterPriceCheckDto })
-  calculatePrice(@Body() dto: PlotterPriceCheckDto) {
-    return this.plotterService.calculateEstimatedPrice(dto);
+  calculatePrice(@GetUser() user: any, @Body() dto: PlotterPriceCheckDto) {
+    return this.plotterService.calculateEstimatedPrice(dto, user.userId);
   }
 
   @Post('orders')
