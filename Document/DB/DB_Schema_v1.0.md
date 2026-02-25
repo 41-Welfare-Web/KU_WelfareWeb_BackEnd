@@ -197,3 +197,20 @@ SMS 인증 및 비밀번호 찾기 시 발급되는 임시 코드를 관리합�
 | `details` | `jsonb` | 변경 전/후 데이터 등 상세 정보 | |
 | `ip_address` | `varchar(45)` | 활동을 수행한 곳의 IP 주소 (IPv6 지원) | |
 | `created_at` | `timestampz` | 활동 발생 시간 | Not Null, Default: `now()` |
+
+**14. `cart_items` (장바구니)**
+
+사용자가 대여 확정 전에 담아두는 장바구니 항목을 저장합니다. 동일 사용자가 동일 물품을 중복 담을 수 없습니다(upsert). 대여 확정(`POST /api/rentals`) 시 해당 사용자의 장바구니 전체가 자동으로 초기화됩니다.
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `id` | `serial` | 장바구니 항목 ID | **Primary Key** |
+| `user_id` | `uuid` | 사용자 ID | Foreign Key (`users.id`), Not Null |
+| `item_id` | `integer` | 물품 종류 ID | Foreign Key (`items.id`), Not Null |
+| `quantity` | `integer` | 대여할 수량 | Not Null, Default: 1 |
+| `start_date` | `date` | 대여 시작일 (미설정 시 NULL) | Nullable |
+| `end_date` | `date` | 반납 예정일 (미설정 시 NULL) | Nullable |
+| `created_at` | `timestampz` | 담은 시간 | Not Null, Default: `now()` |
+| `updated_at` | `timestampz` | 마지막 수정 시간 | Not Null, auto-updated |
+
+* **Unique 제약:** `(user_id, item_id)` — 동일 사용자가 동일 물품을 중복 담을 수 없음.

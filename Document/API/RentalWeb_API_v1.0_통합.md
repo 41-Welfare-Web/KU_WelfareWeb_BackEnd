@@ -14,7 +14,7 @@
 `FR-01` 요구사항에 따라, 회원가입을 위한 SMS 인증번호를 요청합니다.
 
 ## **ENDPOINT:** `POST /api/auth/request-signup-verification`
-**Description:** 입력한 전화번호로 6자리 인증번호를 발송합니다. 보안 및 어뷰징 방지를 위해 하루 최대 5회까지만 요청 가능합니다. 개발 편의를 위해 응답 바디에 생성된 코드가 포함됩니다.
+**Description:** 입력한 전화번호로 6자리 인증번호를 발송합니다. 보안 및 어뷰징 방지를 위해 하루 최대 5회까지만 요청 가능합니다.
 **Required Permissions:** All Users
 
 ---
@@ -36,11 +36,9 @@
 
 ```json
 {
-  "message": "인증번호가 발송되었습니다.",
-  "code": "123456"
+  "message": "인증번호가 발송되었습니다."
 }
 ```
-* **Note:** 현재 프론트엔드 개발 편의를 위해 응답 바디에 `code`가 포함되어 있습니다. 실제 운영 배포 시에는 보안을 위해 제거될 예정입니다.
 
 *   **Error Responses**
 
@@ -2083,7 +2081,7 @@
 
 #### **Responses**
 
-*   **Success Response (`201 Created`)**
+*   **Success Response (`200 OK`)**
 
 ```json
 {
@@ -2191,7 +2189,6 @@
 | (이 외 Admin API의 Error Responses 참조) | | |
 
 ---
-<<<<<<< Updated upstream
 ### **8. 장바구니 (Cart)**
 
 # 내 장바구니 조회 (Get My Cart)
@@ -2201,17 +2198,6 @@
 ## **ENDPOINT:** `GET /api/cart`
 **Description:** 로그인한 사용자의 장바구니 항목 전체를 반환합니다. 각 항목에는 물품 및 카테고리 정보가 포함됩니다. `hasUnsetDates` 필드로 날짜 미설정 항목 존재 여부를 확인할 수 있으며, 프론트엔드에서 대여 확정 버튼 비활성화 조건으로 활용할 수 있습니다.
 **Required Permissions:** JWT Required
-=======
-### **7. 공통 (Common)**
-
-# 헬스체크 (Health Check)
-
-서버 및 연결된 외부 서비스의 상태를 확인합니다.
-
-## **ENDPOINT:** `GET /api/common/health`
-**Description:** DB, SMS(Solapi), Storage(Supabase)의 연결 상태를 진단하여 반환합니다.
-**Required Permissions:** All Users
->>>>>>> Stashed changes
 
 ---
 
@@ -2221,7 +2207,6 @@
 
 ```json
 {
-<<<<<<< Updated upstream
   "items": [
     {
       "id": 1,
@@ -2343,30 +2328,6 @@
 * `quantity`: (integer, optional) 변경할 수량. 최소 1 이상이어야 합니다.
 * `startDate`: (string, optional, nullable) 변경할 대여 시작일. `YYYY-MM-DD` 형식. `null` 전송 시 날짜 초기화.
 * `endDate`: (string, optional, nullable) 변경할 반납일. `YYYY-MM-DD` 형식. `null` 전송 시 날짜 초기화.
-=======
-  "status": "OK",
-  "timestamp": "2024-07-22T11:00:00.000Z",
-  "services": {
-    "database": "UP",
-    "sms": "UP",
-    "storage": "UP"
-  }
-}
-```
-* `status`: 전체 상태. DB가 `DOWN`이면 `ERROR`, 나머지는 `OK`.
-* `services.database`: DB 연결 상태. `UP` 또는 `DOWN`.
-* `services.sms`: Solapi SMS 서비스 상태. `UP`, `DOWN`, `NOT_CONFIGURED` 중 하나.
-* `services.storage`: Supabase Storage 상태. `UP`, `DOWN`, `NOT_CONFIGURED` 중 하나.
-
----
-# 공통 메타데이터 조회 (Get Metadata)
-
-플로터 신청 화면 등에 필요한 공통 데이터를 조회합니다.
-
-## **ENDPOINT:** `GET /api/common/metadata`
-**Description:** `configurations` 테이블에 저장된 소속 리스트, 무료 목적, 플로터 가격 등 공통 데이터를 반환합니다. 로그인 불필요.
-**Required Permissions:** All Users
->>>>>>> Stashed changes
 
 ---
 
@@ -2376,7 +2337,6 @@
 
 ```json
 {
-<<<<<<< Updated upstream
   "id": 1,
   "userId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
   "itemId": 5,
@@ -2420,7 +2380,80 @@
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
 | `cartItemId` | `integer` | 제거할 장바구니 항목의 고유 ID |
-=======
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "message": "장바구니에서 제거되었습니다."
+}
+```
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | `accessToken`이 유효하지 않을 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 타인의 장바구니 항목에 접근하려 할 때 |
+| `404 Not Found` | `CART_ITEM_NOT_FOUND` | 해당 `cartItemId`의 항목이 없을 때 |
+
+---
+* **Note:** `POST /api/rentals`로 대여가 확정되면 해당 사용자의 장바구니 전체가 자동으로 초기화됩니다.
+
+---
+### **9. 공통 (Common)**
+
+# 헬스체크 (Health Check)
+
+서버 및 연결된 외부 서비스의 상태를 확인합니다.
+
+## **ENDPOINT:** `GET /api/common/health`
+**Description:** DB, SMS(Solapi), Storage(Supabase)의 연결 상태를 진단하여 반환합니다.
+**Required Permissions:** All Users
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "status": "OK",
+  "timestamp": "2024-07-22T11:00:00.000Z",
+  "services": {
+    "database": "UP",
+    "sms": "UP",
+    "storage": "UP"
+  }
+}
+```
+* `status`: 전체 상태. DB가 `DOWN`이면 `ERROR`, 나머지는 `OK`.
+* `services.database`: DB 연결 상태. `UP` 또는 `DOWN`.
+* `services.sms`: Solapi SMS 서비스 상태. `UP`, `DOWN`, `NOT_CONFIGURED` 중 하나.
+* `services.storage`: Supabase Storage 상태. `UP`, `DOWN`, `NOT_CONFIGURED` 중 하나.
+
+---
+# 공통 메타데이터 조회 (Get Metadata)
+
+플로터 신청 화면 등에 필요한 공통 데이터를 조회합니다.
+
+## **ENDPOINT:** `GET /api/common/metadata`
+**Description:** `configurations` 테이블에 저장된 소속 리스트, 무료 목적, 플로터 가격 등 공통 데이터를 반환합니다. 로그인 불필요.
+**Required Permissions:** All Users
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
   "departments": ["컴퓨터공학과", "전자공학과", "총학생회"],
   "freePurposes": ["수업 자료", "동아리 활동"],
   "prices": {
@@ -2449,7 +2482,6 @@
 | 필드명 | 타입 | 필수 여부 | 설명 |
 | :--- | :--- | :--- | :--- |
 | `file` | `file` | 필수 | 이미지 파일 (jpg, png, webp 지원, 크기 제한 없음) |
->>>>>>> Stashed changes
 
 ---
 
@@ -2459,11 +2491,7 @@
 
 ```json
 {
-<<<<<<< Updated upstream
-  "message": "장바구니에서 제거되었습니다."
-=======
   "url": "https://[supabase-url]/storage/v1/object/public/rental-web/common/[uuid].png"
->>>>>>> Stashed changes
 }
 ```
 
@@ -2471,15 +2499,6 @@
 
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
-<<<<<<< Updated upstream
-| `401 Unauthorized` | `NOT_AUTHENTICATED` | `accessToken`이 유효하지 않을 때 |
-| `403 Forbidden` | `NO_PERMISSION` | 타인의 장바구니 항목에 접근하려 할 때 |
-| `404 Not Found` | `CART_ITEM_NOT_FOUND` | 해당 `cartItemId`의 항목이 없을 때 |
-
----
-* **Note:** `POST /api/rentals`로 대여가 확정되면 해당 사용자의 장바구니 전체가 자동으로 초기화됩니다.
-=======
 | `400 Bad Request` | `FILE_REQUIRED` | 파일이 없을 때 |
 | `400 Bad Request` | `INVALID_FILE_TYPE` | 이미지 파일(jpg, png, webp)이 아닐 때 |
 | `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
->>>>>>> Stashed changes
