@@ -18,7 +18,8 @@ model User {
   password     String   @db.VarChar(255) // 비밀번호 필드 추가
   studentId    String   @unique @map("student_id") @db.VarChar(20)
   phoneNumber  String   @unique @map("phone_number") @db.VarChar(20)
-  department   String   @db.VarChar(50)
+  departmentType String  @map("department_type") @db.VarChar(30)
+  departmentName String? @map("department_name") @db.VarChar(50)
   role         Role     @default(USER)
   loginAttempts Int      @default(0) @map("login_attempts")
   lockUntil    DateTime? @map("lock_until") @db.Timestamptz

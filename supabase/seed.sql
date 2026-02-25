@@ -53,3 +53,16 @@ INSERT INTO public.items (category_id, name, total_quantity) VALUES
 (3, '몰카탐지기', 8),
 (3, '아이스박스', 2),
 (3, '확성기', 1);
+
+-- configurations 테이블 초기 데이터
+INSERT INTO public.configurations (config_key, config_value, description) VALUES
+  ('rental_max_period_months',      '2',                                                                          '최대 대여 가능 기간 (개월)'),
+  ('login_attempt_limit',           '5',                                                                          '로그인 시도 횟수 제한'),
+  ('plotter_pickup_delay_days',     '2',                                                                          '플로터 신청 후 수령까지 걸리는 근무일 수'),
+  ('verification_code_ttl_minutes', '5',                                                                          '인증번호 유효 시간 (분)'),
+  ('plotter_price_a0',              '5000',                                                                       'A0 용지 인쇄 단가 (원)'),
+  ('plotter_price_a1',              '3000',                                                                       'A1 용지 인쇄 단가 (원)'),
+  ('plotter_free_departments',      '중앙동아리,중앙자치기구',                                                      '무료 인쇄 대상 소속 단위'),
+  ('plotter_free_purposes',         '예산안 출력,동아리 행사',                                                      '무료 인쇄 대상 목적'),
+  ('plotter_departments_list',      '총학생회,중앙자치기구,단과대,학과,중앙동아리,단과대동아리,학과동아리,기타', '서비스 이용 가능 소속 단위 리스트')
+ON CONFLICT (config_key) DO NOTHING;

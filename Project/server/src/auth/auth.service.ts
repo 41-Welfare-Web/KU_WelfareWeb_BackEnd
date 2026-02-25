@@ -115,7 +115,8 @@ export class AuthService {
       studentId,
       phoneNumber,
       name,
-      department,
+      departmentType,
+      departmentName,
       verificationCode,
     } = registerDto;
 
@@ -185,7 +186,8 @@ export class AuthService {
           name,
           studentId,
           phoneNumber,
-          department,
+          departmentType,
+          departmentName: departmentName ?? null,
           role: 'USER',
         },
       });

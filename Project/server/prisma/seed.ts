@@ -17,7 +17,8 @@ async function main() {
       name: '관리자',
       studentId: '00000000',
       phoneNumber: '010-0000-0000',
-      department: '운영국',
+      departmentType: '기타',
+      departmentName: '운영국',
       role: Role.ADMIN,
     },
   });
@@ -61,8 +62,8 @@ async function main() {
     { key: 'plotter_price_a0', value: '5000', desc: 'A0 용지 인쇄 단가 (원)' },
     { key: 'plotter_price_a1', value: '3000', desc: 'A1 용지 인쇄 단가 (원)' },
     { key: 'plotter_free_departments', value: '중앙동아리,중앙자치기구', desc: '무료 인쇄 대상 소속 단위 (쉼표 구분)' },
-    { key: 'plotter_free_purposes', value: '예산안 출력', desc: '무료 인쇄 대상 목적 (쉼표 구분)' },
-    { key: 'plotter_departments_list', value: '총학생회,중앙자치기구,중앙동아리,단과대 학생회,단과대 동아리,학과,일반학회,기타', desc: '서비스 이용 가능 소속 단위 리스트 (쉼표 구분)' },
+    { key: 'plotter_free_purposes', value: '예산안 출력,동아리 행사', desc: '무료 인쇄 대상 목적 (쉼표 구분)' },
+    { key: 'plotter_departments_list', value: '총학생회,중앙자치기구,단과대,학과,중앙동아리,단과대동아리,학과동아리,기타', desc: '서비스 이용 가능 소속 단위 리스트 (쉼표 구분)' },
   ];
   for (const config of configs) {
     await prisma.configuration.upsert({

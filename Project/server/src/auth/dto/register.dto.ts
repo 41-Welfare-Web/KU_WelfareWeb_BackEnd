@@ -4,8 +4,21 @@ import {
   Matches,
   MinLength,
   MaxLength,
+  IsIn,
+  ValidateIf,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+
+export const DEPARTMENT_TYPES = [
+  '총학생회',
+  '중앙자치기구',
+  '단과대',
+  '학과',
+  '중앙동아리',
+  '단과대동아리',
+  '학과동아리',
+  '기타',
+] as const;
 
 export class RegisterDto {
   @ApiProperty({
@@ -45,10 +58,21 @@ export class RegisterDto {
   @IsNotEmpty()
   phoneNumber: string;
 
-  @ApiProperty({ example: '컴퓨터공학과', description: '소속 학과/단위' })
+  @ApiProperty({
+    example: '학과',
+    description: '소속 유형 (총학생회/중앙자치기구/단과대/학과/중앙동아리/단과대동아리/학과동아리/기타)',
+    enum: DEPARTMENT_TYPES,
+  })
   @IsString()
   @IsNotEmpty()
-  department: string;
+  @IsIn(DEPARTMENT_TYPES, { message: '유효하지 않은 소속 유형입니다.' })
+  departmentType: string;
+
+  @ApiProperty({ example: '컴퓨터공학과', description: '소속 단위명 (총학생회 제외 필수)', required: false })
+  @ValidateIf((o) => o.departmentType !== '총학생회')
+  @IsString()
+  @IsNotEmpty({ message: '소속 단위명을 입력해주세요.' })
+  departmentName?: string;
 
   @ApiProperty({ example: '123456', description: 'SMS 인증번호' })
   @IsString()

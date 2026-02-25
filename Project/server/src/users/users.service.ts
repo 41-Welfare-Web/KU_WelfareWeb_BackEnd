@@ -25,7 +25,8 @@ export class UsersService {
         name: true,
         studentId: true,
         phoneNumber: true,
-        department: true,
+        departmentType: true,
+        departmentName: true,
         role: true,
         createdAt: true,
       },
@@ -36,7 +37,7 @@ export class UsersService {
 
   // 2. 내 정보 수정
   async updateMe(userId: string, updateUserDto: UpdateUserDto) {
-    const { currentPassword, newPassword, phoneNumber, department } =
+    const { currentPassword, newPassword, phoneNumber, departmentType, departmentName } =
       updateUserDto;
 
     const user = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
@@ -68,7 +69,10 @@ export class UsersService {
       data.password = await bcrypt.hash(newPassword, salt);
     }
     if (phoneNumber) data.phoneNumber = phoneNumber;
-    if (department) data.department = department;
+    if (departmentType) {
+      data.departmentType = departmentType;
+      data.departmentName = departmentName ?? null;
+    }
 
     const updatedUser = await this.prisma.user.update({
       where: { id: userId },
@@ -79,7 +83,8 @@ export class UsersService {
         name: true,
         studentId: true,
         phoneNumber: true,
-        department: true,
+        departmentType: true,
+        departmentName: true,
         role: true,
         createdAt: true,
       },
@@ -153,7 +158,8 @@ export class UsersService {
           name: true,
           studentId: true,
           phoneNumber: true,
-          department: true,
+          departmentType: true,
+          departmentName: true,
           role: true,
           createdAt: true,
         },

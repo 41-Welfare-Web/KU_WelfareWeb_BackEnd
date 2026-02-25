@@ -1,5 +1,6 @@
-import { IsOptional, IsString, Matches, MinLength } from 'class-validator';
+import { IsOptional, IsString, Matches, MinLength, IsIn } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { DEPARTMENT_TYPES } from '../../auth/dto/register.dto';
 
 export class UpdateUserDto {
   @ApiProperty({
@@ -32,11 +33,21 @@ export class UpdateUserDto {
   phoneNumber?: string;
 
   @ApiProperty({
-    example: '총학생회',
-    description: '변경할 소속 단위',
+    example: '학과',
+    description: '변경할 소속 유형',
+    enum: DEPARTMENT_TYPES,
+    required: false,
+  })
+  @IsOptional()
+  @IsIn(DEPARTMENT_TYPES, { message: '유효하지 않은 소속 유형입니다.' })
+  departmentType?: string;
+
+  @ApiProperty({
+    example: '컴퓨터공학과',
+    description: '변경할 소속 단위명',
     required: false,
   })
   @IsOptional()
   @IsString()
-  department?: string;
+  departmentName?: string;
 }
