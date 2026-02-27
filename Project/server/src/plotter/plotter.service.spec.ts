@@ -57,13 +57,14 @@ describe('PlotterService', () => {
     } as Express.Multer.File;
 
     const dto = {
+      departmentType: '학과',
+      departmentName: '컴퓨터공학과',
       purpose: 'Test',
       paperSize: 'A0',
       pageCount: 1,
-      isPaidService: false,
     };
 
-    await expect(service.create('user-id', dto, fakePdf, undefined)).rejects.toThrow(
+    await expect(service.create('user-id', dto as any, fakePdf, undefined)).rejects.toThrow(
       new BadRequestException('유효하지 않은 PDF 형식입니다. 실제 PDF 파일을 업로드해주세요.'),
     );
   });
@@ -77,6 +78,8 @@ describe('PlotterService', () => {
     } as Express.Multer.File;
 
     const dto = {
+      departmentType: '중앙동아리',
+      departmentName: '소소',
       purpose: '예산안 출력',
       paperSize: 'A0',
       pageCount: 1,
