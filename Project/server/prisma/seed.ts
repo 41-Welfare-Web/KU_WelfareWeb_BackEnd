@@ -64,6 +64,10 @@ async function main() {
     { key: 'plotter_free_departments', value: '중앙동아리,중앙자치기구', desc: '무료 인쇄 대상 소속 단위 (쉼표 구분)' },
     { key: 'plotter_free_purposes', value: '예산안 출력,동아리 행사', desc: '무료 인쇄 대상 목적 (쉼표 구분)' },
     { key: 'plotter_departments_list', value: '총학생회,중앙자치기구,단과대,학과,중앙동아리,단과대동아리,학과동아리,기타', desc: '서비스 이용 가능 소속 단위 리스트 (쉼표 구분)' },
+    { key: 'dept_list_단과대', value: '공과대학,문과대학,경영대학,예술디자인대학,사회과학대학', desc: '단과대 세부 목록' },
+    { key: 'dept_list_학과', value: '컴퓨터공학과,전자공학과,국어국문학과,경영학과,의상디자인학과,융합인재학과', desc: '학과 세부 목록' },
+    { key: 'dept_list_중앙자치기구', value: '대의원회,동아리연합회,졸업준비위원회,학생복지위원회', desc: '중앙자치기구 세부 목록' },
+    { key: 'dept_list_중앙동아리', value: 'A-Quick(축구),악동(밴드),소소(코딩),그림판(미술)', desc: '중앙동아리 세부 목록' },
   ];
   for (const config of configs) {
     await prisma.configuration.upsert({
