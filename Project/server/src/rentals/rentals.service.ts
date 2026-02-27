@@ -251,7 +251,19 @@ export class RentalsService {
         take: pageSize,
         orderBy: { createdAt: 'desc' },
         include: {
-          user: { select: { name: true, studentId: true, phoneNumber: true, departmentType: true, departmentName: true } },
+          user: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              studentId: true,
+              phoneNumber: true,
+              departmentType: true,
+              departmentName: true,
+              role: true,
+              createdAt: true,
+            },
+          },
           rentalItems: { include: { item: { select: { name: true } } } },
         },
       }),
@@ -280,7 +292,19 @@ export class RentalsService {
     const rental = await this.prisma.rental.findFirst({
       where: { id, deletedAt: null },
       include: {
-        user: { select: { name: true, studentId: true, phoneNumber: true, departmentType: true, departmentName: true } },
+        user: {
+          select: {
+            id: true,
+            username: true,
+            name: true,
+            studentId: true,
+            phoneNumber: true,
+            departmentType: true,
+            departmentName: true,
+            role: true,
+            createdAt: true,
+          },
+        },
         rentalItems: { include: { item: true } },
         rentalHistories: {
           orderBy: { changedAt: 'desc' },
@@ -299,14 +323,26 @@ export class RentalsService {
   }
 
   // 4. 예약 취소
-  async cancel(id: number, userId: string) {
-    const rental = await this.prisma.rental.findFirst({
-      where: { id, deletedAt: null },
-      include: {
-        user: true,
-        rentalItems: { include: { item: true } },
-      },
-    });
+    async cancel(id: number, userId: string) {
+      const rental = await this.prisma.rental.findFirst({
+        where: { id, deletedAt: null },
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              studentId: true,
+              phoneNumber: true,
+              departmentType: true,
+              departmentName: true,
+              role: true,
+              createdAt: true,
+            },
+          },
+          rentalItems: { include: { item: true } },
+        },
+      });
     if (!rental) throw new NotFoundException('대여 건을 찾을 수 없습니다.');
 
     if (rental.userId !== userId)
@@ -357,7 +393,19 @@ export class RentalsService {
     const rental = await this.prisma.rental.findFirst({
       where: { id, deletedAt: null },
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+            name: true,
+            studentId: true,
+            phoneNumber: true,
+            departmentType: true,
+            departmentName: true,
+            role: true,
+            createdAt: true,
+          },
+        },
         rentalItems: { include: { item: true } },
       },
     });

@@ -62,17 +62,17 @@ try {
     # 물품 ID 1번이 존재한다고 가정 (Seed에서 생성됨)
     $itemId = $itemsRes[0].id
     $rentalBody = @{
-        startDate = "2026-03-01"
-        endDate = "2026-03-03"
-        items = @( @{ itemId = $itemId; quantity = 1 } )
+        departmentType = "학과"
+        departmentName = "컴퓨터공학과"
+        items = @( @{ itemId = $itemId; quantity = 1; startDate = "2026-06-02"; endDate = "2026-06-04" } )
     } | ConvertTo-Json
 
     try {
         $rentalRes = Invoke-RestMethod -Method Post -Uri "$baseUrl/rentals" -Headers $headers -ContentType "application/json" -Body $rentalBody
-        if ($rentalRes.status -eq "RESERVED") {
-            Write-Host " PASS (Rental ID: $($rentalRes.id))" -ForegroundColor Green
+        if ($rentalRes.rentals[0].status -eq "RESERVED") {
+            Write-Host " PASS (Rental ID: $($rentalRes.rentals[0].id))" -ForegroundColor Green
         } else {
-            Write-Host " FAIL (Status: $($rentalRes.status))" -ForegroundColor Red
+            Write-Host " FAIL (Status: $($rentalRes.rentals[0].status))" -ForegroundColor Red
         }
     } catch {
         Write-Host " FAIL (Error: $_)" -ForegroundColor Red
