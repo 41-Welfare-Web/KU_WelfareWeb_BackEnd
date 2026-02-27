@@ -83,6 +83,8 @@
 | `user_id` | `uuid` | 대여한 사용자 ID | Foreign Key (`users.id`) |
 | `start_date` | `date` | 대여 시작일 | Not Null |
 | `end_date` | `date` | 반납 예정일 | Not Null |
+| `department_type` | `varchar(30)` | 신청 시 소속 유형 | Not Null |
+| `department_name` | `varchar(50)` | 신청 시 소속 단위명 | Nullable |
 | `status` | `varchar(20)` | 대여 상태 ('RESERVED', 'RENTED', 'RETURNED', 'CANCELED', 'OVERDUE') | Not Null, Default: 'RESERVED' |
 | `memo` | `text` | 비고 (수령인 불일치 등 관리자 기록) | |
 | `deleted_at` | `timestampz` | 소프트 삭제 시간 (NULL = 정상) | Nullable |
@@ -126,6 +128,8 @@
 | `page_count` | `integer` | 인쇄 장수 | Not Null |
 | `is_paid_service` | `boolean` | 유료 여부 | Not Null |
 | `price` | `integer` | 확정 금액 (무료 시 0) | Not Null, Default: 0 |
+| `department_type` | `varchar(30)` | 신청 시 소속 유형 | Not Null |
+| `department_name` | `varchar(50)` | 신청 시 소속 단위명 | Nullable |
 | `payment_receipt_url` | `text` | 입금 내역 캡처 이미지 URL | |
 | `file_url` | `text` | 업로드한 PDF 파일 URL | Not Null |
 | `original_filename` | `varchar(255)` | 원본 파일명 | |
