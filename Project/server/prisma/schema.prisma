@@ -191,6 +191,8 @@ model PlotterOrder {
   isPaidService     Boolean       @map("is_paid_service")
   price             Int           @default(0)
   paymentReceiptUrl String?       @map("payment_receipt_url") @db.Text
+  departmentType    String        @map("department_type") @db.VarChar(30)
+  departmentName    String?       @map("department_name") @db.VarChar(50)
   fileUrl           String        @map("file_url") @db.Text
   originalFilename  String?       @map("original_filename") @db.VarChar(255)
   fileSize          Int?          @map("file_size")

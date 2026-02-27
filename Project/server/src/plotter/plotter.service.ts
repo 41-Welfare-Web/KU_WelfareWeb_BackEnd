@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePlotterOrderDto } from './dto/create-plotter-order.dto';
 import { PlotterPriceCheckDto } from './dto/plotter-price-check.dto';
+import { CancelPlotterOrderDto } from './dto/cancel-plotter-order.dto';
 import { PlotterStatus, Role } from '@prisma/client';
 import { FilesService } from '../common/files.service';
 import { ConfigurationsService } from '../configurations/configurations.service';
@@ -89,7 +90,7 @@ export class PlotterService {
       );
     }
 
-    const { purpose, paperSize, pageCount } = createOrderDto;
+    const { purpose, paperSize, pageCount, departmentType, departmentName } = createOrderDto;
 
     // 3. 가격 계산 및 유/무료 판별 로직 호출 (user 조회 포함)
     const { price: totalPrice, isFree } = await this.calculateEstimatedPrice({
@@ -136,6 +137,8 @@ export class PlotterService {
         userId,
         purpose,
         paperSize,
+        departmentType,
+        departmentName: departmentName || null,
         pageCount: Number(pageCount),
         isPaidService: isPaid,
         price: totalPrice,
@@ -197,7 +200,7 @@ export class PlotterService {
     };
   }
 
-  async cancel(id: number, userId: string) {
+  async cancel(id: number, userId: string, dto: CancelPlotterOrderDto) {
     const order = await this.prisma.plotterOrder.findFirst({
       where: { id, deletedAt: null },
     });
@@ -212,9 +215,22 @@ export class PlotterService {
       );
     }
 
+    const { departmentType, departmentName } = dto;
+    const memo = `사용자 직접 취소 (취소 시점 소속: ${departmentType}${departmentName ? ' / ' + departmentName : ''})`;
+
     await this.prisma.plotterOrder.update({
       where: { id },
-      data: { deletedAt: new Date() },
+      data: { 
+        deletedAt: new Date(),
+        plotterOrderHistories: {
+          create: {
+            changedBy: userId,
+            oldStatus: order.status,
+            newStatus: 'CANCELED', // 사실상 소프트 삭제지만 이력에는 취소로 남김
+            memo: memo,
+          }
+        }
+      },
     });
     return { message: '주문이 취소되었습니다.' };
   }

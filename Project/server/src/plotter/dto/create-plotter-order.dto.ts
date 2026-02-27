@@ -1,8 +1,28 @@
-import { IsNotEmpty, IsString, IsBoolean, IsInt } from 'class-validator';
+import { IsNotEmpty, IsString, IsBoolean, IsInt, IsOptional, IsIn } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
+import { DEPARTMENT_TYPES } from '../../auth/dto/register.dto';
 
 export class CreatePlotterOrderDto {
+  @ApiProperty({
+    example: '학과',
+    description: '신청 시 소속 유형',
+    enum: DEPARTMENT_TYPES,
+  })
+  @IsString()
+  @IsNotEmpty()
+  @IsIn(DEPARTMENT_TYPES)
+  departmentType: string;
+
+  @ApiProperty({
+    example: '컴퓨터공학과',
+    description: '신청 시 소속 단위명',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  departmentName?: string;
+
   @ApiProperty({ example: '졸업 작품 포스터', description: '인쇄 목적' })
   @IsString()
   @IsNotEmpty()

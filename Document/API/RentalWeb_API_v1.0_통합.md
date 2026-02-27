@@ -1813,6 +1813,8 @@
 
 | 필드명 | 타입 | 필수 여부 | 설명 |
 | :--- | :--- | :--- | :--- |
+| `departmentType` | `string` | 필수 | 신청 시 소속 유형 |
+| `departmentName` | `string` | 선택 | 신청 시 소속 단위명 |
 | `purpose` | `string` | 필수 | 인쇄 목적 |
 | `paperSize` | `string` | 필수 | 용지 크기 (예: `A0`, `A1`) |
 | `pageCount` | `integer` | 필수 | 인쇄 장수 (업로드된 PDF 파일의 페이지 수와 일치해야 함) |
@@ -1910,7 +1912,7 @@
 `FR-29` 요구사항에 따라, '주문 대기' 상태인 플로터 주문을 사용자가 취소합니다.
 
 ## **ENDPOINT:** `DELETE /api/plotter/orders/{orderId}`
-**Description:** `orderId`에 해당하는 주문을 취소합니다. '주문 대기' 상태에서만 가능합니다.
+**Description:** `orderId`에 해당하는 주문을 취소합니다. '주문 대기' 상태에서만 가능합니다. 취소 시점의 소속 정보를 함께 전달받아 이력에 기록합니다.
 **Required Permissions:** Authenticated Users (자신의 주문 건)
 
 ---
@@ -1920,6 +1922,17 @@
 | 파라미터 | 타입 | 설명 |
 | :--- | :--- | :--- |
 | `orderId` | `integer` | 취소할 주문의 고유 ID |
+
+#### **Request Body**
+
+```json
+{
+  "departmentType": "학과",
+  "departmentName": "컴퓨터공학과"
+}
+```
+* `departmentType`: (string, required) 취소 시 소속 유형.
+* `departmentName`: (string, optional) 취소 시 소속 단위명.
 
 ---
 
