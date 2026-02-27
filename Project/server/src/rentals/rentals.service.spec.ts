@@ -16,13 +16,14 @@ describe('RentalsService', () => {
   const mockPrisma = {
     $transaction: jest.fn((cb) => cb(mockPrisma)),
     item: {
-      findUnique: jest.fn(),
+      findFirst: jest.fn(),
     },
     rental: {
       create: jest.fn(),
       findMany: jest.fn(),
       update: jest.fn(),
-      findUnique: jest.fn(),
+      findFirst: jest.fn(),
+      count: jest.fn(),
     },
     rentalItem: {
       findMany: jest.fn(),
@@ -30,6 +31,12 @@ describe('RentalsService', () => {
     },
     rentalHistory: {
       create: jest.fn(),
+    },
+    user: {
+      findFirst: jest.fn(),
+    },
+    cartItem: {
+      deleteMany: jest.fn(),
     },
   };
 
@@ -59,25 +66,33 @@ describe('RentalsService', () => {
   it('should create a bundle rental automatically including components', async () => {
     const userId = 'user-uuid';
     const dto = {
+      departmentType: '학과',
+      departmentName: '컴퓨터공학과',
       items: [{ itemId: 1, quantity: 1, startDate: '2026-03-01', endDate: '2026-03-03' }],
     };
 
     // Mock: 메인 물품(ID: 1)은 구성품(ID: 2) 1개를 가지고 있음
-    mockPrisma.item.findUnique.mockImplementation(({ where }) => {
+    mockPrisma.item.findFirst.mockImplementation(({ where }) => {
       if (where.id === 1) return Promise.resolve({ id: 1, name: '카메라', totalQuantity: 5, components: [{ componentId: 2, quantity: 1 }] });
       if (where.id === 2) return Promise.resolve({ id: 2, name: '삼각대', totalQuantity: 5, components: [] });
       return Promise.resolve(null);
     });
 
     mockPrisma.rentalItem.findMany.mockResolvedValue([]); // 재고 넉넉함
-    mockPrisma.rental.create.mockResolvedValue({ id: 100, user: { phoneNumber: '01012341234', name: '테스터' }, rentalItems: [] });
+    mockPrisma.rental.create.mockResolvedValue({ 
+      id: 100, 
+      user: { phoneNumber: '01012341234', name: '테스터' }, 
+      rentalItems: [{ item: { name: '카메라' } }] 
+    });
 
     await service.create(userId, dto);
 
-    // 검증: rental.create가 호출될 때 rentalItems에 1번(카메라)과 2번(삼각대)이 모두 포함되어야 함
+    // 검증: rental.create가 호출될 때 department 정보와 rentalItems가 포함되어야 함
     expect(mockPrisma.rental.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
+          departmentType: '학과',
+          departmentName: '컴퓨터공학과',
           rentalItems: {
             create: [
               { itemId: 1, quantity: 1 },
@@ -92,11 +107,13 @@ describe('RentalsService', () => {
   it('should throw ConflictException if a component stock is insufficient', async () => {
     const userId = 'user-uuid';
     const dto = {
+      departmentType: '학과',
+      departmentName: '컴퓨터공학과',
       items: [{ itemId: 1, quantity: 1, startDate: '2026-03-01', endDate: '2026-03-03' }],
     };
 
     // Mock: 카메라는 재고가 있으나 삼각대는 재고가 0인 상황
-    mockPrisma.item.findUnique.mockImplementation(({ where }) => {
+    mockPrisma.item.findFirst.mockImplementation(({ where }) => {
       if (where.id === 1) return Promise.resolve({ id: 1, name: '카메라', totalQuantity: 5, components: [{ componentId: 2, quantity: 1 }] });
       if (where.id === 2) return Promise.resolve({ id: 2, name: '삼각대', totalQuantity: 1, components: [] });
       return Promise.resolve(null);

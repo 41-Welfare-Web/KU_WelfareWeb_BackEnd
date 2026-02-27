@@ -13,10 +13,11 @@ This file contains context for continuing work on the RentalWeb project.
 - **Completed (2026-02-04):**
   1. **Holiday Logic**: Implemented `HolidaysService` and integrated into Rentals/Plotter services.
   2. **PDF Verification**: Added Magic Number check (`%PDF-`) for plotter orders.
-  3. **SMS Service**: Integrated Solapi(CoolSMS) SDK. Verified real SMS sending (`01090665493` -> `777888`).
+  3. **SMS Service**: Integrated Solapi(CoolSMS) SDK. Verified real SMS sending.
   4. **File Service**: Integrated Supabase Storage. Verified file upload and public URL generation.
-  5. **Security**: Applied Rate Limiting (Throttler), Auth Attempt Limits (DB), and CORS policy.
-  6. **Documentation**: Synchronized `Requirements`, `Backend Guide`, `API List`, and created `TODO.md` with deployment/future tasks.
+  5. **Security**: Applied Rate Limiting (Throttler), Auth Attempt Limits (DB), and CORS policy. **Patched password leakage in service responses.**
+  6. **Rental logic**: Added `departmentType` and `departmentName` to Rental application to preserve user's affiliation at the time of booking.
+  7. **Documentation**: Synchronized `Requirements`, `Backend Guide`, `API List`, `DB Schema` with the latest code changes.
 - **Pending User Action:** None. Backend is ready.
 - **Next Step:** Initialize `Project/client` (React + Vite + TS).
 

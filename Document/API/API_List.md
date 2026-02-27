@@ -42,18 +42,18 @@
 *   `PUT /api/rentals/{rentalId}/status` (대여 상태 변경 - **Admin**)
 
 **5. 플로터 (Plotter)**
-*   `POST /api/plotter/calculate-price` (플로터 실시간 예상 가격 계산)
+*   `POST /api/plotter/calculate-price` (플로터 실시간 예상 가격 계산 - **Auth**)
 *   `POST /api/plotter/orders` (플로터 예약 신청)
 *   `GET /api/plotter/orders` (플로터 예약 목록 조회 - 내역 또는 전체-**Admin**)
-*   `DELETE /api/plotter/orders/{orderId}` (플로터 예약 취소 - 소프트 삭제)
-*   `PUT /api/plotter/orders/{orderId}/status` (플로터 예약 상태 변경 - **Admin**)
+*   `DELETE /api/plotter/orders/{id}` (플로터 예약 취소 - 소프트 삭제)
+*   `PUT /api/plotter/orders/{id}/status` (플로터 예약 상태 변경 - **Admin**)
 
 **6. 관리 (Admin)**
 *   `POST /api/admin/upload-image` (물품 이미지 업로드 - **Admin** 전용, 5MB 제한, png/jpeg/jpg/webp, `items` 버킷)
 *   `GET /api/admin/stats` (통계 데이터 조회 - **Admin**)
-*   `GET /api/admin/holidays` (휴무일 목록 조회)
+*   `GET /api/admin/holidays` (휴무일 목록 조회 - **All**)
 *   `POST /api/admin/holidays` (휴무일 추가 - **Admin**)
-*   `DELETE /api/admin/holidays/{holidayId}` (휴무일 삭제 - **Admin**)
+*   `DELETE /api/admin/holidays/{id}` (휴무일 삭제 - **Admin**)
 *   `GET /api/admin/configurations` (시스템 설정 목록 조회 - **Admin**)
 *   `PUT /api/admin/configurations` (시스템 설정 수정 - **Admin**)
 

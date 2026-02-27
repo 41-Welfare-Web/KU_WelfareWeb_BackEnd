@@ -190,6 +190,17 @@ export class UsersService {
     const updated = await this.prisma.user.update({
       where: { id: userId },
       data: { role },
+      select: {
+        id: true,
+        username: true,
+        name: true,
+        studentId: true,
+        phoneNumber: true,
+        departmentType: true,
+        departmentName: true,
+        role: true,
+        createdAt: true,
+      },
     });
 
     return updated;

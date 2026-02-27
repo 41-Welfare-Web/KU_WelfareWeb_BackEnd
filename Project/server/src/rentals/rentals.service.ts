@@ -28,7 +28,7 @@ export class RentalsService {
 
   // 1. 대여 예약 생성 (날짜별 그룹핑 → 다중 rental 생성)
   async create(userId: string, createRentalDto: CreateRentalDto, actorId?: string) {
-    const { items } = createRentalDto;
+    const { items, departmentType, departmentName } = createRentalDto;
     const actualActorId = actorId || userId;
 
     const today = new Date();
@@ -162,6 +162,8 @@ export class RentalsService {
             userId,
             startDate: start,
             endDate: end,
+            departmentType,
+            departmentName: departmentName || null,
             status: RentalStatus.RESERVED,
             rentalItems: {
               create: finalItemsToRent.map((i) => ({
@@ -178,7 +180,19 @@ export class RentalsService {
             },
           },
           include: {
-            user: true,
+            user: {
+              select: {
+                id: true,
+                username: true,
+                name: true,
+                studentId: true,
+                phoneNumber: true,
+                departmentType: true,
+                departmentName: true,
+                role: true,
+                createdAt: true,
+              },
+            },
             rentalItems: {
               include: { item: true },
             },
@@ -371,7 +385,19 @@ export class RentalsService {
         },
       },
       include: {
-        user: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+            name: true,
+            studentId: true,
+            phoneNumber: true,
+            departmentType: true,
+            departmentName: true,
+            role: true,
+            createdAt: true,
+          },
+        },
         rentalItems: { include: { item: true } },
       },
     });
@@ -394,7 +420,7 @@ export class RentalsService {
 
   // 6. 예약 내용 수정 (날짜, 수량 변경) — 단일 rental 수정, items 각각 동일 날짜여야 함
   async update(id: number, userId: string, updateDto: UpdateRentalDto) {
-    const { items } = updateDto;
+    const { items, departmentType, departmentName } = updateDto;
 
     const rental = await this.prisma.rental.findFirst({
       where: { id, deletedAt: null },
@@ -489,6 +515,8 @@ export class RentalsService {
           data: {
             startDate: start,
             endDate: end,
+            departmentType: departmentType || rental.departmentType,
+            departmentName: departmentName === null ? null : (departmentName || rental.departmentName),
             rentalItems: {
               create: items.map((i) => ({
                 itemId: i.itemId,
@@ -511,6 +539,8 @@ export class RentalsService {
           data: {
             startDate: start,
             endDate: end,
+            departmentType: departmentType || rental.departmentType,
+            departmentName: departmentName === null ? null : (departmentName || rental.departmentName),
             rentalHistories: {
               create: {
                 changedBy: userId,

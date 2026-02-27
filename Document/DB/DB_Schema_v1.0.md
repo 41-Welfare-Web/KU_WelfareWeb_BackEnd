@@ -14,7 +14,8 @@
 | `password` | `varchar(255)` | bcrypt 해싱된 비밀번호 | Not Null |
 | `student_id` | `varchar(20)` | 학번 | **Unique**, Not Null |
 | `phone_number` | `varchar(20)` | 전화번호 | **Unique**, Not Null |
-| `department` | `varchar(50)` | 소속 단위(학과, 동아리 등) | Not Null |
+| `department_type` | `varchar(30)` | 소속 유형 (학과, 동아리 등) | Not Null |
+| `department_name` | `varchar(50)` | 소속 단위명 (컴퓨터공학과 등) | Nullable |
 | `role` | `varchar(10)` | 사용자 역할 ('USER', 'ADMIN') | Not Null, Default: 'USER' |
 | `login_attempts` | `integer` | 로그인 실패 횟수 | Not Null, Default: 0 |
 | `lock_until` | `timestampz` | 계정 잠금 만료 시간 | Nullable |

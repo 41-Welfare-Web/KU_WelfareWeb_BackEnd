@@ -253,7 +253,21 @@ export class PlotterService {
           },
         },
       },
-      include: { user: true },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            name: true,
+            studentId: true,
+            phoneNumber: true,
+            departmentType: true,
+            departmentName: true,
+            role: true,
+            createdAt: true,
+          },
+        },
+      },
     });
 
     await this.smsService.sendPlotterStatusNotice(

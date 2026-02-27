@@ -111,7 +111,8 @@
   "name": "김테스트",
   "studentId": "202412345",
   "phoneNumber": "01012345678",
-  "department": "컴퓨터공학과",
+  "departmentType": "학과",
+  "departmentName": "컴퓨터공학과",
   "verificationCode": "123456"
 }
 ```
@@ -120,7 +121,8 @@
 * `name`: (string, required) 실제 이름.
 * `studentId`: (string, required) 학번.
 * `phoneNumber`: (string, required) 전화번호. 하이픈 없이 입력.
-* `department`: (string, required) 소속 단위.
+* `departmentType`: (string, required) 소속 유형 (총학생회, 학과, 중앙동아리 등).
+* `departmentName`: (string, optional) 소속 단위명 (예: 컴퓨터공학과). 총학생회 등 일부 유형은 생략 가능.
 * `verificationCode`: (string, required) SMS로 인증받은 6자리 코드. 최종 가입 시 서버에서 한 번 더 검증합니다.
 
 ---
@@ -461,7 +463,8 @@
   "name": "김테스트",
   "studentId": "202412345",
   "phoneNumber": "01012345678",
-  "department": "컴퓨터공학과",
+  "departmentType": "학과",
+  "departmentName": "컴퓨터공학과",
   "role": "USER",
   "createdAt": "2024-01-01T12:00:00Z"
 }
@@ -491,13 +494,15 @@
   "currentPassword": "password123!",
   "newPassword": "newPassword456!",
   "phoneNumber": "01087654321",
-  "department": "총학생회"
+  "departmentType": "학과",
+  "departmentName": "총학생회"
 }
 ```
 * `currentPassword`: (string, required) 정보 수정을 위한 본인 확인용 현재 비밀번호.
 * `newPassword`: (string, optional) 변경할 새 비밀번호.
 * `phoneNumber`: (string, optional) 변경할 전화번호. 하이픈 없이 입력. 변경 시 SMS 재인증 필요.
-* `department`: (string, optional) 변경할 소속 단위.
+* `departmentType`: (string, optional) 변경할 소속 유형.
+* `departmentName`: (string, optional) 변경할 소속 단위명.
 
 ---
 
@@ -655,7 +660,8 @@
       "name": "김테스트",
       "studentId": "202412345",
       "phoneNumber": "01012345678",
-      "department": "컴퓨터공학과",
+      "departmentType": "학과",
+      "departmentName": "컴퓨터공학과",
       "role": "USER",
       "createdAt": "2024-01-01T12:00:00Z"
     },
@@ -665,7 +671,8 @@
       "name": "박관리",
       "studentId": "202000001",
       "phoneNumber": "010-0000-0001",
-      "department": "총학생회",
+      "departmentType": "총학생회",
+      "departmentName": null,
       "role": "ADMIN",
       "createdAt": "2023-12-25T10:00:00Z"
     }
@@ -722,7 +729,8 @@
   "name": "김테스트",
   "studentId": "202412345",
   "phoneNumber": "010-1234-5678",
-  "department": "컴퓨터공학과",
+  "departmentType": "학과",
+  "departmentName": "컴퓨터공학과",
   "role": "ADMIN",
   "createdAt": "2024-01-01T12:00:00Z"
 }
@@ -1441,12 +1449,16 @@
 
 ```json
 {
+  "departmentType": "학과",
+  "departmentName": "컴퓨터공학과",
   "items": [
     { "itemId": 1, "quantity": 1, "startDate": "2026-06-02", "endDate": "2026-06-04" },
     { "itemId": 5, "quantity": 2, "startDate": "2026-06-09", "endDate": "2026-06-11" }
   ]
 }
 ```
+* `departmentType`: (string, required) 신청 시 소속 유형.
+* `departmentName`: (string, optional) 신청 시 소속 단위명.
 * `items`: (array, required) 대여할 물품 목록
     * `itemId`: (integer, required) 물품 ID
     * `quantity`: (integer, required) 대여 수량
@@ -1516,12 +1528,16 @@
 ```json
 {
   "targetUserId": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
+  "departmentType": "총학생회",
+  "departmentName": null,
   "items": [
     { "itemId": 1, "quantity": 1, "startDate": "2026-06-02", "endDate": "2026-06-04" }
   ]
 }
 ```
 * `targetUserId`: (uuid, required) 대여를 신청할 사용자의 UUID.
+* `departmentType`: (string, required)
+* `departmentName`: (string, optional)
 * `items`: `POST /api/rentals`의 Request Body와 동일 (품목별 날짜 포함).
 
 ---
@@ -1741,8 +1757,8 @@
 주문 전에 인쇄 비용을 미리 계산합니다.
 
 ## **ENDPOINT:** `POST /api/plotter/calculate-price`
-**Description:** 부서, 목적, 용지 크기, 장수를 기반으로 무료/유료 여부와 예상 금액을 반환합니다. 로그인 불필요.
-**Required Permissions:** All Users
+**Description:** 사용자의 소속(프로필 정보 활용), 목적, 용지 크기, 장수를 기반으로 무료/유료 여부와 예상 금액을 반환합니다.
+**Required Permissions:** Authenticated Users
 
 ---
 
@@ -1750,13 +1766,11 @@
 
 ```json
 {
-  "department": "컴퓨터공학과",
   "purpose": "졸업 작품 포스터",
   "paperSize": "A0",
   "pageCount": 1
 }
 ```
-* `department`: (string, required) 소속 단위.
 * `purpose`: (string, required) 인쇄 목적.
 * `paperSize`: (string, required) 용지 크기. (예: `A0`, `A1`)
 * `pageCount`: (integer, required) 인쇄 장수.
@@ -1802,7 +1816,6 @@
 | `purpose` | `string` | 필수 | 인쇄 목적 |
 | `paperSize` | `string` | 필수 | 용지 크기 (예: `A0`, `A1`) |
 | `pageCount` | `integer` | 필수 | 인쇄 장수 (업로드된 PDF 파일의 페이지 수와 일치해야 함) |
-| `isPaidService` | `boolean` | 필수 | 유료 서비스 여부 (서버에서 자동 판별 후 클라이언트에 전달) |
 | `paymentReceiptImage` | `file` | 유료 시 필수 | 입금 내역 캡처 이미지 파일 (유료 서비스일 경우) |
 | `pdfFile` | `file` | 필수 | 인쇄할 PDF 파일 |
 

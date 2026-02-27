@@ -125,6 +125,8 @@ model Rental {
   userId    String       @map("user_id") @db.Uuid
   startDate DateTime     @map("start_date") @db.Date
   endDate   DateTime     @map("end_date") @db.Date
+  departmentType String  @map("department_type") @db.VarChar(30)
+  departmentName String? @map("department_name") @db.VarChar(50)
   status    RentalStatus @default(RESERVED)
   memo      String?      @db.Text
   deletedAt DateTime?    @map("deleted_at") @db.Timestamptz
