@@ -100,13 +100,16 @@ RentalWeb/
 ## API 엔드포인트 목록
 
 ### 인증 (Auth)
+- `POST /api/auth/request-signup-verification` — 회원가입 SMS 인증번호 요청 (FR-01, Throttle 3/min)
+- `POST /api/auth/verify-signup-code` — 회원가입 인증번호 확인 (FR-01)
 - `POST /api/auth/register` — 회원가입 (FR-01)
 - `POST /api/auth/login` — 로그인, JWT 발급 (FR-03), 5회 실패 시 10분 잠금
 - `POST /api/auth/logout` — 로그아웃, refreshToken 무효화
 - `POST /api/auth/refresh` — AccessToken 갱신
-- `POST /api/auth/find-username` — 아이디 찾기 (이름+전화번호)
-- `POST /api/auth/password-reset/request` — 비밀번호 재설정 요청
-- `POST /api/auth/password-reset/confirm` — 비밀번호 재설정 확정
+- `POST /api/auth/find-username` — 아이디 찾기 (이름+전화번호, Throttle 3/min)
+- `POST /api/auth/password-reset/request` — 비밀번호 재설정 1단계: SMS 인증번호 발송 (Throttle 3/min)
+- `POST /api/auth/password-reset/verify` — 비밀번호 재설정 2단계: 코드 검증 → resetToken 발급 (10분 유효)
+- `POST /api/auth/password-reset/confirm` — 비밀번호 재설정 3단계: resetToken + 새 비밀번호 확정
 
 ### 사용자 (Users)
 - `GET /api/users/me` — 내 정보 조회
@@ -118,16 +121,24 @@ RentalWeb/
 ### 물품 (Items & Categories)
 - `GET /api/items` — 목록 조회 (search, category_ids, sortBy, sortOrder)
 - `GET /api/items/{item_id}` — 상세 조회
+- `GET /api/items/{item_id}/availability` — 날짜별 재고 조회 (캘린더용, FR-32)
 - `POST /api/items` — 생성 **[Admin]**
 - `PUT /api/items/{item_id}` — 수정 **[Admin]**
 - `DELETE /api/items/{item_id}` — 삭제 **[Admin]**
+- `GET /api/items/{item_id}/instances` — 개별 실물 목록 조회 **[Admin]** (FR-34)
+- `POST /api/items/{item_id}/instances` — 개별 실물 등록 **[Admin]** (FR-34)
+- `PUT /api/items/instances/{instance_id}` — 개별 실물 상태 수정 **[Admin]** (FR-34)
+- `DELETE /api/items/instances/{instance_id}` — 개별 실물 삭제 **[Admin]** (FR-34)
+- `POST /api/items/{item_id}/components` — 세트 구성품 추가 **[Admin]** (FR-36)
+- `DELETE /api/items/{item_id}/components/{component_id}` — 세트 구성품 삭제 **[Admin]** (FR-36)
 - `GET /api/categories` — 카테고리 목록
 - `POST /api/categories` — 카테고리 생성 **[Admin]**
 - `PUT /api/categories/{id}` — 카테고리 수정 **[Admin]**
 - `DELETE /api/categories/{id}` — 카테고리 삭제 **[Admin]**
 
 ### 대여 (Rentals)
-- `POST /api/rentals` — 예약 생성 (start_date, end_date, items[])
+- `POST /api/rentals` — 예약 생성 (start_date, end_date, items[], 세트 자동 포함)
+- `POST /api/rentals/admin` — 관리자 대리 예약 생성 **[Admin]** (FR-20)
 - `GET /api/rentals` — 목록 조회 (본인 또는 전체-Admin)
 - `GET /api/rentals/{rental_id}` — 상세 조회
 - `PUT /api/rentals/{rental_id}` — 예약 수정 (RESERVED 상태만)
@@ -135,18 +146,34 @@ RentalWeb/
 - `PUT /api/rentals/{rental_id}/status` — 상태 변경 **[Admin]** (memo 필수 조건 있음)
 
 ### 플로터 (Plotter)
+- `POST /api/plotter/calculate-price` — 실시간 예상 가격 계산 (FR-28)
 - `POST /api/plotter/orders` — 주문 신청 (multipart/form-data, PDF 파일 검증)
 - `GET /api/plotter/orders` — 목록 조회
 - `DELETE /api/plotter/orders/{order_id}` — 취소 (PENDING 상태만)
 - `PUT /api/plotter/orders/{order_id}/status` — 상태 변경 **[Admin]** (REJECTED 시 rejection_reason 필수)
 
+### 장바구니 (Cart)
+- `GET /api/cart` — 내 장바구니 조회 (FR-12, FR-13)
+- `POST /api/cart` — 장바구니 물품 추가 (FR-11, 동일 물품 존재 시 수량 덮어씀)
+- `PUT /api/cart/{cart_item_id}` — 장바구니 항목 수량/날짜 수정 (FR-13, FR-14)
+- `DELETE /api/cart/{cart_item_id}` — 장바구니 항목 제거 (FR-13)
+
 ### 관리 (Admin)
+- `POST /api/admin/upload-image` — 물품 이미지 업로드 **[Admin]** (5MB, png/jpeg/jpg/webp, `items` 버킷)
 - `GET /api/admin/stats` — 통계 데이터
 - `GET /api/admin/holidays` — 휴무일 목록 (All Users)
 - `POST /api/admin/holidays` — 휴무일 추가 **[Admin]**
 - `DELETE /api/admin/holidays/{holiday_id}` — 휴무일 삭제 **[Admin]**
 - `GET /api/admin/configurations` — 시스템 설정 **[Admin]**
 - `PUT /api/admin/configurations` — 설정 수정 **[Admin]**
+
+### 공통 (Common)
+- `GET /api/common/health` — 시스템 헬스체크 (DB/SMS/Storage 상태, FR-37)
+- `GET /api/common/metadata` — 공통 메타데이터 조회 (소속 목록, 무료 목적 목록, 가격표)
+- `POST /api/common/upload` — 공용 이미지 업로드 (인증 필요, jpg/png/webp, `common` 버킷)
+
+### 사용자 (Users) — 추가 엔드포인트
+- `GET /api/users/me/dashboard` — 마이페이지 대시보드 요약 (대여 건수, 반납일, 플로터 상태, FR-33)
 
 ---
 
@@ -168,7 +195,7 @@ RentalWeb/
 ### 인증 정책
 - JWT (AccessToken 단명 + RefreshToken 갱신)
 - 로그인 5회 실패 → **10분 계정 잠금**
-- SMS 인증: 3분 유효, 하루 최대 5회 재발송
+- SMS 인증: **5분** 유효, 하루 최대 5회 재발송, 실패 5회 시 즉시 만료
 
 ### SMS 알림 (FR-18)
 - 물품: 예약 완료, 반납 D-1, 연체 발생
@@ -211,7 +238,7 @@ pnpm test:edge-functions  # Deno Edge Function 테스트
 
 | FR | 내용 |
 |----|------|
-| FR-01 | 회원가입 + SMS 인증 (3분/5회) |
+| FR-01 | 회원가입 + SMS 인증 (5분/5회) |
 | FR-02 | 아이디 중복 확인 (실시간) |
 | FR-03 | 로그인 + JWT + 5회 실패 잠금 |
 | FR-07 | 역할 기반 접근 제어 |

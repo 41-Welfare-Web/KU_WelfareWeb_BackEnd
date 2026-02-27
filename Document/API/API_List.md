@@ -9,7 +9,8 @@
 *   `POST /api/auth/refresh` (토큰 갱신)
 *   `POST /api/auth/find-username` (아이디 찾기)
 *   `POST /api/auth/password-reset/request` (비밀번호 재설정 요청)
-*   `POST /api/auth/password-reset/confirm` (비밀번호 재설정 확정)
+*   `POST /api/auth/password-reset/verify` (비밀번호 재설정 코드 검증 → resetToken 발급)
+*   `POST /api/auth/password-reset/confirm` (비밀번호 재설정 확정 - resetToken + 새 비밀번호)
 
 **2. 사용자 (Users)**
 *   `GET /api/users/me` (내 정보 조회)
@@ -27,6 +28,9 @@
 *   `POST /api/items/{itemId}/components` (세트 구성품 추가 - **Admin**)
 *   `DELETE /api/items/{itemId}/components/{componentId}` (세트 구성품 삭제 - **Admin**)
 *   `GET /api/categories` (카테고리 목록 조회)
+*   `POST /api/categories` (카테고리 생성 - **Admin**)
+*   `PUT /api/categories/{categoryId}` (카테고리 수정 - **Admin**)
+*   `DELETE /api/categories/{categoryId}` (카테고리 삭제 - 소프트 삭제 - **Admin**)
 
 **4. 대여 (Rentals)**
 *   `POST /api/rentals` (새 대여 예약 생성 - 세트 자동 포함)
@@ -45,6 +49,7 @@
 *   `PUT /api/plotter/orders/{orderId}/status` (플로터 예약 상태 변경 - **Admin**)
 
 **6. 관리 (Admin)**
+*   `POST /api/admin/upload-image` (물품 이미지 업로드 - **Admin** 전용, 5MB 제한, png/jpeg/jpg/webp, `items` 버킷)
 *   `GET /api/admin/stats` (통계 데이터 조회 - **Admin**)
 *   `GET /api/admin/holidays` (휴무일 목록 조회)
 *   `POST /api/admin/holidays` (휴무일 추가 - **Admin**)
