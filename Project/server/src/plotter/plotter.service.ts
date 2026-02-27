@@ -7,7 +7,6 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePlotterOrderDto } from './dto/create-plotter-order.dto';
 import { PlotterPriceCheckDto } from './dto/plotter-price-check.dto';
-import { CancelPlotterOrderDto } from './dto/cancel-plotter-order.dto';
 import { PlotterStatus, Role } from '@prisma/client';
 import { FilesService } from '../common/files.service';
 import { ConfigurationsService } from '../configurations/configurations.service';
@@ -200,7 +199,7 @@ export class PlotterService {
     };
   }
 
-  async cancel(id: number, userId: string, dto: CancelPlotterOrderDto) {
+  async cancel(id: number, userId: string) {
     const order = await this.prisma.plotterOrder.findFirst({
       where: { id, deletedAt: null },
     });
@@ -215,8 +214,7 @@ export class PlotterService {
       );
     }
 
-    const { departmentType, departmentName } = dto;
-    const memo = `사용자 직접 취소 (취소 시점 소속: ${departmentType}${departmentName ? ' / ' + departmentName : ''})`;
+    const memo = `사용자 직접 취소 (주문 시 소속: ${order.departmentType}${order.departmentName ? ' / ' + order.departmentName : ''})`;
 
     await this.prisma.plotterOrder.update({
       where: { id },
@@ -226,7 +224,7 @@ export class PlotterService {
           create: {
             changedBy: userId,
             oldStatus: order.status,
-            newStatus: 'CANCELED', // 사실상 소프트 삭제지만 이력에는 취소로 남김
+            newStatus: 'CANCELED',
             memo: memo,
           }
         }

@@ -18,7 +18,6 @@ import {
   CreatePlotterOrderWithFilesDto,
 } from './dto/create-plotter-order.dto';
 import { PlotterPriceCheckDto } from './dto/plotter-price-check.dto';
-import { CancelPlotterOrderDto } from './dto/cancel-plotter-order.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../auth/get-user.decorator';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -112,12 +111,8 @@ export class PlotterController {
 
   @Delete('orders/:id')
   @ApiOperation({ summary: '플로터 주문 취소' })
-  cancel(
-    @GetUser() user: any,
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: CancelPlotterOrderDto,
-  ) {
-    return this.plotterService.cancel(id, user.userId, dto);
+  cancel(@GetUser() user: any, @Param('id', ParseIntPipe) id: number) {
+    return this.plotterService.cancel(id, user.userId);
   }
 
   @Put('orders/:id/status')
