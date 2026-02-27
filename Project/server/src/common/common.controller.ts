@@ -49,13 +49,24 @@ export class CommonController {
   @Get('metadata')
   @ApiOperation({ summary: '공통 메타데이터 조회 (소속 리스트, 무료 목적 등)' })
   async getMetadata() {
-    const departments = await this.configService.getValue('plotter_departments_list', '');
+    const typeString = await this.configService.getValue('plotter_departments_list', '');
+    const types = typeString ? typeString.split(',').map((t) => t.trim()) : [];
+
+    // 각 유형별로 세부 목록을 조회하여 이차원 배열 생성
+    const departments2D = await Promise.all(
+      types.map(async (type) => {
+        const namesString = await this.configService.getValue(`dept_list_${type}`, '');
+        const names = namesString ? namesString.split(',').map((n) => n.trim()) : [];
+        return [type, ...names];
+      }),
+    );
+
     const freePurposes = await this.configService.getValue('plotter_free_purposes', '');
     const priceA0 = await this.configService.getValue('plotter_price_a0', '0');
     const priceA1 = await this.configService.getValue('plotter_price_a1', '0');
 
     return {
-      departments: departments ? departments.split(',').map((d) => d.trim()) : [],
+      departments: departments2D,
       freePurposes: freePurposes ? freePurposes.split(',').map((p) => p.trim()) : [],
       prices: {
         a0: parseInt(priceA0, 10),
