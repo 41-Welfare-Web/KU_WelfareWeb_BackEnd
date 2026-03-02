@@ -53,20 +53,23 @@ export class CommonController {
     const types = typeString ? typeString.split(',').map((t) => t.trim()) : [];
 
     // 각 유형별로 세부 목록을 조회하여 이차원 배열 생성
+    // value의 0번째가 분류명, 이후가 하위 항목. 단일 항목은 dept_list_ 키 없이 [type]만 반환
     const departments2D = await Promise.all(
       types.map(async (type) => {
         const namesString = await this.configService.getValue(`dept_list_${type}`, '');
         const names = namesString ? namesString.split(',').map((n) => n.trim()) : [];
-        return [type, ...names];
+        return names.length > 0 ? names : [type];
       }),
     );
 
+    const purposes = await this.configService.getValue('plotter_purposes', '');
     const freePurposes = await this.configService.getValue('plotter_free_purposes', '');
     const priceA0 = await this.configService.getValue('plotter_price_a0', '0');
     const priceA1 = await this.configService.getValue('plotter_price_a1', '0');
 
     return {
       departments: departments2D,
+      purposes: purposes ? purposes.split(',').map((p) => p.trim()) : [],
       freePurposes: freePurposes ? freePurposes.split(',').map((p) => p.trim()) : [],
       prices: {
         a0: parseInt(priceA0, 10),
