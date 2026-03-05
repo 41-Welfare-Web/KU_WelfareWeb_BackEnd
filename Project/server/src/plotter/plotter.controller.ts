@@ -11,6 +11,7 @@ import {
   Delete,
   Put,
   ParseIntPipe,
+  HttpCode,
 } from '@nestjs/common';
 import { PlotterService } from './plotter.service';
 import {
@@ -41,6 +42,7 @@ export class PlotterController {
   constructor(private readonly plotterService: PlotterService) {}
 
   @Post('calculate-price')
+  @HttpCode(200)
   @ApiOperation({ summary: '플로터 예상 가격 계산 (실시간 미리보기용)' })
   @ApiBody({ type: PlotterPriceCheckDto })
   calculatePrice(@GetUser() user: any, @Body() dto: PlotterPriceCheckDto) {
