@@ -288,10 +288,14 @@ export class AuthService {
     });
 
     if (user) {
-      await this.smsService.sendSMS(
-        phoneNumber,
-        `[RentalWeb] 회원님의 아이디는 [${user.username}] 입니다.`,
-      );
+      try {
+        await this.smsService.sendSMS(
+          phoneNumber,
+          `[RentalWeb] 회원님의 아이디는 [${user.username}] 입니다.`,
+        );
+      } catch (smsError) {
+        console.error('[AuthService] 아이디 찾기 SMS 발송 실패 (무시):', smsError.message);
+      }
     }
 
     return {

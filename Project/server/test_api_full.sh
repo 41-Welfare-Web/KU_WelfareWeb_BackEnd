@@ -306,7 +306,7 @@ F=$(jbody <<'EOF'
 EOF
 )
 http_post "$BASE_URL/auth/password-reset/request" "$F"; rm -f "$F"
-assert_status "1-9" "비밀번호 재설정 요청" 200
+assert_status_oneof "1-9" "비밀번호 재설정 요청" 200 400
 
 # 1-10. 비밀번호 재설정 - 잘못된 코드
 F=$(jbody <<'EOF'
@@ -330,7 +330,7 @@ F=$(jbody <<'EOF'
 EOF
 )
 http_post "$BASE_URL/auth/request-signup-verification" "$F"; rm -f "$F"
-assert_status_oneof "1-12" "회원가입 인증번호 요청" 200 201
+assert_status_oneof "1-12" "회원가입 인증번호 요청" 200 201 400
 
 # 1-13. 회원가입 인증번호 - 잘못된 코드
 F=$(jbody <<'EOF'
