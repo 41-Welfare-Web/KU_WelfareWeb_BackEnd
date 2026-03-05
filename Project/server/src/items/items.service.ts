@@ -313,6 +313,15 @@ export class ItemsService {
 
   // 12. 세트 구성품 삭제
   async removeComponent(parentId: number, componentId: number) {
+    const existing = await this.prisma.itemComponent.findUnique({
+      where: {
+        parentId_componentId: { parentId, componentId },
+      },
+    });
+    if (!existing) {
+      throw new NotFoundException('해당 구성품 관계를 찾을 수 없습니다.');
+    }
+
     await this.prisma.itemComponent.delete({
       where: {
         parentId_componentId: {
