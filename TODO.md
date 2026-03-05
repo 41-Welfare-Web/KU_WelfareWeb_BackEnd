@@ -1,7 +1,7 @@
 # RentalWeb Project TODO List
 
 ## 🚀 배포 및 보안 (Deployment & Security)
-- [ ] **회원가입 인증번호 응답 노출 제거**: 현재 프론트엔드 개발 편의를 위해 `POST /api/auth/request-signup-verification` 응답에 `code`가 포함되어 있음. 실제 운영 배포 전 반드시 삭제할 것.
+- [x] **회원가입 인증번호 응답 노출 제거**: 응답에서 `code` 필드 제거 완료. 현재 `message`만 반환.
 - [ ] **CoolSMS(Solapi) CIDR 설정 변경**: 현재 개발용으로 `0.0.0.0/0` 설정됨. 실제 서버 배포 후 서버의 고정 IP로 제한할 것.
 - [ ] **Supabase Storage 권한 설정**: Bucket 정책(Policies)에서 `authenticated` 사용자만 업로드 가능하도록 설정 확인.
 - [ ] **환경 변수 점검**: `.env`의 모든 비밀키가 노출되지 않도록 서버 관리 대시보드(Railway 등)에 안전하게 등록.
