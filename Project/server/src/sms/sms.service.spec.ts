@@ -6,7 +6,9 @@ import { InternalServerErrorException } from '@nestjs/common';
 jest.mock('coolsms-node-sdk', () => {
   return jest.fn().mockImplementation(() => {
     return {
-      sendOne: jest.fn().mockResolvedValue({ statusCode: '2000', statusMessage: '정상 접수' }),
+      sendOne: jest
+        .fn()
+        .mockResolvedValue({ statusCode: '2000', statusMessage: '정상 접수' }),
     };
   });
 });
@@ -37,12 +39,14 @@ describe('SmsService', () => {
     }).compile();
 
     service = module.get<SmsService>(SmsService);
-    // @ts-ignore
+    // @ts-expect-error -- accessing private property for testing
     expect(service.isMock).toBe(true);
 
     const spy = jest.spyOn(console, 'log').mockImplementation();
     await service.sendSMS('01012345678', 'Test Message');
-    expect(spy).toHaveBeenCalledWith(expect.stringContaining('[MOCK SMS (Solapi)]'));
+    expect(spy).toHaveBeenCalledWith(
+      expect.stringContaining('[MOCK SMS (Solapi)]'),
+    );
     spy.mockRestore();
   });
 
@@ -56,20 +60,22 @@ describe('SmsService', () => {
     }).compile();
 
     service = module.get<SmsService>(SmsService);
-    // @ts-ignore
+    // @ts-expect-error -- accessing private property for testing
     expect(service.isMock).toBe(false);
 
     // Get the mock instance from the service
-    // @ts-ignore
+    // @ts-expect-error -- accessing private property for testing
     const mockSendOne = service.messageService.sendOne;
 
     const result = await service.sendSMS('01099999999', 'Real Message');
     expect(result).toBe(true);
     expect(mockSendOne).toHaveBeenCalledTimes(1);
-    expect(mockSendOne).toHaveBeenCalledWith(expect.objectContaining({
-      to: '01099999999',
-      text: 'Real Message'
-    }));
+    expect(mockSendOne).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: '01099999999',
+        text: 'Real Message',
+      }),
+    );
   });
 
   it('should throw error if SDK call fails', async () => {
@@ -89,8 +95,8 @@ describe('SmsService', () => {
 
     service = module.get<SmsService>(SmsService);
 
-    await expect(service.sendSMS('01099999999', 'Fail Message')).rejects.toThrow(
-      InternalServerErrorException,
-    );
+    await expect(
+      service.sendSMS('01099999999', 'Fail Message'),
+    ).rejects.toThrow(InternalServerErrorException);
   });
 });

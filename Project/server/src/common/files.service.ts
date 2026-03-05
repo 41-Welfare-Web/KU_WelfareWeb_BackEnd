@@ -34,7 +34,7 @@ export class FilesService {
     }
 
     // Real Upload
-    const { data, error } = await this.supabase.storage
+    const { error } = await this.supabase.storage
       .from(this.bucketName)
       .upload(filePath, file.buffer, {
         contentType: file.mimetype,
@@ -43,7 +43,9 @@ export class FilesService {
 
     if (error) {
       console.error('[FilesService] Upload Error:', error);
-      throw new InternalServerErrorException('파일 업로드 중 오류가 발생했습니다.');
+      throw new InternalServerErrorException(
+        '파일 업로드 중 오류가 발생했습니다.',
+      );
     }
 
     // Get Public URL
@@ -65,23 +67,23 @@ export class FilesService {
     // *주의* 실제 URL 구조에 따라 파싱 로직이 달라질 수 있음.
     // 여기서는 간단히 전체 경로가 URL에 포함되어 있다고 가정하고 파싱
     try {
-        const urlObj = new URL(fileUrl);
-        // Pathname: /storage/v1/object/public/rental-web/plotter/pdfs/uuid.pdf
-        const decodedPath = decodeURIComponent(urlObj.pathname);
-        const pathParts = decodedPath.split(`/${this.bucketName}/`);
-        if (pathParts.length < 2) return; // 버킷명 없는 경우 패스
+      const urlObj = new URL(fileUrl);
+      // Pathname: /storage/v1/object/public/rental-web/plotter/pdfs/uuid.pdf
+      const decodedPath = decodeURIComponent(urlObj.pathname);
+      const pathParts = decodedPath.split(`/${this.bucketName}/`);
+      if (pathParts.length < 2) return; // 버킷명 없는 경우 패스
 
-        const filePath = pathParts[1]; // plotter/pdfs/uuid.pdf
+      const filePath = pathParts[1]; // plotter/pdfs/uuid.pdf
 
-        const { error } = await this.supabase.storage
+      const { error } = await this.supabase.storage
         .from(this.bucketName)
         .remove([filePath]);
 
-        if (error) {
-            console.error('[FilesService] Delete Error:', error);
-        }
-    } catch (e) {
-        console.warn(`[FilesService] Failed to parse file URL: ${fileUrl}`);
+      if (error) {
+        console.error('[FilesService] Delete Error:', error);
+      }
+    } catch {
+      console.warn(`[FilesService] Failed to parse file URL: ${fileUrl}`);
     }
   }
 

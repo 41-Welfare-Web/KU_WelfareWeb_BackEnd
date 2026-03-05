@@ -42,8 +42,14 @@ export class PlotterService {
     let totalPrice = unitPrice * Number(pageCount);
 
     // 무료 조건 체크
-    const freeDeptsStr = await this.configService.getValue('plotter_free_departments', '');
-    const freePurposesStr = await this.configService.getValue('plotter_free_purposes', '');
+    const freeDeptsStr = await this.configService.getValue(
+      'plotter_free_departments',
+      '',
+    );
+    const freePurposesStr = await this.configService.getValue(
+      'plotter_free_purposes',
+      '',
+    );
 
     const freeDepts = freeDeptsStr.split(',').map((d) => d.trim());
     const freePurposes = freePurposesStr.split(',').map((p) => p.trim());
@@ -89,14 +95,18 @@ export class PlotterService {
       );
     }
 
-    const { purpose, paperSize, pageCount, departmentType, departmentName } = createOrderDto;
+    const { purpose, paperSize, pageCount, departmentType, departmentName } =
+      createOrderDto;
 
     // 3. 가격 계산 및 유/무료 판별 로직 호출 (user 조회 포함)
-    const { price: totalPrice, isFree } = await this.calculateEstimatedPrice({
-      purpose,
-      paperSize,
-      pageCount,
-    }, userId);
+    const { price: totalPrice } = await this.calculateEstimatedPrice(
+      {
+        purpose,
+        paperSize,
+        pageCount,
+      },
+      userId,
+    );
 
     // 사용자 정보 조회 (SMS 발송 등에 필요)
     const user = await this.prisma.user.findFirst({
@@ -149,7 +159,14 @@ export class PlotterService {
         status: PlotterStatus.PENDING,
       },
       include: {
-        user: { select: { name: true, studentId: true, departmentType: true, departmentName: true } },
+        user: {
+          select: {
+            name: true,
+            studentId: true,
+            departmentType: true,
+            departmentName: true,
+          },
+        },
       },
     });
 
@@ -218,7 +235,7 @@ export class PlotterService {
 
     await this.prisma.plotterOrder.update({
       where: { id },
-      data: { 
+      data: {
         deletedAt: new Date(),
         plotterOrderHistories: {
           create: {
@@ -226,8 +243,8 @@ export class PlotterService {
             oldStatus: order.status,
             newStatus: 'CANCELED',
             memo: memo,
-          }
-        }
+          },
+        },
       },
     });
     return { message: '주문이 취소되었습니다.' };
@@ -292,7 +309,10 @@ export class PlotterService {
         rejectionReason,
       );
     } catch (smsError) {
-      console.error('[PlotterService] 상태 변경 SMS 알림 실패 (무시):', smsError.message);
+      console.error(
+        '[PlotterService] 상태 변경 SMS 알림 실패 (무시):',
+        smsError.message,
+      );
     }
 
     return updated;

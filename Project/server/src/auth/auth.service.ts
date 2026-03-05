@@ -42,7 +42,9 @@ export class AuthService {
     });
 
     if (!savedRecord || savedRecord.code !== verificationCode) {
-      throw new BadRequestException('인증번호가 일치하지 않거나 만료되었습니다.');
+      throw new BadRequestException(
+        '인증번호가 일치하지 않거나 만료되었습니다.',
+      );
     }
 
     return { success: true, message: '인증에 성공하였습니다.' };
@@ -93,12 +95,15 @@ export class AuthService {
 
       await this.smsService.sendVerificationCode(phoneNumber, code);
 
-      return { 
-        message: '인증번호가 발송되었습니다.'
+      return {
+        message: '인증번호가 발송되었습니다.',
       };
     } catch (error) {
       console.error('[AuthService] Signup Verification Error:', error);
-      if (error instanceof ConflictException || error instanceof BadRequestException) {
+      if (
+        error instanceof ConflictException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
       throw new InternalServerErrorException(
@@ -208,7 +213,7 @@ export class AuthService {
         },
         ...tokens,
       };
-    } catch (error) {
+    } catch {
       throw new InternalServerErrorException(
         '회원가입 중 오류가 발생했습니다.',
       );
@@ -294,7 +299,10 @@ export class AuthService {
           `[RentalWeb] 회원님의 아이디는 [${user.username}] 입니다.`,
         );
       } catch (smsError) {
-        console.error('[AuthService] 아이디 찾기 SMS 발송 실패 (무시):', smsError.message);
+        console.error(
+          '[AuthService] 아이디 찾기 SMS 발송 실패 (무시):',
+          smsError.message,
+        );
       }
     }
 
@@ -417,7 +425,9 @@ export class AuthService {
       );
     }
 
-    const user = await this.prisma.user.findFirst({ where: { username, deletedAt: null } });
+    const user = await this.prisma.user.findFirst({
+      where: { username, deletedAt: null },
+    });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
     const salt = await bcrypt.genSalt();
@@ -432,7 +442,7 @@ export class AuthService {
   }
 
   // 로그아웃
-  async logout(dto: LogoutDto) {
+  async logout(_dto: LogoutDto) {
     return { message: 'Successfully logged out.' };
   }
 
@@ -452,7 +462,7 @@ export class AuthService {
 
       const tokens = this.generateTokens(user);
       return tokens;
-    } catch (e) {
+    } catch {
       throw new UnauthorizedException('유효하지 않은 토큰입니다.');
     }
   }

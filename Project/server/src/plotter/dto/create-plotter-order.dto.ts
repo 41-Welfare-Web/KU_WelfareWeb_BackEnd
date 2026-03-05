@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsBoolean, IsInt, IsOptional, IsIn } from 'class-validator';
+import { IsNotEmpty, IsString, IsInt, IsOptional, IsIn } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { DEPARTMENT_TYPES } from '../../auth/dto/register.dto';

@@ -6,11 +6,11 @@ import { HolidaysService } from '../holidays/holidays.service';
 import { SmsService } from '../sms/sms.service';
 import { CartService } from '../cart/cart.service';
 import { RentalStatus } from '@prisma/client';
-import { BadRequestException, ConflictException } from '@nestjs/common';
+import { ConflictException } from '@nestjs/common';
 
 describe('RentalsService', () => {
   let service: RentalsService;
-  let prisma: PrismaService;
+  let _prisma: PrismaService;
   let smsService: SmsService;
 
   const mockPrisma = {
@@ -51,15 +51,24 @@ describe('RentalsService', () => {
       providers: [
         RentalsService,
         { provide: PrismaService, useValue: mockPrisma },
-        { provide: ConfigurationsService, useValue: { getValue: jest.fn().mockResolvedValue('2') } },
-        { provide: HolidaysService, useValue: { isHoliday: jest.fn().mockResolvedValue(false) } },
+        {
+          provide: ConfigurationsService,
+          useValue: { getValue: jest.fn().mockResolvedValue('2') },
+        },
+        {
+          provide: HolidaysService,
+          useValue: { isHoliday: jest.fn().mockResolvedValue(false) },
+        },
         { provide: SmsService, useValue: mockSmsService },
-        { provide: CartService, useValue: { clearCart: jest.fn().mockResolvedValue(undefined) } },
+        {
+          provide: CartService,
+          useValue: { clearCart: jest.fn().mockResolvedValue(undefined) },
+        },
       ],
     }).compile();
 
     service = module.get<RentalsService>(RentalsService);
-    prisma = module.get<PrismaService>(PrismaService);
+    _prisma = module.get<PrismaService>(PrismaService);
     smsService = module.get<SmsService>(SmsService);
   });
 
@@ -68,21 +77,40 @@ describe('RentalsService', () => {
     const dto = {
       departmentType: '학과',
       departmentName: '컴퓨터공학과',
-      items: [{ itemId: 1, quantity: 1, startDate: '2026-04-01', endDate: '2026-04-03' }],
+      items: [
+        {
+          itemId: 1,
+          quantity: 1,
+          startDate: '2026-04-01',
+          endDate: '2026-04-03',
+        },
+      ],
     };
 
     // Mock: 메인 물품(ID: 1)은 구성품(ID: 2) 1개를 가지고 있음
     mockPrisma.item.findFirst.mockImplementation(({ where }) => {
-      if (where.id === 1) return Promise.resolve({ id: 1, name: '카메라', totalQuantity: 5, components: [{ componentId: 2, quantity: 1 }] });
-      if (where.id === 2) return Promise.resolve({ id: 2, name: '삼각대', totalQuantity: 5, components: [] });
+      if (where.id === 1)
+        return Promise.resolve({
+          id: 1,
+          name: '카메라',
+          totalQuantity: 5,
+          components: [{ componentId: 2, quantity: 1 }],
+        });
+      if (where.id === 2)
+        return Promise.resolve({
+          id: 2,
+          name: '삼각대',
+          totalQuantity: 5,
+          components: [],
+        });
       return Promise.resolve(null);
     });
 
     mockPrisma.rentalItem.findMany.mockResolvedValue([]); // 재고 넉넉함
-    mockPrisma.rental.create.mockResolvedValue({ 
-      id: 100, 
-      user: { phoneNumber: '01012341234', name: '테스터' }, 
-      rentalItems: [{ item: { name: '카메라' } }] 
+    mockPrisma.rental.create.mockResolvedValue({
+      id: 100,
+      user: { phoneNumber: '01012341234', name: '테스터' },
+      rentalItems: [{ item: { name: '카메라' } }],
     });
 
     await service.create(userId, dto);
@@ -109,19 +137,38 @@ describe('RentalsService', () => {
     const dto = {
       departmentType: '학과',
       departmentName: '컴퓨터공학과',
-      items: [{ itemId: 1, quantity: 1, startDate: '2026-04-01', endDate: '2026-04-03' }],
+      items: [
+        {
+          itemId: 1,
+          quantity: 1,
+          startDate: '2026-04-01',
+          endDate: '2026-04-03',
+        },
+      ],
     };
 
     // Mock: 카메라는 재고가 있으나 삼각대는 재고가 0인 상황
     mockPrisma.item.findFirst.mockImplementation(({ where }) => {
-      if (where.id === 1) return Promise.resolve({ id: 1, name: '카메라', totalQuantity: 5, components: [{ componentId: 2, quantity: 1 }] });
-      if (where.id === 2) return Promise.resolve({ id: 2, name: '삼각대', totalQuantity: 1, components: [] });
+      if (where.id === 1)
+        return Promise.resolve({
+          id: 1,
+          name: '카메라',
+          totalQuantity: 5,
+          components: [{ componentId: 2, quantity: 1 }],
+        });
+      if (where.id === 2)
+        return Promise.resolve({
+          id: 2,
+          name: '삼각대',
+          totalQuantity: 1,
+          components: [],
+        });
       return Promise.resolve(null);
     });
 
     // 삼각대(ID: 2)에 대해 이미 1개가 예약되어 있다고 설정
     mockPrisma.rentalItem.findMany.mockImplementation(({ where }) => {
-      if (where.itemId === 2) return Promise.resolve([{ quantity: 1 }]); 
+      if (where.itemId === 2) return Promise.resolve([{ quantity: 1 }]);
       return Promise.resolve([]);
     });
 
@@ -141,7 +188,10 @@ describe('RentalsService', () => {
     };
 
     mockPrisma.rental.findMany.mockResolvedValue([overdueRental]);
-    mockPrisma.rental.update.mockResolvedValue({ ...overdueRental, status: RentalStatus.OVERDUE });
+    mockPrisma.rental.update.mockResolvedValue({
+      ...overdueRental,
+      status: RentalStatus.OVERDUE,
+    });
 
     await service.handleOverdueRentals();
 

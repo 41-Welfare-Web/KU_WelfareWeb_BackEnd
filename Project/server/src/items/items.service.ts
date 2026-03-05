@@ -3,7 +3,6 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateItemDto } from './dto/create-item.dto';
@@ -17,7 +16,15 @@ export class ItemsService {
   constructor(private prisma: PrismaService) {}
 
   async create(createItemDto: CreateItemDto) {
-    const { categoryId, itemCode, name, description, imageUrl, managementType, totalQuantity } = createItemDto;
+    const {
+      categoryId,
+      itemCode,
+      name,
+      description,
+      imageUrl,
+      managementType,
+      totalQuantity,
+    } = createItemDto;
 
     const category = await this.prisma.category.findFirst({
       where: { id: categoryId, deletedAt: null },
@@ -25,7 +32,8 @@ export class ItemsService {
     if (!category) throw new NotFoundException('존재하지 않는 카테고리입니다.');
 
     const existing = await this.prisma.item.findUnique({ where: { itemCode } });
-    if (existing && !existing.deletedAt) throw new ConflictException('이미 존재하는 물품 코드입니다.');
+    if (existing && !existing.deletedAt)
+      throw new ConflictException('이미 존재하는 물품 코드입니다.');
 
     return this.prisma.item.create({
       data: {
@@ -36,8 +44,8 @@ export class ItemsService {
         managementType,
         totalQuantity: managementType === 'BULK' ? totalQuantity : null,
         category: {
-          connect: { id: categoryId }
-        }
+          connect: { id: categoryId },
+        },
       },
       include: { category: true },
     });
@@ -66,8 +74,24 @@ export class ItemsService {
     else orderBy = { rentalCount: sortOrder };
 
     const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    const todayStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      0,
+      0,
+      0,
+      0,
+    );
+    const todayEnd = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      23,
+      59,
+      59,
+      999,
+    );
 
     const items = await this.prisma.item.findMany({
       where,
@@ -92,7 +116,7 @@ export class ItemsService {
         (sum, ri) => sum + ri.quantity,
         0,
       );
-      const { rentalItems, ...itemData } = item;
+      const { rentalItems: _rentalItems, ...itemData } = item;
       return {
         ...itemData,
         currentStock: (item.totalQuantity || 0) - reservedQty,
@@ -112,7 +136,9 @@ export class ItemsService {
   }
 
   async update(id: number, updateItemDto: UpdateItemDto) {
-    const item = await this.prisma.item.findFirst({ where: { id, deletedAt: null } });
+    const item = await this.prisma.item.findFirst({
+      where: { id, deletedAt: null },
+    });
     if (!item) throw new NotFoundException('물품을 찾을 수 없습니다.');
 
     if (updateItemDto.itemCode && updateItemDto.itemCode !== item.itemCode) {
@@ -170,7 +196,7 @@ export class ItemsService {
 
     const current = new Date(startDate);
     const end = new Date(endDate);
-    
+
     const searchStart = new Date(startDate);
     searchStart.setDate(searchStart.getDate() - 1);
     const searchEnd = new Date(endDate);
@@ -192,11 +218,11 @@ export class ItemsService {
 
     while (current <= end) {
       const currentDateStr = toLocalDateStr(current);
-      
+
       const reservedQty = rentals.reduce((sum, r) => {
         const rStartStr = toLocalDateStr(new Date(r.rental.startDate));
         const rEndStr = toLocalDateStr(new Date(r.rental.endDate));
-        
+
         if (currentDateStr >= rStartStr && currentDateStr <= rEndStr) {
           return sum + r.quantity;
         }
@@ -225,13 +251,16 @@ export class ItemsService {
 
   // 8. 개별 실물 등록
   async createInstance(itemId: number, dto: CreateItemInstanceDto) {
-    const item = await this.prisma.item.findFirst({ where: { id: itemId, deletedAt: null } });
+    const item = await this.prisma.item.findFirst({
+      where: { id: itemId, deletedAt: null },
+    });
     if (!item) throw new NotFoundException('물품을 찾을 수 없습니다.');
 
     const existing = await this.prisma.itemInstance.findUnique({
       where: { serialNumber: dto.serialNumber },
     });
-    if (existing && !existing.deletedAt) throw new ConflictException('이미 존재하는 시리얼 번호입니다.');
+    if (existing && !existing.deletedAt)
+      throw new ConflictException('이미 존재하는 시리얼 번호입니다.');
 
     return this.prisma.itemInstance.create({
       data: {
@@ -252,7 +281,8 @@ export class ItemsService {
       const existing = await this.prisma.itemInstance.findUnique({
         where: { serialNumber: dto.serialNumber },
       });
-      if (existing && !existing.deletedAt) throw new ConflictException('이미 존재하는 시리얼 번호입니다.');
+      if (existing && !existing.deletedAt)
+        throw new ConflictException('이미 존재하는 시리얼 번호입니다.');
     }
 
     return this.prisma.itemInstance.update({
@@ -270,7 +300,9 @@ export class ItemsService {
     if (!instance) throw new NotFoundException('실물을 찾을 수 없습니다.');
 
     if (instance._count.rentalItems > 0) {
-      throw new BadRequestException('대여 기록이 있는 실물은 삭제할 수 없습니다. 상태를 BROKEN으로 변경하세요.');
+      throw new BadRequestException(
+        '대여 기록이 있는 실물은 삭제할 수 없습니다. 상태를 BROKEN으로 변경하세요.',
+      );
     }
 
     await this.prisma.itemInstance.update({
@@ -283,12 +315,16 @@ export class ItemsService {
   // 11. 세트 구성품 추가
   async addComponent(parentId: number, dto: AddItemComponentDto) {
     if (parentId === dto.componentId) {
-      throw new BadRequestException('자기 자신을 구성품으로 추가할 수 없습니다.');
+      throw new BadRequestException(
+        '자기 자신을 구성품으로 추가할 수 없습니다.',
+      );
     }
 
     const [parent, component] = await Promise.all([
       this.prisma.item.findFirst({ where: { id: parentId, deletedAt: null } }),
-      this.prisma.item.findFirst({ where: { id: dto.componentId, deletedAt: null } }),
+      this.prisma.item.findFirst({
+        where: { id: dto.componentId, deletedAt: null },
+      }),
     ]);
 
     if (!parent || !component) {
