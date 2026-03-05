@@ -12,8 +12,19 @@ import { ApiProperty } from '@nestjs/swagger';
 export const DEPARTMENT_TYPES = [
   '총학생회',
   '중앙자치기구',
-  '단과대',
-  '학과',
+  '문과대학',
+  '이과대학',
+  '공과대학',
+  '건축대학',
+  '경영대학',
+  '사회과학대학',
+  '생명과학대학',
+  '융합과학기술원',
+  '부동산과학원',
+  '사범대학',
+  '수의과대학',
+  '상허교양대학',
+  '예술디자인대학',
   '중앙동아리',
   '단과대동아리',
   '학과동아리',
@@ -60,7 +71,7 @@ export class RegisterDto {
 
   @ApiProperty({
     example: '학과',
-    description: '소속 유형 (총학생회/중앙자치기구/단과대/학과/중앙동아리/단과대동아리/학과동아리/기타)',
+    description: '소속 유형 (metadata API의 departments 분류명)',
     enum: DEPARTMENT_TYPES,
   })
   @IsString()

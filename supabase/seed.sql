@@ -64,5 +64,5 @@ INSERT INTO public.configurations (config_key, config_value, description) VALUES
   ('plotter_price_a1',              '3000',                                                                       'A1 용지 인쇄 단가 (원)'),
   ('plotter_free_departments',      '중앙동아리,중앙자치기구',                                                      '무료 인쇄 대상 소속 단위'),
   ('plotter_free_purposes',         '예산안 출력,동아리 행사',                                                      '무료 인쇄 대상 목적'),
-  ('plotter_departments_list',      '총학생회,중앙자치기구,단과대,학과,중앙동아리,단과대동아리,학과동아리,기타', '서비스 이용 가능 소속 단위 리스트')
+  ('plotter_departments_list',      '총학생회,중앙자치기구,문과대학,이과대학,공과대학,건축대학,경영대학,사회과학대학,생명과학대학,융합과학기술원,부동산과학원,사범대학,수의과대학,상허교양대학,예술디자인대학,중앙동아리,단과대동아리,학과동아리,기타', '서비스 이용 가능 소속 단위 리스트')
 ON CONFLICT (config_key) DO NOTHING;

@@ -68,7 +68,7 @@ describe('RentalsService', () => {
     const dto = {
       departmentType: '학과',
       departmentName: '컴퓨터공학과',
-      items: [{ itemId: 1, quantity: 1, startDate: '2026-03-01', endDate: '2026-03-03' }],
+      items: [{ itemId: 1, quantity: 1, startDate: '2026-04-01', endDate: '2026-04-03' }],
     };
 
     // Mock: 메인 물품(ID: 1)은 구성품(ID: 2) 1개를 가지고 있음
@@ -109,7 +109,7 @@ describe('RentalsService', () => {
     const dto = {
       departmentType: '학과',
       departmentName: '컴퓨터공학과',
-      items: [{ itemId: 1, quantity: 1, startDate: '2026-03-01', endDate: '2026-03-03' }],
+      items: [{ itemId: 1, quantity: 1, startDate: '2026-04-01', endDate: '2026-04-03' }],
     };
 
     // Mock: 카메라는 재고가 있으나 삼각대는 재고가 0인 상황
