@@ -123,14 +123,20 @@ assert_status() {
 }
 
 assert_status_oneof() {
-  local test_id="$1" test_name="$2" exp1="$3" exp2="$4"
+  local test_id="$1" test_name="$2"
+  shift 2
+  local expected=("$@")
   TOTAL=$((TOTAL + 1))
-  if [ "$STATUS" = "$exp1" ] || [ "$STATUS" = "$exp2" ]; then
+  local match=false
+  for exp in "${expected[@]}"; do
+    [ "$STATUS" = "$exp" ] && match=true
+  done
+  if $match; then
     PASS=$((PASS + 1))
     echo -e "  ${GREEN}✓ PASS${NC} [$test_id] $test_name (HTTP $STATUS)"
   else
     FAIL=$((FAIL + 1))
-    echo -e "  ${RED}✗ FAIL${NC} [$test_id] $test_name (expected $exp1 or $exp2, got $STATUS)"
+    echo -e "  ${RED}✗ FAIL${NC} [$test_id] $test_name (expected ${expected[*]}, got $STATUS)"
     echo -e "    ${YELLOW}Response: ${BODY:0:200}${NC}"
   fi
 }
