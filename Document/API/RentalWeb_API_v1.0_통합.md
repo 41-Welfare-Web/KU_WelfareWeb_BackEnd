@@ -517,7 +517,8 @@
   "name": "김테스트",
   "studentId": "202412345",
   "phoneNumber": "01087654321",
-  "department": "총학생회",
+  "departmentType": "총학생회",
+  "departmentName": null,
   "role": "USER",
   "createdAt": "2024-01-01T12:00:00Z"
 }
@@ -1594,7 +1595,7 @@
   "rentals": [
     {
       "id": 101,
-      "user": { "name": "김테스트", "studentId": "202412345", "phoneNumber": "01012345678", "department": "컴퓨터공학과" },
+      "user": { "name": "김테스트", "studentId": "202412345", "phoneNumber": "01012345678", "departmentType": "공과대학", "departmentName": "컴퓨터공학과" },
       "startDate": "2024-08-01",
       "endDate": "2024-08-05",
       "status": "RESERVED",

@@ -77,7 +77,7 @@ $res = Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/auth/login
 Invoke-RestMethod -Method Get -Uri "http://localhost:3000/api/users/me" -Headers @{ Authorization = "Bearer $token" }
 
 # 새 대여 생성
-Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/rentals" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"startDate":"2026-03-01","endDate":"2026-03-03","items":[{"itemId":1,"quantity":1}]}'
+Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/rentals" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"departmentType":"공과대학","departmentName":"컴퓨터공학과","items":[{"itemId":1,"quantity":1,"startDate":"2026-03-10","endDate":"2026-03-12"}]}'
 ```
 
 ---
@@ -88,14 +88,14 @@ Invoke-RestMethod -Method Post -Uri "http://localhost:3000/api/rentals" -Headers
 
 ### 5.1 인증 (Auth)
 ```powershell
-# 1. 회원가입 인증번호 요청 (응답에서 code 확인 가능)
+# 1. 회원가입 인증번호 요청
 Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/request-signup-verification" -ContentType "application/json" -Body '{"phoneNumber":"01090665493"}'
 
 # 2. 회원가입 인증번호 확인 (버튼 활성화용)
 Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/verify-signup-code" -ContentType "application/json" -Body '{"phoneNumber":"01090665493","verificationCode":"123456"}'
 
 # 3. 회원가입 (Register)
-Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/register" -ContentType "application/json" -Body '{"username":"newuser01","password":"password123!","name":"홍길동","studentId":"20260001","phoneNumber":"01090665493","department":"컴퓨터공학과","verificationCode":"123456"}'
+Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/register" -ContentType "application/json" -Body '{"username":"newuser01","password":"password123!","name":"홍길동","studentId":"20260001","phoneNumber":"01090665493","departmentType":"공과대학","departmentName":"컴퓨터공학과","verificationCode":"123456"}'
 
 # 4. 아이디 찾기 (Find Username)
 Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/find-username" -ContentType "application/json" -Body '{"name":"홍길동","phoneNumber":"01090665493"}'
@@ -106,8 +106,8 @@ $res = Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/refresh" -ContentType 
 
 ### 5.2 사용자 (Users)
 ```powershell
-# 내 정보 수정 (Update My Profile)
-Invoke-RestMethod -Method Put -Uri "$baseUrl/users/me" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"department":"소프트웨어학부","phoneNumber":"01011112222"}'
+# 내 정보 수정 (Update My Profile) — currentPassword 필수
+Invoke-RestMethod -Method Put -Uri "$baseUrl/users/me" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"currentPassword":"admin123!","departmentType":"공과대학","departmentName":"소프트웨어학부","phoneNumber":"01011112222"}'
 
 # 관리자: 특정 사용자 역할 변경 (Update User Role)
 Invoke-RestMethod -Method Put -Uri "$baseUrl/users/{userId}/role" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"role":"ADMIN"}'
