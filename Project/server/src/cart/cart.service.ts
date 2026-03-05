@@ -95,9 +95,7 @@ export class CartService {
 
     if (resolvedStart !== null && resolvedEnd !== null) {
       this.validateDates(resolvedStart, resolvedEnd);
-    } else if (
-      (resolvedStart === null) !== (resolvedEnd === null)
-    ) {
+    } else if ((resolvedStart === null) !== (resolvedEnd === null)) {
       throw new BadRequestException(
         '시작일과 반납일은 함께 설정하거나 함께 초기화해야 합니다.',
       );

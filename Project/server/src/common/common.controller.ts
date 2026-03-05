@@ -11,7 +11,13 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from './files.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ConfigurationsService } from '../configurations/configurations.service';
-import { ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiConsumes,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { PrismaService } from '../prisma/prisma.service';
 import { SmsService } from '../sms/sms.service';
 
@@ -49,28 +55,41 @@ export class CommonController {
   @Get('metadata')
   @ApiOperation({ summary: '공통 메타데이터 조회 (소속 리스트, 무료 목적 등)' })
   async getMetadata() {
-    const typeString = await this.configService.getValue('plotter_departments_list', '');
+    const typeString = await this.configService.getValue(
+      'plotter_departments_list',
+      '',
+    );
     const types = typeString ? typeString.split(',').map((t) => t.trim()) : [];
 
     // 각 유형별로 세부 목록을 조회하여 이차원 배열 생성
     // value의 0번째가 분류명, 이후가 하위 항목. 단일 항목은 dept_list_ 키 없이 [type]만 반환
     const departments2D = await Promise.all(
       types.map(async (type) => {
-        const namesString = await this.configService.getValue(`dept_list_${type}`, '');
-        const names = namesString ? namesString.split(',').map((n) => n.trim()) : [];
+        const namesString = await this.configService.getValue(
+          `dept_list_${type}`,
+          '',
+        );
+        const names = namesString
+          ? namesString.split(',').map((n) => n.trim())
+          : [];
         return names.length > 0 ? names : [type];
       }),
     );
 
     const purposes = await this.configService.getValue('plotter_purposes', '');
-    const freePurposes = await this.configService.getValue('plotter_free_purposes', '');
+    const freePurposes = await this.configService.getValue(
+      'plotter_free_purposes',
+      '',
+    );
     const priceA0 = await this.configService.getValue('plotter_price_a0', '0');
     const priceA1 = await this.configService.getValue('plotter_price_a1', '0');
 
     return {
       departments: departments2D,
       purposes: purposes ? purposes.split(',').map((p) => p.trim()) : [],
-      freePurposes: freePurposes ? freePurposes.split(',').map((p) => p.trim()) : [],
+      freePurposes: freePurposes
+        ? freePurposes.split(',').map((p) => p.trim())
+        : [],
       prices: {
         a0: parseInt(priceA0, 10),
         a1: parseInt(priceA1, 10),
@@ -101,9 +120,16 @@ export class CommonController {
     }
 
     // 이미지 파일 형식 검증
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+    const allowedMimeTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/jpg',
+      'image/webp',
+    ];
     if (!allowedMimeTypes.includes(file.mimetype)) {
-      throw new BadRequestException('이미지 파일(jpg, png, webp)만 업로드 가능합니다.');
+      throw new BadRequestException(
+        '이미지 파일(jpg, png, webp)만 업로드 가능합니다.',
+      );
     }
 
     const url = await this.filesService.uploadFile(file, 'common');

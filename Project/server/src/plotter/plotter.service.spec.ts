@@ -21,14 +21,28 @@ describe('PlotterService', () => {
           useValue: {
             plotterOrder: { create: jest.fn().mockResolvedValue({ id: 1 }) },
             user: {
-              findFirst: jest.fn().mockResolvedValue({ id: 'user-id', departmentType: '중앙동아리', name: '테스터', phoneNumber: '01012341234' }),
-              findUnique: jest.fn().mockResolvedValue({ id: 'user-id', departmentType: '중앙동아리', name: '테스터', phoneNumber: '01012341234' }),
+              findFirst: jest.fn().mockResolvedValue({
+                id: 'user-id',
+                departmentType: '중앙동아리',
+                name: '테스터',
+                phoneNumber: '01012341234',
+              }),
+              findUnique: jest.fn().mockResolvedValue({
+                id: 'user-id',
+                departmentType: '중앙동아리',
+                name: '테스터',
+                phoneNumber: '01012341234',
+              }),
             },
           },
         },
         {
           provide: FilesService,
-          useValue: { uploadFile: jest.fn().mockResolvedValue('http://example.com/file.pdf') },
+          useValue: {
+            uploadFile: jest
+              .fn()
+              .mockResolvedValue('http://example.com/file.pdf'),
+          },
         },
         {
           provide: ConfigurationsService,
@@ -36,11 +50,15 @@ describe('PlotterService', () => {
         },
         {
           provide: HolidaysService,
-          useValue: { calculateBusinessDate: jest.fn().mockResolvedValue(new Date()) },
+          useValue: {
+            calculateBusinessDate: jest.fn().mockResolvedValue(new Date()),
+          },
         },
         {
           provide: SmsService,
-          useValue: { sendPlotterStatusNotice: jest.fn().mockResolvedValue(true) },
+          useValue: {
+            sendPlotterStatusNotice: jest.fn().mockResolvedValue(true),
+          },
         },
       ],
     }).compile();
@@ -64,8 +82,12 @@ describe('PlotterService', () => {
       pageCount: 1,
     };
 
-    await expect(service.create('user-id', dto as any, fakePdf, undefined)).rejects.toThrow(
-      new BadRequestException('유효하지 않은 PDF 형식입니다. 실제 PDF 파일을 업로드해주세요.'),
+    await expect(
+      service.create('user-id', dto as any, fakePdf, undefined),
+    ).rejects.toThrow(
+      new BadRequestException(
+        '유효하지 않은 PDF 형식입니다. 실제 PDF 파일을 업로드해주세요.',
+      ),
     );
   });
 

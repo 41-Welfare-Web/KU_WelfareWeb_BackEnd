@@ -20,7 +20,12 @@ import { GetUser } from '../auth/get-user.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '@prisma/client';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 
 @ApiTags('대여 (Rentals)')
 @ApiBearerAuth()
@@ -32,7 +37,11 @@ export class RentalsController {
   @Post()
   @ApiOperation({ summary: '새 대여 예약 생성' })
   create(@GetUser() user: any, @Body() createRentalDto: CreateRentalDto) {
-    return this.rentalsService.create(user.userId, createRentalDto, user.userId);
+    return this.rentalsService.create(
+      user.userId,
+      createRentalDto,
+      user.userId,
+    );
   }
 
   @Post('admin')
@@ -48,10 +57,27 @@ export class RentalsController {
 
   @Get()
   @ApiOperation({ summary: '대여 목록 조회' })
-  @ApiQuery({ name: 'page', required: false, description: '페이지 번호 (기본값: 1)' })
-  @ApiQuery({ name: 'pageSize', required: false, description: '페이지 크기 (기본값: 10)' })
-  @ApiQuery({ name: 'userId', required: false, description: '특정 사용자 ID로 필터링 (관리자 전용)' })
-  @ApiQuery({ name: 'status', required: false, description: '대여 상태 필터 (RESERVED, RENTED, RETURNED, CANCELLED, OVERDUE)' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: '페이지 번호 (기본값: 1)',
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    description: '페이지 크기 (기본값: 10)',
+  })
+  @ApiQuery({
+    name: 'userId',
+    required: false,
+    description: '특정 사용자 ID로 필터링 (관리자 전용)',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description:
+      '대여 상태 필터 (RESERVED, RENTED, RETURNED, CANCELLED, OVERDUE)',
+  })
   findAll(
     @GetUser() user: any,
     @Query('page') page: string = '1',

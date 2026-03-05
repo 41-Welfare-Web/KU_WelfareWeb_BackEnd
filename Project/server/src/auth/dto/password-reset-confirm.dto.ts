@@ -2,7 +2,10 @@ import { IsNotEmpty, IsString, MinLength, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PasswordResetConfirmDto {
-  @ApiProperty({ example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...', description: 'verify 단계에서 발급받은 resetToken' })
+  @ApiProperty({
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    description: 'verify 단계에서 발급받은 resetToken',
+  })
   @IsString()
   @IsNotEmpty()
   resetToken: string;

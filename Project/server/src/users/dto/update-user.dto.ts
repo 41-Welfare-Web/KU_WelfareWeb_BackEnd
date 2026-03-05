@@ -1,4 +1,10 @@
-import { IsOptional, IsString, Matches, MinLength, IsIn } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  Matches,
+  MinLength,
+  IsIn,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { DEPARTMENT_TYPES } from '../../auth/dto/register.dto';
 

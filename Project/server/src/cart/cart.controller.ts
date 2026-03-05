@@ -31,7 +31,9 @@ export class CartController {
   }
 
   @Post()
-  @ApiOperation({ summary: '장바구니 물품 추가 (동일 물품 존재 시 수량 덮어씀)' })
+  @ApiOperation({
+    summary: '장바구니 물품 추가 (동일 물품 존재 시 수량 덮어씀)',
+  })
   addToCart(@GetUser() user: any, @Body() dto: AddToCartDto) {
     return this.cartService.addToCart(user.userId, dto);
   }

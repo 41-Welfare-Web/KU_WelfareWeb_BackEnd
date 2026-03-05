@@ -27,7 +27,11 @@ export class RentalsService {
   ) {}
 
   // 1. 대여 예약 생성 (날짜별 그룹핑 → 다중 rental 생성)
-  async create(userId: string, createRentalDto: CreateRentalDto, actorId?: string) {
+  async create(
+    userId: string,
+    createRentalDto: CreateRentalDto,
+    actorId?: string,
+  ) {
     // 대상 사용자 존재 확인
     const user = await this.prisma.user.findFirst({
       where: { id: userId, deletedAt: null },
@@ -110,10 +114,15 @@ export class RentalsService {
           });
 
           if (!itemWithComponents) {
-            throw new NotFoundException(`물품(ID: ${reqItem.itemId})을 찾을 수 없습니다.`);
+            throw new NotFoundException(
+              `물품(ID: ${reqItem.itemId})을 찾을 수 없습니다.`,
+            );
           }
 
-          finalItemsToRent.push({ itemId: reqItem.itemId, quantity: reqItem.quantity });
+          finalItemsToRent.push({
+            itemId: reqItem.itemId,
+            quantity: reqItem.quantity,
+          });
 
           if (itemWithComponents.components.length > 0) {
             for (const component of itemWithComponents.components) {
@@ -131,7 +140,9 @@ export class RentalsService {
           });
 
           if (!item) {
-            throw new NotFoundException(`물품(ID: ${finalItem.itemId})을 찾을 수 없습니다.`);
+            throw new NotFoundException(
+              `물품(ID: ${finalItem.itemId})을 찾을 수 없습니다.`,
+            );
           }
 
           const totalQty = item.totalQuantity || 1;
@@ -183,7 +194,10 @@ export class RentalsService {
               create: {
                 changedBy: actualActorId,
                 newStatus: RentalStatus.RESERVED,
-                memo: actorId && actorId !== userId ? '관리자 대리 예약 생성' : '대여 예약 생성',
+                memo:
+                  actorId && actorId !== userId
+                    ? '관리자 대리 예약 생성'
+                    : '대여 예약 생성',
               },
             },
           },
@@ -224,7 +238,10 @@ export class RentalsService {
           RentalStatus.RESERVED,
         );
       } catch (smsError) {
-        console.error('[RentalsService] 예약 생성 SMS 알림 실패 (무시):', smsError.message);
+        console.error(
+          '[RentalsService] 예약 생성 SMS 알림 실패 (무시):',
+          smsError.message,
+        );
       }
 
       createdRentals.push(rental);
@@ -321,7 +338,7 @@ export class RentalsService {
         rentalItems: { include: { item: true } },
         rentalHistories: {
           orderBy: { changedAt: 'desc' },
-          include: { user: { select: { name: true } } }
+          include: { user: { select: { name: true } } },
         },
       },
     });
@@ -336,26 +353,26 @@ export class RentalsService {
   }
 
   // 4. 예약 취소
-    async cancel(id: number, userId: string) {
-      const rental = await this.prisma.rental.findFirst({
-        where: { id, deletedAt: null },
-        include: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-              name: true,
-              studentId: true,
-              phoneNumber: true,
-              departmentType: true,
-              departmentName: true,
-              role: true,
-              createdAt: true,
-            },
+  async cancel(id: number, userId: string) {
+    const rental = await this.prisma.rental.findFirst({
+      where: { id, deletedAt: null },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            name: true,
+            studentId: true,
+            phoneNumber: true,
+            departmentType: true,
+            departmentName: true,
+            role: true,
+            createdAt: true,
           },
-          rentalItems: { include: { item: true } },
         },
-      });
+        rentalItems: { include: { item: true } },
+      },
+    });
     if (!rental) throw new NotFoundException('대여 건을 찾을 수 없습니다.');
 
     if (rental.userId !== userId)
@@ -393,7 +410,10 @@ export class RentalsService {
         '사용자 직접 취소',
       );
     } catch (smsError) {
-      console.error('[RentalsService] 예약 취소 SMS 알림 실패 (무시):', smsError.message);
+      console.error(
+        '[RentalsService] 예약 취소 SMS 알림 실패 (무시):',
+        smsError.message,
+      );
     }
 
     return { message: '예약이 취소되었습니다.' };
@@ -481,7 +501,10 @@ export class RentalsService {
         memo,
       );
     } catch (smsError) {
-      console.error('[RentalsService] 상태 변경 SMS 알림 실패 (무시):', smsError.message);
+      console.error(
+        '[RentalsService] 상태 변경 SMS 알림 실패 (무시):',
+        smsError.message,
+      );
     }
 
     return updated;
@@ -514,7 +537,10 @@ export class RentalsService {
       if (firstStartDate || firstEndDate) {
         // 모든 items의 날짜가 동일해야 함
         for (const item of items) {
-          if (item.startDate !== firstStartDate || item.endDate !== firstEndDate) {
+          if (
+            item.startDate !== firstStartDate ||
+            item.endDate !== firstEndDate
+          ) {
             throw new BadRequestException(
               '예약 수정 시 모든 품목의 날짜는 동일해야 합니다. 날짜가 다른 경우 취소 후 재신청하세요.',
             );
@@ -530,7 +556,10 @@ export class RentalsService {
       throw new BadRequestException('종료일이 시작일보다 빠를 수 없습니다.');
     }
 
-    if (items?.[0]?.startDate && (await this.holidaysService.isHoliday(start))) {
+    if (
+      items?.[0]?.startDate &&
+      (await this.holidaysService.isHoliday(start))
+    ) {
       throw new BadRequestException('수정하려는 시작일이 휴무일입니다.');
     }
     if (items?.[0]?.endDate && (await this.holidaysService.isHoliday(end))) {
@@ -585,7 +614,10 @@ export class RentalsService {
             startDate: start,
             endDate: end,
             departmentType: departmentType || rental.departmentType,
-            departmentName: departmentName === null ? null : (departmentName || rental.departmentName),
+            departmentName:
+              departmentName === null
+                ? null
+                : departmentName || rental.departmentName,
             rentalItems: {
               create: items.map((i) => ({
                 itemId: i.itemId,
@@ -609,7 +641,10 @@ export class RentalsService {
             startDate: start,
             endDate: end,
             departmentType: departmentType || rental.departmentType,
-            departmentName: departmentName === null ? null : (departmentName || rental.departmentName),
+            departmentName:
+              departmentName === null
+                ? null
+                : departmentName || rental.departmentName,
             rentalHistories: {
               create: {
                 changedBy: userId,
@@ -648,7 +683,9 @@ export class RentalsService {
       },
     });
 
-    console.log(`[RentalsService] Found ${overdueRentals.length} overdue rentals.`);
+    console.log(
+      `[RentalsService] Found ${overdueRentals.length} overdue rentals.`,
+    );
 
     for (const rental of overdueRentals) {
       await this.prisma.rental.update({
@@ -677,7 +714,10 @@ export class RentalsService {
           `[RentalWeb] ${rental.user.name}님, [${itemSummary}]의 반납 기한이 지났습니다. 현재 연체 상태이오니 즉시 반납 부탁드립니다.`,
         );
       } catch (smsError) {
-        console.error(`[RentalsService] 연체 SMS 발송 실패 (rental #${rental.id}):`, smsError.message);
+        console.error(
+          `[RentalsService] 연체 SMS 발송 실패 (rental #${rental.id}):`,
+          smsError.message,
+        );
       }
     }
   }
@@ -729,7 +769,10 @@ export class RentalsService {
           dueDateStr,
         );
       } catch (smsError) {
-        console.error(`[RentalsService] D-1 반납 안내 SMS 실패 (rental #${rental.id}):`, smsError.message);
+        console.error(
+          `[RentalsService] D-1 반납 안내 SMS 실패 (rental #${rental.id}):`,
+          smsError.message,
+        );
       }
     }
   }

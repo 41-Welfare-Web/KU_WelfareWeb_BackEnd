@@ -79,7 +79,11 @@ export class RegisterDto {
   @IsIn(DEPARTMENT_TYPES, { message: '유효하지 않은 소속 유형입니다.' })
   departmentType: string;
 
-  @ApiProperty({ example: '컴퓨터공학과', description: '소속 단위명 (총학생회 제외 필수)', required: false })
+  @ApiProperty({
+    example: '컴퓨터공학과',
+    description: '소속 단위명 (총학생회 제외 필수)',
+    required: false,
+  })
   @ValidateIf((o) => o.departmentType !== '총학생회')
   @IsString()
   @IsNotEmpty({ message: '소속 단위명을 입력해주세요.' })

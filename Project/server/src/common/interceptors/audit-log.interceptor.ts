@@ -34,7 +34,10 @@ export class AuditLogInterceptor implements NestInterceptor {
               },
             });
           } catch (error) {
-            console.error('[AuditLogInterceptor] Failed to save audit log:', error);
+            console.error(
+              '[AuditLogInterceptor] Failed to save audit log:',
+              error,
+            );
           }
         }
       }),

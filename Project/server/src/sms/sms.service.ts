@@ -52,7 +52,7 @@ export class SmsService {
     } catch (error) {
       console.error('[SmsService] Solapi Send Failed:', error);
       throw new InternalServerErrorException(
-        `문자 발송 실패: ${error.message || 'Unknown Error'}`, 
+        `문자 발송 실패: ${error.message || 'Unknown Error'}`,
       );
     }
   }
@@ -85,7 +85,7 @@ export class SmsService {
     if (memo) {
       message += `\n사유/메모: ${memo}`;
     }
-    
+
     return this.sendSMS(receiver, message);
   }
 

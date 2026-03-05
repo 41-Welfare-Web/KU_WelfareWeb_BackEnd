@@ -37,10 +37,17 @@ export class UsersService {
 
   // 2. 내 정보 수정
   async updateMe(userId: string, updateUserDto: UpdateUserDto) {
-    const { currentPassword, newPassword, phoneNumber, departmentType, departmentName } =
-      updateUserDto;
+    const {
+      currentPassword,
+      newPassword,
+      phoneNumber,
+      departmentType,
+      departmentName,
+    } = updateUserDto;
 
-    const user = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
+    });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
     if (newPassword) {
@@ -96,7 +103,9 @@ export class UsersService {
   // 3. 회원 탈퇴 (Soft Delete)
   async deleteMe(userId: string, deleteUserDto: DeleteUserDto) {
     const { password } = deleteUserDto;
-    const user = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
+    });
 
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
@@ -184,7 +193,9 @@ export class UsersService {
       throw new BadRequestException('유효하지 않은 역할입니다.');
     }
 
-    const user = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
+    });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
     const updated = await this.prisma.user.update({

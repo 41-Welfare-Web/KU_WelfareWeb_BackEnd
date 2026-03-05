@@ -25,7 +25,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ThrottlerModule.forRoot([
       {
         ttl: 60000, // 60 seconds (milliseconds)
-        limit: 60,  // 60 requests per ttl
+        limit: 60, // 60 requests per ttl
       },
     ]),
     ScheduleModule.forRoot(),

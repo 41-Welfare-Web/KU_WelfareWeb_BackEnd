@@ -16,7 +16,13 @@ import { Roles } from '../auth/roles.decorator';
 import { Role } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesService } from '../common/files.service';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiBody,
+} from '@nestjs/swagger';
 
 @ApiTags('관리자 전용 (Admin)')
 @ApiBearerAuth()

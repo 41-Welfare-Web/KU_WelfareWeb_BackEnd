@@ -1,4 +1,10 @@
-import { IsInt, IsOptional, IsDateString, Min, ValidateIf } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsDateString,
+  Min,
+  ValidateIf,
+} from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateCartItemDto {
