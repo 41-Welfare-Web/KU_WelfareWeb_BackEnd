@@ -14,6 +14,7 @@
 
 **2. 사용자 (Users)**
 *   `GET /api/users/me` (내 정보 조회)
+*   `GET /api/users/me/dashboard` (내 대시보드 요약 조회 - FR-33)
 *   `PUT /api/users/me` (내 정보 수정)
 *   `DELETE /api/users/me` (회원 탈퇴 - 소프트 삭제)
 *   `GET /api/users` (전체 사용자 목록 조회 - **Admin** )
@@ -22,11 +23,16 @@
 **3. 물품 (Items & Categories)**
 *   `GET /api/items` (물품 목록 조회)
 *   `GET /api/items/{itemId}` (물품 상세 조회)
+*   `GET /api/items/{itemId}/availability` (물품 날짜별 재고 조회 - 캘린더용, FR-32)
 *   `POST /api/items` (물품 생성 - **Admin**)
 *   `PUT /api/items/{itemId}` (물품 수정 - **Admin**)
 *   `DELETE /api/items/{itemId}` (물품 삭제 - 소프트 삭제 - **Admin**)
-*   `POST /api/items/{itemId}/components` (세트 구성품 추가 - **Admin**)
-*   `DELETE /api/items/{itemId}/components/{componentId}` (세트 구성품 삭제 - **Admin**)
+*   `GET /api/items/{itemId}/instances` (개별 실물 목록 조회 - **Admin**, FR-34)
+*   `POST /api/items/{itemId}/instances` (개별 실물 등록 - **Admin**, FR-34)
+*   `PUT /api/items/instances/{instanceId}` (개별 실물 상태 수정 - **Admin**, FR-34)
+*   `DELETE /api/items/instances/{instanceId}` (개별 실물 삭제 - 소프트 삭제 - **Admin**, FR-34)
+*   `POST /api/items/{itemId}/components` (세트 구성품 추가 - **Admin**, FR-36)
+*   `DELETE /api/items/{itemId}/components/{componentId}` (세트 구성품 삭제 - **Admin**, FR-36)
 *   `GET /api/categories` (카테고리 목록 조회)
 *   `POST /api/categories` (카테고리 생성 - **Admin**)
 *   `PUT /api/categories/{categoryId}` (카테고리 수정 - **Admin**)
@@ -57,16 +63,10 @@
 *   `GET /api/admin/configurations` (시스템 설정 목록 조회 - **Admin**)
 *   `PUT /api/admin/configurations` (시스템 설정 수정 - **Admin**)
 
-**7. 신규 추가 API (v1.3)**
-*   `GET /api/common/health` (시스템 헬스체크 및 서비스 진단)
+**7. 공통 (Common)**
+*   `GET /api/common/health` (시스템 헬스체크 및 서비스 진단 - FR-37)
 *   `GET /api/common/metadata` (공통 메타데이터 조회 - 소속 리스트, 가격 등)
-*   `GET /api/items/{itemId}/availability` (물품 날짜별 재고 조회 - 캘린더용)
-*   `GET /api/users/me/dashboard` (내 대시보드 요약 조회)
-*   `GET /api/items/{itemId}/instances` (개별 실물 목록 조회 - **Admin**)
-*   `POST /api/items/{itemId}/instances` (개별 실물 등록 - **Admin**)
-*   `PUT /api/items/instances/{instanceId}` (개별 실물 상태 수정 - **Admin**)
-*   `DELETE /api/items/instances/{instanceId}` (개별 실물 삭제 - 소프트 삭제 - **Admin**)
-*   `POST /api/common/upload` (공용 이미지 업로드)
+*   `POST /api/common/upload` (공용 이미지 업로드 - **Auth**, FR-35)
 
 **8. 장바구니 (Cart)**
 *   `GET /api/cart` (내 장바구니 조회 - FR-12, FR-13)
