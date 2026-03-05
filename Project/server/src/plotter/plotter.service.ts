@@ -284,12 +284,16 @@ export class PlotterService {
       },
     });
 
-    await this.smsService.sendPlotterStatusNotice(
-      updated.user.phoneNumber,
-      updated.user.name,
-      status,
-      rejectionReason,
-    );
+    try {
+      await this.smsService.sendPlotterStatusNotice(
+        updated.user.phoneNumber,
+        updated.user.name,
+        status,
+        rejectionReason,
+      );
+    } catch (smsError) {
+      console.error('[PlotterService] 상태 변경 SMS 알림 실패 (무시):', smsError.message);
+    }
 
     return updated;
   }
