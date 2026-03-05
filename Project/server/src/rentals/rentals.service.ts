@@ -28,6 +28,14 @@ export class RentalsService {
 
   // 1. 대여 예약 생성 (날짜별 그룹핑 → 다중 rental 생성)
   async create(userId: string, createRentalDto: CreateRentalDto, actorId?: string) {
+    // 대상 사용자 존재 확인
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
+    });
+    if (!user) {
+      throw new NotFoundException('대상 사용자를 찾을 수 없습니다.');
+    }
+
     const { items, departmentType, departmentName } = createRentalDto;
     const actualActorId = actorId || userId;
 
