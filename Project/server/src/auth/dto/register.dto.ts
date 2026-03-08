@@ -12,6 +12,10 @@ import { ApiProperty } from '@nestjs/swagger';
 export const DEPARTMENT_TYPES = [
   '총학생회',
   '중앙자치기구',
+  '단과대 학생회',
+  '학과 학생회',
+  '중앙동아리',
+  '과동아리',
   '문과대학',
   '이과대학',
   '공과대학',
@@ -25,9 +29,6 @@ export const DEPARTMENT_TYPES = [
   '수의과대학',
   '상허교양대학',
   '예술디자인대학',
-  '중앙동아리',
-  '단과대동아리',
-  '학과동아리',
   '기타',
 ] as const;
 
