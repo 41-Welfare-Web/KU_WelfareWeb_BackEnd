@@ -77,9 +77,9 @@ export class CommonController {
     );
 
     // 2. 2D 배열을 파싱하여 새로운 구조에 맞게 데이터를 가공
-    const collegeOptions = [];
-    const departmentOptions = [];
-    const centralAutonomousOptions = [];
+    const collegeOptions: string[] = [];
+    const departmentOptions: string[] = [];
+    const centralAutonomousOptions: string[] = [];
 
     original2DArray.forEach((arr) => {
       if (!arr || arr.length === 0) return;
