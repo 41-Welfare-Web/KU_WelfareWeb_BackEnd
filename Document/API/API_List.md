@@ -65,7 +65,7 @@
 
 **7. 공통 (Common)**
 *   `GET /api/common/health` (시스템 헬스체크 및 서비스 진단 - FR-37)
-*   `GET /api/common/metadata` (공통 메타데이터 조회 - 소속 리스트, 가격 등)
+*   `GET /api/common/metadata` (공통 메타데이터 조회 - 소속/가격 등 UI 구성용)
 *   `POST /api/common/upload` (공용 이미지 업로드 - **Auth**, FR-35)
 
 **8. 장바구니 (Cart)**
