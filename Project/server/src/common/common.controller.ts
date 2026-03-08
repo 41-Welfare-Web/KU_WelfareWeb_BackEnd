@@ -55,27 +55,90 @@ export class CommonController {
   @Get('metadata')
   @ApiOperation({ summary: '공통 메타데이터 조회 (소속 리스트, 무료 목적 등)' })
   async getMetadata() {
+    // 1. DB에서 원래 방식대로 2D 배열 데이터를 가져옴
     const typeString = await this.configService.getValue(
       'plotter_departments_list',
       '',
     );
     const types = typeString ? typeString.split(',').map((t) => t.trim()) : [];
 
-    // 각 유형별로 세부 목록을 조회하여 이차원 배열 생성
-    // value의 0번째가 분류명, 이후가 하위 항목. 단일 항목은 dept_list_ 키 없이 [type]만 반환
-    const departments2D = await Promise.all(
+    const original2DArray = await Promise.all(
       types.map(async (type) => {
+        if (!type) return [];
         const namesString = await this.configService.getValue(
           `dept_list_${type}`,
           '',
         );
-        const names = namesString
+        // dept_list_{type}에 값이 있으면 그걸 쓰고, 없으면 type 자체를 배열에 담아 반환
+        return namesString
           ? namesString.split(',').map((n) => n.trim())
-          : [];
-        return names.length > 0 ? names : [type];
+          : [type];
       }),
     );
 
+    // 2. 2D 배열을 파싱하여 새로운 구조에 맞게 데이터를 가공
+    const collegeOptions = [];
+    const departmentOptions = [];
+    const centralAutonomousOptions = [];
+
+    original2DArray.forEach((arr) => {
+      if (!arr || arr.length === 0) return;
+
+      const mainCategory = arr[0];
+      const subCategories = arr.slice(1);
+
+      if (mainCategory === '총학생회') {
+        centralAutonomousOptions.push(mainCategory);
+      } else if (mainCategory === '중앙자치기구') {
+        centralAutonomousOptions.push(...subCategories);
+      } else if (
+        subCategories.length > 0 &&
+        (mainCategory.endsWith('대학') ||
+          mainCategory.endsWith('과학원') ||
+          mainCategory.endsWith('기술원'))
+      ) {
+        collegeOptions.push(mainCategory);
+        departmentOptions.push(...subCategories);
+      } else if (
+        subCategories.length === 0 &&
+        (mainCategory.endsWith('대학') ||
+          mainCategory.endsWith('과학원') ||
+          mainCategory.endsWith('기술원'))
+      ) {
+        collegeOptions.push(mainCategory);
+      }
+    });
+
+    // 3. 최종적인 새로운 소속 목록 구조 정의
+    const departments = [
+      {
+        category: '단과대 학생회',
+        requiresInput: false,
+        options: collegeOptions.map((c) => `${c} 학생회`),
+      },
+      {
+        category: '학과 학생회',
+        requiresInput: false,
+        options: departmentOptions.map((d) => `${d} 학생회`),
+      },
+      {
+        category: '중앙자치기구',
+        requiresInput: false,
+        options: centralAutonomousOptions,
+      },
+      {
+        category: '중앙동아리',
+        requiresInput: true,
+        placeholder: '동아리 이름을 입력하세요',
+      },
+      {
+        category: '과동아리',
+        requiresInput: true,
+        placeholder: '동아리 이름을 입력하세요',
+      },
+    ];
+
+    // 4. 기타 메타데이터 조회
     const purposes = await this.configService.getValue('plotter_purposes', '');
     const freePurposes = await this.configService.getValue(
       'plotter_free_purposes',
@@ -85,7 +148,7 @@ export class CommonController {
     const priceA1 = await this.configService.getValue('plotter_price_a1', '0');
 
     return {
-      departments: departments2D,
+      departments: departments,
       purposes: purposes ? purposes.split(',').map((p) => p.trim()) : [],
       freePurposes: freePurposes
         ? freePurposes.split(',').map((p) => p.trim())
