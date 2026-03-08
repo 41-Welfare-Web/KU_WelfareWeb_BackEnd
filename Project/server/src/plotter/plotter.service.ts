@@ -74,8 +74,13 @@ export class PlotterService {
 
     // 2. 가격 및 목적 설정 조회
     const purposesStr = await this.configService.getValue('plotter_purposes', '');
-    const freePurposesStr = await this.configService.getValue('plotter_free_purposes', '');
-    const freeDeptsStr = await this.configService.getValue('plotter_free_departments', '학과 학생회, 단과대 학생회, 중앙자치기구');
+    const freePurposesStr = await this.configService.getValue('plotter_free_purposes', '예산안 출력, 회칙 인쇄, 행사 홍보');
+    
+    // 공식 무료 대상 소속 리스트 (MetaData API의 category 및 options 명칭 기준)
+    const freeDeptsStr = await this.configService.getValue(
+      'plotter_free_departments', 
+      '학과 학생회, 단과대 학생회, 중앙자치기구, 중앙동아리, 총학생회'
+    );
     
     const priceA0 = await this.configService.getValue('plotter_price_a0', '2000');
     const priceA1 = await this.configService.getValue('plotter_price_a1', '1500');
@@ -101,6 +106,7 @@ export class PlotterService {
     });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
+    // DTO에 소속 유형이 있으면 그것을 쓰고(프론트엔드 선택값), 없으면 DB의 사용자 기본 소속 사용
     const departmentType = dtoDeptType || user.departmentType;
 
     // 중앙 집중화된 메타데이터를 사용하여 가격 및 무료 조건 판정
@@ -110,11 +116,17 @@ export class PlotterService {
     let totalPrice = unitPrice * Number(pageCount);
 
     // MetaData API에서 내려주는 값과 100% 동일한 기준으로 검증
-    const isFreeDept = metadata.freeDepartments.includes(departmentType.trim());
+    // 1. 소속 검증: 입력된 소속명이 무료 대상 소속 리스트(학과 학생회 등)에 포함되는지 확인
+    const isFreeDept = metadata.freeDepartments.some(freeDept => 
+      departmentType.trim() === freeDept || departmentType.trim().includes(freeDept)
+    );
+
+    // 2. 목적 검증: 입력된 목적이 무료 목적 리스트에 정확히 포함되는지 확인
     const isFreePurpose = metadata.freePurposes.includes(purpose.trim());
 
     let message = `인쇄 비용은 총 ${totalPrice.toLocaleString()}원입니다.`;
     
+    // 최종 무료 판정: 소속과 목적이 모두 무료 조건(MetaData)에 부합해야 함
     if (isFreeDept && isFreePurpose) {
       totalPrice = 0;
       message = `[무료 대상] '${departmentType}' 소속 및 '${purpose}' 목적은 무료 인쇄 지원 대상입니다.`;
