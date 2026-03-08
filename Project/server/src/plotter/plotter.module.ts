@@ -10,5 +10,6 @@ import { SmsModule } from '../sms/sms.module';
   imports: [ConfigurationsModule, HolidaysModule, SmsModule],
   controllers: [PlotterController],
   providers: [PlotterService, FilesService],
+  exports: [PlotterService],
 })
 export class PlotterModule {}

@@ -110,4 +110,63 @@ describe('PlotterService', () => {
     const result = await service.create('user-id', dto, realPdf, undefined);
     expect(result).toBeDefined();
   });
+
+  describe('calculateEstimatedPrice', () => {
+    it('should identify as free if the provided departmentType is a free target, even if user default is not', async () => {
+      // Mocking user: default is '학과' (Paid)
+      const mockUser = { id: 'user-id', departmentType: '학과' };
+      const prisma = (service as any).prisma;
+      prisma.user.findFirst.mockResolvedValue(mockUser);
+
+      // Mocking configurations: '자치기구' is free
+      const config = (service as any).configService;
+      config.getValue.mockImplementation(async (key: string) => {
+        if (key === 'plotter_free_departments') return '자치기구, 중앙동아리';
+        if (key === 'plotter_free_purposes') return '예산안 출력';
+        if (key === 'plotter_price_a0') return '5000';
+        return '0';
+      });
+
+      // Case: User selects '자치기구' (Free) and '예산안 출력' (Free)
+      const dto = {
+        purpose: '예산안 출력',
+        paperSize: 'A0',
+        pageCount: 1,
+        departmentType: '자치기구',
+      };
+
+      const result = await service.calculateEstimatedPrice(dto, 'user-id');
+      expect(result.isFree).toBe(true);
+      expect(result.price).toBe(0);
+      expect(result.message).toContain('무료 인쇄 대상입니다.');
+    });
+
+    it('should identify as paid if the provided departmentType is not a free target, even if user default is', async () => {
+      // Mocking user: default is '자치기구' (Free)
+      const mockUser = { id: 'user-id', departmentType: '자치기구' };
+      const prisma = (service as any).prisma;
+      prisma.user.findFirst.mockResolvedValue(mockUser);
+
+      const config = (service as any).configService;
+      config.getValue.mockImplementation(async (key: string) => {
+        if (key === 'plotter_free_departments') return '자치기구, 중앙동아리';
+        if (key === 'plotter_free_purposes') return '예산안 출력';
+        if (key === 'plotter_price_a0') return '5000';
+        return '0';
+      });
+
+      // Case: User selects '학과' (Paid) although they are originally '자치기구'
+      const dto = {
+        purpose: '예산안 출력',
+        paperSize: 'A0',
+        pageCount: 1,
+        departmentType: '학과',
+      };
+
+      const result = await service.calculateEstimatedPrice(dto, 'user-id');
+      expect(result.isFree).toBe(false);
+      expect(result.price).toBe(5000);
+      expect(result.message).toContain('인쇄 비용은 총 5,000원입니다.');
+    });
+  });
 });

@@ -23,6 +23,75 @@ export class PlotterService {
     private smsService: SmsService,
   ) {}
 
+  // 플로터 관련 메타데이터 조회 (MetaData API와 검증 로직에서 공통 사용)
+  async getMetadata() {
+    // 1. 소속 목록 파싱 로직
+    const typeString = await this.configService.getValue('plotter_departments_list', '');
+    const types = typeString ? typeString.split(',').map((t) => t.trim()) : [];
+
+    const original2DArray = await Promise.all(
+      types.map(async (type) => {
+        if (!type) return [];
+        const namesString = await this.configService.getValue(`dept_list_${type}`, '');
+        return namesString ? namesString.split(',').map((n) => n.trim()) : [type];
+      }),
+    );
+
+    const collegeOptions: string[] = [];
+    const departmentOptions: string[] = [];
+    const centralAutonomousOptions: string[] = [];
+
+    original2DArray.forEach((arr) => {
+      if (!arr || arr.length === 0) return;
+      const mainCategory = arr[0];
+      const subCategories = arr.slice(1);
+
+      if (mainCategory === '총학생회') {
+        centralAutonomousOptions.push(mainCategory);
+      } else if (mainCategory === '중앙자치기구') {
+        centralAutonomousOptions.push(...subCategories);
+      } else if (
+        subCategories.length > 0 &&
+        (mainCategory.endsWith('대학') || mainCategory.endsWith('과학원') || mainCategory.endsWith('기술원'))
+      ) {
+        collegeOptions.push(mainCategory);
+        departmentOptions.push(...subCategories);
+      } else if (
+        subCategories.length === 0 &&
+        (mainCategory.endsWith('대학') || mainCategory.endsWith('과학원') || mainCategory.endsWith('기술원'))
+      ) {
+        collegeOptions.push(mainCategory);
+      }
+    });
+
+    const departments = [
+      { category: '단과대 학생회', requiresInput: false, options: collegeOptions.map((c) => `${c} 학생회`) },
+      { category: '학과 학생회', requiresInput: false, options: departmentOptions.map((d) => `${d} 학생회`) },
+      { category: '중앙자치기구', requiresInput: false, options: centralAutonomousOptions },
+      { category: '중앙동아리', requiresInput: true, placeholder: '동아리 이름을 입력하세요' },
+      { category: '과동아리', requiresInput: true, placeholder: '동아리 이름을 입력하세요' },
+    ];
+
+    // 2. 가격 및 목적 설정 조회
+    const purposesStr = await this.configService.getValue('plotter_purposes', '');
+    const freePurposesStr = await this.configService.getValue('plotter_free_purposes', '');
+    const freeDeptsStr = await this.configService.getValue('plotter_free_departments', '학과 학생회, 단과대 학생회, 중앙자치기구');
+    
+    const priceA0 = await this.configService.getValue('plotter_price_a0', '2000');
+    const priceA1 = await this.configService.getValue('plotter_price_a1', '1500');
+
+    return {
+      departments,
+      purposes: purposesStr ? purposesStr.split(',').map((p) => p.trim()) : [],
+      freePurposes: freePurposesStr ? freePurposesStr.split(',').map((p) => p.trim()) : [],
+      freeDepartments: freeDeptsStr ? freeDeptsStr.split(',').map((d) => d.trim()) : [],
+      prices: {
+        a0: parseInt(priceA0, 10),
+        a1: parseInt(priceA1, 10),
+      },
+    };
+  }
+
   // 가격 및 무료 여부 계산 (공통 로직)
   async calculateEstimatedPrice(dto: PlotterPriceCheckDto, userId: string) {
     const { purpose, paperSize, pageCount, departmentType: dtoDeptType } = dto;
@@ -32,38 +101,25 @@ export class PlotterService {
     });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
-    // DTO에 소속 유형이 있으면 그것을 쓰고, 없으면 DB의 사용자 기본 소속 사용
     const departmentType = dtoDeptType || user.departmentType;
 
-    const unitPriceStr = await this.configService.getValue(
-      `plotter_price_${paperSize.toLowerCase()}`,
-      '0',
-    );
-    const unitPrice = parseInt(unitPriceStr, 10);
+    // 중앙 집중화된 메타데이터를 사용하여 가격 및 무료 조건 판정
+    const metadata = await this.getMetadata();
+
+    const unitPrice = paperSize.toLowerCase() === 'a0' ? metadata.prices.a0 : metadata.prices.a1;
     let totalPrice = unitPrice * Number(pageCount);
 
-    // 무료 조건 체크
-    const freeDeptsStr = await this.configService.getValue(
-      'plotter_free_departments',
-      '',
-    );
-    const freePurposesStr = await this.configService.getValue(
-      'plotter_free_purposes',
-      '',
-    );
-
-    const freeDepts = freeDeptsStr.split(',').map((d) => d.trim());
-    const freePurposes = freePurposesStr.split(',').map((p) => p.trim());
-
-    const isFreeDept = freeDepts.includes(departmentType);
-    const isFreePurpose = freePurposes.includes(purpose);
+    // MetaData API에서 내려주는 값과 100% 동일한 기준으로 검증
+    const isFreeDept = metadata.freeDepartments.includes(departmentType.trim());
+    const isFreePurpose = metadata.freePurposes.includes(purpose.trim());
 
     let message = `인쇄 비용은 총 ${totalPrice.toLocaleString()}원입니다.`;
+    
     if (isFreeDept && isFreePurpose) {
       totalPrice = 0;
-      message = `${departmentType} 소속 및 ${purpose} 목적으로 인해 무료 인쇄 대상입니다.`;
-    } else if (totalPrice > 0) {
-      message += ' 입금 확인증(영수증) 업로드가 필요합니다.';
+      message = `[무료 대상] '${departmentType}' 소속 및 '${purpose}' 목적은 무료 인쇄 지원 대상입니다.`;
+    } else {
+      message += ` (총 ${totalPrice.toLocaleString()}원) 입금 확인증 업로드가 필요합니다.`;
     }
 
     return {

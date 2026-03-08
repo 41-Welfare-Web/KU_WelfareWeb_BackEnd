@@ -6,9 +6,10 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuditLogInterceptor } from './interceptors/audit-log.interceptor';
 import { PrismaModule } from '../prisma/prisma.module';
 import { SmsModule } from '../sms/sms.module';
+import { PlotterModule } from '../plotter/plotter.module';
 
 @Module({
-  imports: [ConfigurationsModule, PrismaModule, SmsModule],
+  imports: [ConfigurationsModule, PrismaModule, SmsModule, PlotterModule],
   providers: [
     FilesService,
     {
