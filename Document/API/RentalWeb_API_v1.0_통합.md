@@ -111,7 +111,7 @@
   "name": "김테스트",
   "studentId": "202412345",
   "phoneNumber": "01012345678",
-  "departmentType": "학과",
+  "departmentType": "학과 학생회",
   "departmentName": "컴퓨터공학과",
   "verificationCode": "123456"
 }
@@ -121,7 +121,7 @@
 * `name`: (string, required) 실제 이름.
 * `studentId`: (string, required) 학번.
 * `phoneNumber`: (string, required) 전화번호. 하이픈 없이 입력.
-* `departmentType`: (string, required) 소속 유형 (총학생회, 학과, 중앙동아리 등).
+* `departmentType`: (string, required) 소속 유형 (총학생회, 학과 학생회, 중앙동아리 등).
 * `departmentName`: (string, optional) 소속 단위명 (예: 컴퓨터공학과). 총학생회 등 일부 유형은 생략 가능.
 * `verificationCode`: (string, required) SMS로 인증받은 6자리 코드. 최종 가입 시 서버에서 한 번 더 검증합니다.
 
@@ -463,7 +463,7 @@
   "name": "김테스트",
   "studentId": "202412345",
   "phoneNumber": "01012345678",
-  "departmentType": "학과",
+  "departmentType": "학과 학생회",
   "departmentName": "컴퓨터공학과",
   "role": "USER",
   "createdAt": "2024-01-01T12:00:00Z"
@@ -494,7 +494,7 @@
   "currentPassword": "password123!",
   "newPassword": "newPassword456!",
   "phoneNumber": "01087654321",
-  "departmentType": "학과",
+  "departmentType": "학과 학생회",
   "departmentName": "총학생회"
 }
 ```
@@ -661,7 +661,7 @@
       "name": "김테스트",
       "studentId": "202412345",
       "phoneNumber": "01012345678",
-      "departmentType": "학과",
+      "departmentType": "학과 학생회",
       "departmentName": "컴퓨터공학과",
       "role": "USER",
       "createdAt": "2024-01-01T12:00:00Z"
@@ -730,7 +730,7 @@
   "name": "김테스트",
   "studentId": "202412345",
   "phoneNumber": "010-1234-5678",
-  "departmentType": "학과",
+  "departmentType": "학과 학생회",
   "departmentName": "컴퓨터공학과",
   "role": "ADMIN",
   "createdAt": "2024-01-01T12:00:00Z"
@@ -1450,7 +1450,7 @@
 
 ```json
 {
-  "departmentType": "학과",
+  "departmentType": "학과 학생회",
   "departmentName": "컴퓨터공학과",
   "items": [
     { "itemId": 1, "quantity": 1, "startDate": "2026-06-02", "endDate": "2026-06-04" },
@@ -1901,7 +1901,7 @@
     {
       "id": 201,
       "user": { "name": "김테스트", "studentId": "202412345" },
-      "departmentType": "학과",
+      "departmentType": "학과 학생회",
       "departmentName": "컴퓨터공학과",
       "purpose": "졸업 작품 포스터",
       "paperSize": "A0",
@@ -2535,6 +2535,17 @@
 {
   "departments": [
     {
+      "category": "중앙자치기구",
+      "requiresInput": false,
+      "options": [
+        "총학생회",
+        "건국문화예술학생연합",
+        "동아리연합회",
+        "졸업준비위원회",
+        "학생복지위원회"
+      ]
+    },
+    {
       "category": "단과대 학생회",
       "requiresInput": false,
       "options": [
@@ -2563,25 +2574,24 @@
       ]
     },
     {
-      "category": "중앙자치기구",
-      "requiresInput": false,
-      "options": [
-        "총학생회",
-        "건국문화예술학생연합",
-        "동아리연합회",
-        "졸업준비위원회",
-        "학생복지위원회"
-      ]
-    },
-    {
       "category": "중앙동아리",
       "requiresInput": true,
       "placeholder": "동아리 이름을 입력하세요"
     },
     {
-      "category": "과동아리",
+      "category": "단과대동아리",
       "requiresInput": true,
       "placeholder": "동아리 이름을 입력하세요"
+    },
+    {
+      "category": "학과동아리",
+      "requiresInput": true,
+      "placeholder": "동아리 이름을 입력하세요"
+    },
+    {
+      "category": "기타",
+      "requiresInput": true,
+      "placeholder": "소속명을 직접 입력하세요"
     }
   ],
   "purposes": ["회칙 명시 사항 인쇄(예산안 등)", "학과 행사 목적", "동아리 홍보물", "기타"],
