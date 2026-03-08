@@ -1,5 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import coolsms from 'coolsms-node-sdk';
+import { ConfigurationsService } from '../configurations/configurations.service';
 
 @Injectable()
 export class SmsService {
@@ -7,7 +8,7 @@ export class SmsService {
   private senderNumber: string;
   private isMock: boolean;
 
-  constructor() {
+  constructor(private configService: ConfigurationsService) {
     const apiKey = process.env.SOLAPI_API_KEY;
     const apiSecret = process.env.SOLAPI_API_SECRET;
     this.senderNumber = process.env.SOLAPI_SENDER_NUMBER || '';
@@ -29,8 +30,18 @@ export class SmsService {
    * SMS 발송 (단문)
    * @param receiver 수신자 전화번호 (하이픈 없이 숫자만)
    * @param message 내용
+   * @param ignoreConfig 설정값(sms_notifications_enabled) 무시 여부 (인증번호 등 필수 발송용)
    */
-  async sendSMS(receiver: string, message: string): Promise<boolean> {
+  async sendSMS(receiver: string, message: string, ignoreConfig = false): Promise<boolean> {
+    // 1. 설정 확인 (필수 발송이 아닌 경우에만)
+    if (!ignoreConfig) {
+      const smsEnabled = await this.configService.getValue('sms_notifications_enabled', 'true');
+      if (smsEnabled !== 'true') {
+        console.log(`[SmsService] SMS Notifications are DISABLED. Skipping message to ${receiver}`);
+        return true;
+      }
+    }
+
     if (this.isMock) {
       console.log(`
 [MOCK SMS (Solapi)] To: ${receiver} | Msg: ${message}
@@ -58,11 +69,11 @@ export class SmsService {
   }
 
   /**
-   * 인증번호 발송 편의 메소드
+   * 인증번호 발송 편의 메소드 (인증번호는 항상 발송되어야 하므로 ignoreConfig=true)
    */
   async sendVerificationCode(receiver: string, code: string): Promise<boolean> {
     const message = `[RentalWeb] 인증번호는 [${code}] 입니다. 5분 내에 입력해주세요.`;
-    return this.sendSMS(receiver, message);
+    return this.sendSMS(receiver, message, true);
   }
 
   /**

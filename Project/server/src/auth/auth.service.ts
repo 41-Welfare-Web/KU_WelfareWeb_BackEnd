@@ -297,6 +297,7 @@ export class AuthService {
         await this.smsService.sendSMS(
           phoneNumber,
           `[RentalWeb] 회원님의 아이디는 [${user.username}] 입니다.`,
+          true, // 아이디 찾기는 필수 기능이므로 설정 무시하고 발송
         );
       } catch (smsError) {
         console.error(

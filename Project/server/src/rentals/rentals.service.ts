@@ -243,20 +243,17 @@ export class RentalsService {
 
       // SMS 알림은 트랜잭션 밖에서 best-effort로 발송
       try {
-        const smsEnabled = await this.configService.getValue('sms_notifications_enabled', 'true');
-        if (smsEnabled === 'true') {
-          const itemSummary =
-            rental.rentalItems.length > 0
-              ? `${rental.rentalItems[0].item.name} 외 ${rental.rentalItems.length - 1}건`
-              : '물품 없음';
+        const itemSummary =
+          rental.rentalItems.length > 1
+            ? `${rental.rentalItems[0].item.name} 외 ${rental.rentalItems.length - 1}건`
+            : rental.rentalItems[0]?.item.name || '물품 없음';
 
-          await this.smsService.sendRentalStatusNotice(
-            rental.user.phoneNumber,
-            rental.user.name,
-            itemSummary,
-            RentalStatus.RESERVED,
-          );
-        }
+        await this.smsService.sendRentalStatusNotice(
+          rental.user.phoneNumber,
+          rental.user.name,
+          itemSummary,
+          RentalStatus.RESERVED,
+        );
       } catch (smsError) {
         console.error(
           '[RentalsService] 예약 생성 SMS 알림 실패 (무시):',
@@ -422,16 +419,13 @@ export class RentalsService {
         : '물품 없음';
 
     try {
-      const smsEnabled = await this.configService.getValue('sms_notifications_enabled', 'true');
-      if (smsEnabled === 'true') {
-        await this.smsService.sendRentalStatusNotice(
-          rental.user.phoneNumber,
-          rental.user.name,
-          itemSummary,
-          RentalStatus.CANCELED,
-          '사용자 직접 취소',
-        );
-      }
+      await this.smsService.sendRentalStatusNotice(
+        rental.user.phoneNumber,
+        rental.user.name,
+        itemSummary,
+        RentalStatus.CANCELED,
+        '사용자 직접 취소',
+      );
     } catch (smsError) {
       console.error(
         '[RentalsService] 예약 취소 SMS 알림 실패 (무시):',
@@ -752,13 +746,10 @@ export class RentalsService {
           : '물품 없음';
 
       try {
-        const smsEnabled = await this.configService.getValue('sms_notifications_enabled', 'true');
-        if (smsEnabled === 'true') {
-          await this.smsService.sendSMS(
-            rental.user.phoneNumber,
-            `[RentalWeb] ${rental.user.name}님, [${itemSummary}]의 반납 기한이 지났습니다. 현재 연체 상태이오니 즉시 반납 부탁드립니다.`,
-          );
-        }
+        await this.smsService.sendSMS(
+          rental.user.phoneNumber,
+          `[RentalWeb] ${rental.user.name}님, [${itemSummary}]의 반납 기한이 지났습니다. 현재 연체 상태이오니 즉시 반납 부탁드립니다.`,
+        );
       } catch (smsError) {
         console.error(
           `[RentalsService] 연체 SMS 발송 실패 (rental #${rental.id}):`,
@@ -808,15 +799,12 @@ export class RentalsService {
       const dueDateStr = rental.endDate.toISOString().split('T')[0];
 
       try {
-        const smsEnabled = await this.configService.getValue('sms_notifications_enabled', 'true');
-        if (smsEnabled === 'true') {
-          await this.smsService.sendReturnReminder(
-            rental.user.phoneNumber,
-            rental.user.name,
-            itemSummary,
-            dueDateStr,
-          );
-        }
+        await this.smsService.sendReturnReminder(
+          rental.user.phoneNumber,
+          rental.user.name,
+          itemSummary,
+          dueDateStr,
+        );
       } catch (smsError) {
         console.error(
           `[RentalsService] D-1 반납 안내 SMS 실패 (rental #${rental.id}):`,

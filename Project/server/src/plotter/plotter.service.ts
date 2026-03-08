@@ -395,15 +395,12 @@ export class PlotterService {
     });
 
     try {
-      const smsEnabled = await this.configService.getValue('sms_notifications_enabled', 'true');
-      if (smsEnabled === 'true') {
-        await this.smsService.sendPlotterStatusNotice(
-          updated.user.phoneNumber,
-          updated.user.name,
-          status,
-          rejectionReason,
-        );
-      }
+      await this.smsService.sendPlotterStatusNotice(
+        updated.user.phoneNumber,
+        updated.user.name,
+        status,
+        rejectionReason,
+      );
     } catch (smsError) {
       console.error(
         '[PlotterService] 상태 변경 SMS 알림 실패 (무시):',
