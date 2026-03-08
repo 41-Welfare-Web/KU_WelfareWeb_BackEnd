@@ -69,7 +69,8 @@ export class PlotterService {
       { category: '학과 학생회', requiresInput: false, options: departmentOptions.map((d) => `${d} 학생회`) },
       { category: '중앙자치기구', requiresInput: false, options: centralAutonomousOptions },
       { category: '중앙동아리', requiresInput: true, placeholder: '동아리 이름을 입력하세요' },
-      { category: '과동아리', requiresInput: true, placeholder: '동아리 이름을 입력하세요' },
+      { category: '단과대동아리', requiresInput: true, placeholder: '동아리 이름을 입력하세요' },
+      { category: '학과동아리', requiresInput: true, placeholder: '동아리 이름을 입력하세요' },
     ];
 
     // 2. 가격 및 목적 설정 조회
