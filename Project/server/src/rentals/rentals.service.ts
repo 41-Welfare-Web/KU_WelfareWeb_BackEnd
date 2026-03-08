@@ -161,17 +161,34 @@ export class RentalsService {
                 ],
               },
             },
-            select: { quantity: true },
+            include: {
+              rental: { select: { startDate: true, endDate: true } },
+            },
           });
 
-          const reservedQty = overlappingRentals.reduce(
-            (sum, r) => sum + r.quantity,
-            0,
-          );
+          // 날짜별로 최대 예약 수량 계산
+          let maxReservedInPeriod = 0;
+          const curr = new Date(start);
+          while (curr <= end) {
+            const dateStr = curr.toISOString().split('T')[0];
+            const reservedOnDay = overlappingRentals.reduce((sum, r) => {
+              const rStart = new Date(r.rental.startDate).toISOString().split('T')[0];
+              const rEnd = new Date(r.rental.endDate).toISOString().split('T')[0];
+              if (dateStr >= rStart && dateStr <= rEnd) {
+                return sum + r.quantity;
+              }
+              return sum;
+            }, 0);
 
-          if (totalQty - reservedQty < finalItem.quantity) {
+            if (reservedOnDay > maxReservedInPeriod) {
+              maxReservedInPeriod = reservedOnDay;
+            }
+            curr.setDate(curr.getDate() + 1);
+          }
+
+          if (totalQty - maxReservedInPeriod < finalItem.quantity) {
             throw new ConflictException(
-              `'${item.name}'의 재고가 부족합니다. (남은 수량: ${totalQty - reservedQty})`,
+              `'${item.name}'의 재고가 부족합니다. (가용 재고: ${totalQty - maxReservedInPeriod})`,
             );
           }
         }
@@ -601,17 +618,34 @@ export class RentalsService {
                 ],
               },
             },
-            select: { quantity: true },
+            include: {
+              rental: { select: { startDate: true, endDate: true } },
+            },
           });
 
-          const otherReservedQty = overlappingRentals.reduce(
-            (sum, r) => sum + r.quantity,
-            0,
-          );
+          // 날짜별로 최대 예약 수량 계산
+          let maxOtherReserved = 0;
+          const curr = new Date(start);
+          while (curr <= end) {
+            const dateStr = curr.toISOString().split('T')[0];
+            const reservedOnDay = overlappingRentals.reduce((sum, r) => {
+              const rStart = new Date(r.rental.startDate).toISOString().split('T')[0];
+              const rEnd = new Date(r.rental.endDate).toISOString().split('T')[0];
+              if (dateStr >= rStart && dateStr <= rEnd) {
+                return sum + r.quantity;
+              }
+              return sum;
+            }, 0);
 
-          if (totalQty - otherReservedQty < reqItem.quantity) {
+            if (reservedOnDay > maxOtherReserved) {
+              maxOtherReserved = reservedOnDay;
+            }
+            curr.setDate(curr.getDate() + 1);
+          }
+
+          if (totalQty - maxOtherReserved < reqItem.quantity) {
             throw new ConflictException(
-              `'${item.name}'의 재고가 부족합니다. (가용: ${totalQty - otherReservedQty})`,
+              `'${item.name}'의 재고가 부족합니다. (가용: ${totalQty - maxOtherReserved})`,
             );
           }
         }

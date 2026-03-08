@@ -38,6 +38,14 @@ export class CreatePlotterOrderDto {
   @IsInt()
   @IsNotEmpty()
   pageCount: number;
+
+  @ApiProperty({
+    example: '2026-03-15',
+    description: '수령 희망 일자 (YYYY-MM-DD)',
+  })
+  @IsString()
+  @IsNotEmpty()
+  pickupDate: string;
 }
 
 export class CreatePlotterOrderWithFilesDto extends CreatePlotterOrderDto {

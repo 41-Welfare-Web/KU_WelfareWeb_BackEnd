@@ -95,8 +95,14 @@ export class PlotterService {
       );
     }
 
-    const { purpose, paperSize, pageCount, departmentType, departmentName } =
-      createOrderDto;
+    const {
+      purpose,
+      paperSize,
+      pageCount,
+      departmentType,
+      departmentName,
+      pickupDate: requestedPickupDate,
+    } = createOrderDto;
 
     // 3. 가격 계산 및 유/무료 판별 로직 호출 (user 조회 포함)
     const { price: totalPrice } = await this.calculateEstimatedPrice(
@@ -128,18 +134,32 @@ export class PlotterService {
       ? await this.filesService.uploadFile(receiptFile, 'plotter/receipts')
       : null;
 
-    // 근무일 수령 예정일 계산 (Config 활용)
+    // 근무일 최소 수령 가능일 계산 (Config 활용)
     const delayDaysStr = await this.configService.getValue(
       'plotter_pickup_delay_days',
       '2',
     );
     const delayDays = parseInt(delayDaysStr, 10);
-
-    // 영업일 기준 수령일 계산
-    const pickupDate = await this.holidaysService.calculateBusinessDate(
+    const minPickupDate = await this.holidaysService.calculateBusinessDate(
       new Date(),
       delayDays,
     );
+
+    const pickupDate = new Date(requestedPickupDate);
+    pickupDate.setHours(0, 0, 0, 0);
+
+    if (pickupDate < minPickupDate) {
+      const minDateStr = minPickupDate.toISOString().split('T')[0];
+      throw new BadRequestException(
+        `수령 희망 일자가 너무 빠릅니다. 최소 ${delayDays}영업일 이후인 ${minDateStr}부터 가능합니다.`,
+      );
+    }
+
+    if (await this.holidaysService.isHoliday(pickupDate)) {
+      throw new BadRequestException(
+        '수령 희망 일자가 휴무일(주말 포함)입니다. 다른 날짜를 선택해주세요.',
+      );
+    }
 
     const order = await this.prisma.plotterOrder.create({
       data: {
