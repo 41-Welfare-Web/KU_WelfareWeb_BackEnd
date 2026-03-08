@@ -134,7 +134,7 @@
 | `file_url` | `text` | 업로드한 PDF 파일 URL | Not Null |
 | `original_filename` | `varchar(255)` | 원본 파일명 | |
 | `file_size` | `integer` | 파일 크기 (bytes) | |
-| `pickup_date` | `date` | 수령 예정일 | Not Null |
+| `pickup_date` | `date` | 수령 희망일 (사용자 선택) | Not Null |
 | `status` | `varchar(20)` | 주문 상태 ('PENDING', 'CONFIRMED', 'PRINTED', 'REJECTED', 'COMPLETED') | Not Null, Default: 'PENDING' |
 | `rejection_reason` | `text` | 반려 사유 | |
 | `deleted_at` | `timestampz` | 소프트 삭제 시간 (NULL = 정상) | Nullable |

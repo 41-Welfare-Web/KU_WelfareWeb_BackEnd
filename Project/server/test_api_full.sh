@@ -859,6 +859,7 @@ STATUS=$(curl -s -o "$RESP_FILE" -w '%{http_code}' -X POST \
   -F "purpose=</tmp/f_purpose.txt" \
   -F "paperSize=A0" \
   -F "pageCount=1" \
+  -F "pickupDate=$FUTURE_END" \
   -F "pdfFile=@$TEMP_PDF" \
   "$BASE_URL/plotter/orders" 2>/dev/null || echo "000")
 BODY=$(cat "$RESP_FILE" 2>/dev/null || echo "")
@@ -885,6 +886,7 @@ STATUS=$(curl -s -o "$RESP_FILE" -w '%{http_code}' -X POST \
   -F "purpose=</tmp/f_purpose.txt" \
   -F "paperSize=A1" \
   -F "pageCount=1" \
+  -F "pickupDate=$FUTURE_END" \
   -F "pdfFile=@$TEMP_PDF" \
   "$BASE_URL/plotter/orders" 2>/dev/null || echo "000")
 BODY=$(cat "$RESP_FILE" 2>/dev/null || echo "")
@@ -923,6 +925,7 @@ STATUS=$(curl -s -o "$RESP_FILE" -w '%{http_code}' -X POST \
   -F "purpose=</tmp/f_purpose.txt" \
   -F "paperSize=A0" \
   -F "pageCount=1" \
+  -F "pickupDate=$FUTURE_END" \
   -F "pdfFile=@$TEMP_PDF" \
   "$BASE_URL/plotter/orders" 2>/dev/null || echo "000")
 BODY=$(cat "$RESP_FILE" 2>/dev/null || echo "")

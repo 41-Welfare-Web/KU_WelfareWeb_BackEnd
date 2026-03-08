@@ -1818,7 +1818,8 @@
 | `departmentName` | `string` | 선택 | 신청 시 소속 단위명 |
 | `purpose` | `string` | 필수 | 인쇄 목적 |
 | `paperSize` | `string` | 필수 | 용지 크기 (예: `A0`, `A1`) |
-| `pageCount` | `integer` | 필수 | 인쇄 장수 (업로드된 PDF 파일의 페이지 수와 일치해야 함) |
+| `pageCount` | `integer` | 필수 | 인쇄 장수 |
+| `pickupDate` | `string` | 필수 | 수령 희망 일자 (YYYY-MM-DD) |
 | `paymentReceiptImage` | `file` | 유료 시 필수 | 입금 내역 캡처 이미지 파일 (유료 서비스일 경우) |
 | `pdfFile` | `file` | 필수 | 인쇄할 PDF 파일 |
 
@@ -1851,6 +1852,8 @@
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
 | `400 Bad Request` | `INVALID_FILE_TYPE` | PDF 파일이 아닐 때 |
+| `400 Bad Request` | `PICKUP_DATE_TOO_EARLY` | 수령 희망일이 최소 준비 기간(영업일 2일)보다 빠를 때 |
+| `400 Bad Request` | `PICKUP_DATE_ON_HOLIDAY` | 수령 희망일이 휴무일일 때 |
 | `400 Bad Request` | `PAGE_COUNT_MISMATCH` | 입력된 `pageCount`와 실제 PDF 페이지 수가 다를 때 |
 | `400 Bad Request` | `PAYMENT_RECEIPT_REQUIRED` | 유료 서비스인데 `paymentReceiptImage`가 누락되었을 때 |
 | `400 Bad Request` | `INVALID_INPUT` | 필수 필드 누락 또는 유효성 검사 실패 |
