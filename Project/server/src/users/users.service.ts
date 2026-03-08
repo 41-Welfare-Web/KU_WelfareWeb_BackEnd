@@ -114,9 +114,15 @@ export class UsersService {
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
     }
 
+    const timestamp = Date.now();
     await this.prisma.user.update({
       where: { id: userId },
-      data: { deletedAt: new Date() },
+      data: {
+        deletedAt: new Date(),
+        username: `${user.username}_del_${timestamp}`,
+        studentId: `${user.studentId}_del_${timestamp}`,
+        phoneNumber: `${user.phoneNumber}_del_${timestamp}`,
+      },
     });
 
     return { message: '회원 탈퇴가 성공적으로 처리되었습니다.' };
