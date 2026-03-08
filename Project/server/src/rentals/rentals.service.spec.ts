@@ -33,7 +33,13 @@ describe('RentalsService', () => {
       create: jest.fn(),
     },
     user: {
-      findFirst: jest.fn(),
+      findFirst: jest.fn().mockResolvedValue({
+        id: 'user-uuid',
+        name: '테스터',
+        phoneNumber: '01012341234',
+        departmentType: '학과',
+        departmentName: '컴퓨터공학과',
+      }),
     },
     cartItem: {
       deleteMany: jest.fn(),
@@ -168,12 +174,19 @@ describe('RentalsService', () => {
 
     // 삼각대(ID: 2)에 대해 이미 1개가 예약되어 있다고 설정
     mockPrisma.rentalItem.findMany.mockImplementation(({ where }) => {
-      if (where.itemId === 2) return Promise.resolve([{ quantity: 1 }]);
+      if (where.itemId === 2) {
+        return Promise.resolve([
+          {
+            quantity: 1,
+            rental: { startDate: new Date('2026-04-01'), endDate: new Date('2026-04-03') },
+          },
+        ]);
+      }
       return Promise.resolve([]);
     });
 
     await expect(service.create(userId, dto)).rejects.toThrow(
-      new ConflictException("'삼각대'의 재고가 부족합니다. (남은 수량: 0)"),
+      new ConflictException("'삼각대'의 재고가 부족합니다. (가용 재고: 0)"),
     );
   });
 
@@ -204,7 +217,7 @@ describe('RentalsService', () => {
     );
 
     // 검증: 연체 안내 SMS가 발송되었는지
-    expect(smsService.sendSMS).toHaveBeenCalledWith(
+    expect(mockSmsService.sendSMS).toHaveBeenCalledWith(
       '01011112222',
       expect.stringContaining('연체 상태이오니 즉시 반납 부탁드립니다.'),
     );

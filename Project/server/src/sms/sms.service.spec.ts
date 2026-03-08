@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SmsService } from './sms.service';
 import { InternalServerErrorException } from '@nestjs/common';
+import { ConfigurationsService } from '../configurations/configurations.service';
 
 // Mock coolsms-node-sdk
 jest.mock('coolsms-node-sdk', () => {
@@ -20,9 +21,14 @@ describe('SmsService', () => {
 
   const originalEnv = process.env;
 
+  const mockConfigService = {
+    getValue: jest.fn().mockResolvedValue('true'),
+  };
+
   beforeEach(async () => {
     jest.resetModules(); // Reset cache to reload Env vars
     process.env = { ...originalEnv };
+    jest.clearAllMocks();
   });
 
   afterAll(() => {
@@ -35,7 +41,10 @@ describe('SmsService', () => {
     delete process.env.SOLAPI_SENDER_NUMBER;
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [SmsService],
+      providers: [
+        SmsService,
+        { provide: ConfigurationsService, useValue: mockConfigService },
+      ],
     }).compile();
 
     service = module.get<SmsService>(SmsService);
@@ -56,7 +65,10 @@ describe('SmsService', () => {
     process.env.SOLAPI_SENDER_NUMBER = '01012345678';
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [SmsService],
+      providers: [
+        SmsService,
+        { provide: ConfigurationsService, useValue: mockConfigService },
+      ],
     }).compile();
 
     service = module.get<SmsService>(SmsService);
@@ -90,7 +102,10 @@ describe('SmsService', () => {
     }));
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [SmsService],
+      providers: [
+        SmsService,
+        { provide: ConfigurationsService, useValue: mockConfigService },
+      ],
     }).compile();
 
     service = module.get<SmsService>(SmsService);
@@ -98,5 +113,47 @@ describe('SmsService', () => {
     await expect(
       service.sendSMS('01099999999', 'Fail Message'),
     ).rejects.toThrow(InternalServerErrorException);
+  });
+
+  it('should skip sending if sms_notifications_enabled is false', async () => {
+    mockConfigService.getValue.mockResolvedValueOnce('false');
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        SmsService,
+        { provide: ConfigurationsService, useValue: mockConfigService },
+      ],
+    }).compile();
+
+    service = module.get<SmsService>(SmsService);
+    const result = await service.sendSMS('01011112222', 'Should be skipped');
+
+    expect(result).toBe(true);
+    // @ts-expect-error -- private
+    if (!service.isMock && service.messageService) {
+      // @ts-expect-error -- private
+      expect(service.messageService.sendOne).not.toHaveBeenCalled();
+    }
+  });
+
+  it('should NOT skip sending even if sms_notifications_enabled is false if ignoreConfig is true', async () => {
+    mockConfigService.getValue.mockResolvedValueOnce('false');
+    process.env.SOLAPI_API_KEY = 'test-key';
+    process.env.SOLAPI_API_SECRET = 'test-secret';
+    process.env.SOLAPI_SENDER_NUMBER = '01012345678';
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        SmsService,
+        { provide: ConfigurationsService, useValue: mockConfigService },
+      ],
+    }).compile();
+
+    service = module.get<SmsService>(SmsService);
+    // @ts-expect-error -- private
+    const mockSendOne = service.messageService.sendOne;
+
+    await service.sendSMS('01011112222', 'Must be sent', true);
+    expect(mockSendOne).toHaveBeenCalled();
   });
 });

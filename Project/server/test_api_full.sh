@@ -365,7 +365,7 @@ assert_status "2-3" "대시보드 조회" 200
 
 # 2-4. 내 정보 수정
 F=$(jbody <<EOF
-{"currentPassword":"$ADMIN_PASSWORD","departmentType":"총학생회"}
+{"currentPassword":"$ADMIN_PASSWORD","departmentType":"중앙자치기구"}
 EOF
 )
 http_put "$BASE_URL/users/me" "$F" "$ACCESS_TOKEN"; rm -f "$F"
@@ -667,7 +667,7 @@ http_post "$BASE_URL/items" "$F" "$ACCESS_TOKEN"; rm -f "$F"
 TEST_RENTAL_ID=""
 F=$(mktemp)
 cat > "$F" <<EOF
-{"departmentType":"총학생회","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":1,"startDate":"$FUTURE_START","endDate":"$FUTURE_END"}]}
+{"departmentType":"중앙자치기구","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":1,"startDate":"$FUTURE_START","endDate":"$FUTURE_END"}]}
 EOF
 http_post "$BASE_URL/rentals" "$F" "$ACCESS_TOKEN"; rm -f "$F"
 assert_status "6-1" "대여 예약 생성 (정상)" 201
@@ -679,7 +679,7 @@ fi
 # 6-2. 과거 날짜
 F=$(mktemp)
 cat > "$F" <<EOF
-{"departmentType":"총학생회","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":1,"startDate":"2020-01-06","endDate":"2020-01-07"}]}
+{"departmentType":"중앙자치기구","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":1,"startDate":"2020-01-06","endDate":"2020-01-07"}]}
 EOF
 http_post "$BASE_URL/rentals" "$F" "$ACCESS_TOKEN"; rm -f "$F"
 assert_status "6-2" "과거 날짜 예약 거부" 400
@@ -689,7 +689,7 @@ NEXT_SAT=$(date -d "next Saturday" +%Y-%m-%d 2>/dev/null || echo "2026-03-07")
 NEXT_SUN=$(date -d "next Sunday" +%Y-%m-%d 2>/dev/null || echo "2026-03-08")
 F=$(mktemp)
 cat > "$F" <<EOF
-{"departmentType":"총학생회","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":1,"startDate":"$NEXT_SAT","endDate":"$NEXT_SUN"}]}
+{"departmentType":"중앙자치기구","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":1,"startDate":"$NEXT_SAT","endDate":"$NEXT_SUN"}]}
 EOF
 http_post "$BASE_URL/rentals" "$F" "$ACCESS_TOKEN"; rm -f "$F"
 assert_status "6-3" "주말 날짜 예약 거부" 400
@@ -699,7 +699,7 @@ FAR_FUTURE=$(date -d "+6 months" +%Y-%m-%d 2>/dev/null || echo "2026-09-01")
 FAR_FUTURE_END=$(date -d "+6 months +3 days" +%Y-%m-%d 2>/dev/null || echo "2026-09-04")
 F=$(mktemp)
 cat > "$F" <<EOF
-{"departmentType":"총학생회","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":1,"startDate":"$FAR_FUTURE","endDate":"$FAR_FUTURE_END"}]}
+{"departmentType":"중앙자치기구","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":1,"startDate":"$FAR_FUTURE","endDate":"$FAR_FUTURE_END"}]}
 EOF
 http_post "$BASE_URL/rentals" "$F" "$ACCESS_TOKEN"; rm -f "$F"
 assert_status "6-4" "최대 기간 초과 예약 거부" 400
@@ -707,7 +707,7 @@ assert_status "6-4" "최대 기간 초과 예약 거부" 400
 # 6-5. 재고 초과
 F=$(mktemp)
 cat > "$F" <<EOF
-{"departmentType":"총학생회","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":9999,"startDate":"$FUTURE_START","endDate":"$FUTURE_END"}]}
+{"departmentType":"중앙자치기구","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":9999,"startDate":"$FUTURE_START","endDate":"$FUTURE_END"}]}
 EOF
 http_post "$BASE_URL/rentals" "$F" "$ACCESS_TOKEN"; rm -f "$F"
 assert_status_oneof "6-5" "재고 초과 예약 거부" 400 409
@@ -731,7 +731,7 @@ if [ -n "$TEST_RENTAL_ID" ]; then
   MODIFIED_END=$(get_future_weekday 12)
   F=$(mktemp)
   cat > "$F" <<EOF
-{"departmentType":"총학생회","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":1,"startDate":"$MODIFIED_START","endDate":"$MODIFIED_END"}]}
+{"departmentType":"중앙자치기구","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":1,"startDate":"$MODIFIED_START","endDate":"$MODIFIED_END"}]}
 EOF
   http_put "$BASE_URL/rentals/$TEST_RENTAL_ID" "$F" "$ACCESS_TOKEN"; rm -f "$F"
   assert_status "6-8" "예약 수정 (RESERVED)" 200
@@ -780,7 +780,7 @@ ADMIN_RENTAL_ID=""
 if [ -n "$ADMIN_USER_ID" ]; then
   F=$(mktemp)
   cat > "$F" <<EOF
-{"targetUserId":"$ADMIN_USER_ID","departmentType":"총학생회","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":1,"startDate":"$FUTURE_START","endDate":"$FUTURE_END"}]}
+{"targetUserId":"$ADMIN_USER_ID","departmentType":"중앙자치기구","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":1,"startDate":"$FUTURE_START","endDate":"$FUTURE_END"}]}
 EOF
   http_post "$BASE_URL/rentals/admin" "$F" "$ACCESS_TOKEN"; rm -f "$F"
   assert_status "6-13" "관리자 대리 예약" 201
@@ -792,7 +792,7 @@ fi
 # 6-14. 없는 사용자 대리 예약
 F=$(mktemp)
 cat > "$F" <<EOF
-{"targetUserId":"00000000-0000-0000-0000-000000000000","departmentType":"총학생회","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":1,"startDate":"$FUTURE_START","endDate":"$FUTURE_END"}]}
+{"targetUserId":"00000000-0000-0000-0000-000000000000","departmentType":"중앙자치기구","items":[{"itemId":$RENTAL_TEST_ITEM_ID,"quantity":1,"startDate":"$FUTURE_START","endDate":"$FUTURE_END"}]}
 EOF
 http_post "$BASE_URL/rentals/admin" "$F" "$ACCESS_TOKEN"; rm -f "$F"
 assert_status "6-14" "없는 사용자 대리 예약 거부" 404
@@ -952,7 +952,7 @@ rm -f "$TEMP_PDF" /tmp/f_dept_type.txt /tmp/f_dept_name.txt /tmp/f_purpose.txt
 # 소속 원래대로
 F=$(mktemp)
 cat > "$F" <<EOF
-{"currentPassword":"$ADMIN_PASSWORD","departmentType":"총학생회"}
+{"currentPassword":"$ADMIN_PASSWORD","departmentType":"중앙자치기구"}
 EOF
 http_put "$BASE_URL/users/me" "$F" "$ACCESS_TOKEN" > /dev/null 2>&1; rm -f "$F"
 

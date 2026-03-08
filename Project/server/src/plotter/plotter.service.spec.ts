@@ -52,12 +52,14 @@ describe('PlotterService', () => {
           provide: HolidaysService,
           useValue: {
             calculateBusinessDate: jest.fn().mockResolvedValue(new Date()),
+            isHoliday: jest.fn().mockResolvedValue(false),
           },
         },
         {
           provide: SmsService,
           useValue: {
             sendPlotterStatusNotice: jest.fn().mockResolvedValue(true),
+            sendSMS: jest.fn().mockResolvedValue(true),
           },
         },
       ],
@@ -80,6 +82,7 @@ describe('PlotterService', () => {
       purpose: 'Test',
       paperSize: 'A0',
       pageCount: 1,
+      pickupDate: '2026-03-10',
     };
 
     await expect(
@@ -105,6 +108,7 @@ describe('PlotterService', () => {
       purpose: '예산안 출력',
       paperSize: 'A0',
       pageCount: 1,
+      pickupDate: '2026-03-15',
     } as any;
 
     const result = await service.create('user-id', dto, realPdf, undefined);
@@ -138,7 +142,7 @@ describe('PlotterService', () => {
       const result = await service.calculateEstimatedPrice(dto, 'user-id');
       expect(result.isFree).toBe(true);
       expect(result.price).toBe(0);
-      expect(result.message).toContain('무료 인쇄 대상입니다.');
+      expect(result.message).toContain('무료 인쇄 지원 대상입니다.');
     });
 
     it('should identify as paid if the provided departmentType is not a free target, even if user default is', async () => {
