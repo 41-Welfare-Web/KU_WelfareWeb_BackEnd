@@ -114,14 +114,17 @@ export class UsersService {
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
     }
 
-    const timestamp = Date.now();
+    const timestamp = Date.now().toString().slice(-10); // 타임스탬프 뒷 10자리
+    const suffix = `_d${timestamp}`; // 총 12자 (_d + 10자리)
+
     await this.prisma.user.update({
       where: { id: userId },
       data: {
         deletedAt: new Date(),
-        username: `${user.username}_del_${timestamp}`,
-        studentId: `${user.studentId}_del_${timestamp}`,
-        phoneNumber: `${user.phoneNumber}_del_${timestamp}`,
+        // 20자 제한을 넘지 않도록 기존 값을 8자로 자르고 접미사(12자) 추가
+        username: `${user.username.slice(0, 8)}${suffix}`,
+        studentId: `${user.studentId.slice(0, 8)}${suffix}`,
+        phoneNumber: `${user.phoneNumber.slice(0, 8)}${suffix}`,
       },
     });
 
