@@ -18,8 +18,18 @@ export class CartService {
       orderBy: { createdAt: 'asc' },
       include: {
         item: {
-          include: {
-            category: { select: { id: true, name: true } },
+          select: {
+            id: true,
+            name: true,
+            itemCode: true,
+            imageUrl: true,
+            totalQuantity: true,
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
       },
@@ -50,7 +60,19 @@ export class CartService {
       update: { quantity },
       include: {
         item: {
-          include: { category: { select: { id: true, name: true } } },
+          select: {
+            id: true,
+            name: true,
+            itemCode: true,
+            imageUrl: true,
+            totalQuantity: true,
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
         },
       },
     });
@@ -114,7 +136,19 @@ export class CartService {
       },
       include: {
         item: {
-          include: { category: { select: { id: true, name: true } } },
+          select: {
+            id: true,
+            name: true,
+            itemCode: true,
+            imageUrl: true,
+            totalQuantity: true,
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
         },
       },
     });
