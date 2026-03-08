@@ -1758,7 +1758,7 @@
 주문 전에 인쇄 비용을 미리 계산합니다.
 
 ## **ENDPOINT:** `POST /api/plotter/calculate-price`
-**Description:** 사용자의 소속(프로필 정보 활용), 목적, 용지 크기, 장수를 기반으로 무료/유료 여부와 예상 금액을 반환합니다.
+**Description:** 사용자의 소속(입력된 소속 우선, 미입력 시 프로필 정보 활용), 목적, 용지 크기, 장수를 기반으로 무료/유료 여부와 예상 금액을 반환합니다.
 **Required Permissions:** Authenticated Users
 
 ---
@@ -1769,12 +1769,14 @@
 {
   "purpose": "졸업 작품 포스터",
   "paperSize": "A0",
-  "pageCount": 1
+  "pageCount": 1,
+  "departmentType": "자치기구"
 }
 ```
 * `purpose`: (string, required) 인쇄 목적.
 * `paperSize`: (string, required) 용지 크기. (예: `A0`, `A1`)
 * `pageCount`: (integer, required) 인쇄 장수.
+* `departmentType`: (string, optional) 소속 유형. (미입력 시 사용자 기본 정보 활용)
 
 ---
 

@@ -25,14 +25,15 @@ export class PlotterService {
 
   // 가격 및 무료 여부 계산 (공통 로직)
   async calculateEstimatedPrice(dto: PlotterPriceCheckDto, userId: string) {
-    const { purpose, paperSize, pageCount } = dto;
+    const { purpose, paperSize, pageCount, departmentType: dtoDeptType } = dto;
 
     const user = await this.prisma.user.findFirst({
       where: { id: userId, deletedAt: null },
     });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
-    const departmentType = user.departmentType;
+    // DTO에 소속 유형이 있으면 그것을 쓰고, 없으면 DB의 사용자 기본 소속 사용
+    const departmentType = dtoDeptType || user.departmentType;
 
     const unitPriceStr = await this.configService.getValue(
       `plotter_price_${paperSize.toLowerCase()}`,
@@ -105,11 +106,13 @@ export class PlotterService {
     } = createOrderDto;
 
     // 3. 가격 계산 및 유/무료 판별 로직 호출 (user 조회 포함)
+    // DTO에서 받은 departmentType을 명시적으로 넘겨줌으로써 무료 판정 정확도 개선
     const { price: totalPrice } = await this.calculateEstimatedPrice(
       {
         purpose,
         paperSize,
         pageCount,
+        departmentType,
       },
       userId,
     );

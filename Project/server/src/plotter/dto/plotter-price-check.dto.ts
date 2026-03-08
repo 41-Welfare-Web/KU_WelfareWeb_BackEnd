@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsInt, Min } from 'class-validator';
+import { IsNotEmpty, IsString, IsInt, Min, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
@@ -19,4 +19,13 @@ export class PlotterPriceCheckDto {
   @IsNotEmpty()
   @Min(1)
   pageCount: number;
+
+  @ApiProperty({
+    example: '자치기구',
+    description: '소속 유형 (선택 사항, 미입력 시 사용자 기본 정보 사용)',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  departmentType?: string;
 }

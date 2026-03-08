@@ -195,7 +195,7 @@ RentalWeb/
 - `PUT /api/rentals/:id/status` — 상태 변경 **[Admin]** (memo 필수 조건 있음)
 
 ### 플로터 (Plotter) — 5개
-- `POST /api/plotter/calculate-price` — 실시간 예상 가격 계산 (FR-28)
+- `POST /api/plotter/calculate-price` — 실시간 예상 가격 계산 (purpose, paperSize, pageCount, departmentType[optional]) (FR-28)
 - `POST /api/plotter/orders` — 주문 신청 (multipart/form-data, PDF 파일 검증)
 - `GET /api/plotter/orders` — 목록 조회 (본인 또는 전체-Admin, 페이지네이션)
 - `DELETE /api/plotter/orders/:id` — 취소 (PENDING 상태만)
