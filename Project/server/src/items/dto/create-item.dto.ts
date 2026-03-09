@@ -20,10 +20,14 @@ export class CreateItemDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ example: 'CAM-001', description: '물품 코드 (Unique)' })
+  @ApiProperty({
+    example: 'ITEM-001',
+    description: '물품 코드 (미입력 시 자동 생성)',
+    required: false,
+  })
   @IsString()
-  @IsNotEmpty()
-  itemCode: string;
+  @IsOptional()
+  itemCode?: string;
 
   @ApiProperty({
     example: '고화질 촬영용 카메라입니다.',

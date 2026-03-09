@@ -36,9 +36,20 @@ export class ItemsService {
     });
     if (!category) throw new NotFoundException('존재하지 않는 카테고리입니다.');
 
-    const existing = await this.prisma.item.findUnique({ where: { itemCode } });
-    if (existing && !existing.deletedAt)
-      throw new ConflictException('이미 존재하는 물품 코드입니다.');
+    // TODO: 아이템 코드 명명 규칙 및 관리 방식에 대한 추후 논의 필요 (현재는 자동 증가 방식)
+    // itemCode 자동 생성 로직 (마지막 번호 + 1)
+    let finalItemCode = '';
+    const lastItem = await this.prisma.item.findFirst({
+      where: { itemCode: { startsWith: 'ITEM-' } },
+      orderBy: { itemCode: 'desc' },
+    });
+
+    if (lastItem) {
+      const lastNum = parseInt(lastItem.itemCode.replace('ITEM-', ''));
+      finalItemCode = `ITEM-${(lastNum + 1).toString().padStart(3, '0')}`;
+    } else {
+      finalItemCode = 'ITEM-001';
+    }
 
     let imageUrl = dtoImageUrl;
     if (image) {
@@ -48,7 +59,7 @@ export class ItemsService {
     return this.prisma.item.create({
       data: {
         name,
-        itemCode,
+        itemCode: finalItemCode,
         description,
         imageUrl,
         videoUrl,
