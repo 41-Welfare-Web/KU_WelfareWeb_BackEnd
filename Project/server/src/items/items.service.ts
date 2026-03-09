@@ -10,24 +10,29 @@ import { UpdateItemDto } from './dto/update-item.dto';
 import { CreateItemInstanceDto } from './dto/create-item-instance.dto';
 import { UpdateItemInstanceDto } from './dto/update-item-instance.dto';
 import { AddItemComponentDto } from './dto/add-item-component.dto';
+import { FilesService } from '../common/files.service';
 
 @Injectable()
 export class ItemsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private filesService: FilesService,
+  ) {}
 
-  async create(createItemDto: CreateItemDto) {
+  async create(createItemDto: CreateItemDto, image?: Express.Multer.File) {
     const {
       categoryId,
       itemCode,
       name,
       description,
-      imageUrl,
+      imageUrl: dtoImageUrl,
+      videoUrl,
       managementType,
       totalQuantity,
     } = createItemDto;
 
     const category = await this.prisma.category.findFirst({
-      where: { id: categoryId, deletedAt: null },
+      where: { id: Number(categoryId), deletedAt: null },
     });
     if (!category) throw new NotFoundException('존재하지 않는 카테고리입니다.');
 
@@ -35,16 +40,22 @@ export class ItemsService {
     if (existing && !existing.deletedAt)
       throw new ConflictException('이미 존재하는 물품 코드입니다.');
 
+    let imageUrl = dtoImageUrl;
+    if (image) {
+      imageUrl = await this.filesService.uploadFile(image, 'items');
+    }
+
     return this.prisma.item.create({
       data: {
         name,
         itemCode,
         description,
         imageUrl,
+        videoUrl,
         managementType,
-        totalQuantity: managementType === 'BULK' ? totalQuantity : null,
+        totalQuantity: managementType === 'BULK' ? Number(totalQuantity) : null,
         category: {
-          connect: { id: categoryId },
+          connect: { id: Number(categoryId) },
         },
       },
       include: { category: true },
@@ -135,7 +146,11 @@ export class ItemsService {
     return item;
   }
 
-  async update(id: number, updateItemDto: UpdateItemDto) {
+  async update(
+    id: number,
+    updateItemDto: UpdateItemDto,
+    image?: Express.Multer.File,
+  ) {
     const item = await this.prisma.item.findFirst({
       where: { id, deletedAt: null },
     });
@@ -149,9 +164,23 @@ export class ItemsService {
         throw new ConflictException('이미 존재하는 물품 코드입니다.');
     }
 
+    const updateData: any = { ...updateItemDto };
+
+    if (image) {
+      updateData.imageUrl = await this.filesService.uploadFile(image, 'items');
+    }
+
+    // 데이터 타입 보정 (multipart form-data 대응)
+    if (updateData.totalQuantity !== undefined) {
+      updateData.totalQuantity = Number(updateData.totalQuantity);
+    }
+    if (updateData.categoryId !== undefined) {
+      updateData.categoryId = Number(updateData.categoryId);
+    }
+
     return this.prisma.item.update({
       where: { id },
-      data: updateItemDto,
+      data: updateData,
       include: { category: true },
     });
   }

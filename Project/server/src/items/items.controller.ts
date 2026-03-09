@@ -9,7 +9,10 @@ import {
   Query,
   UseGuards,
   ParseIntPipe,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
@@ -36,10 +39,14 @@ export class ItemsController {
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
+  @UseInterceptors(FileInterceptor('image'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '물품 생성 (관리자)' })
-  create(@Body() createItemDto: CreateItemDto) {
-    return this.itemsService.create(createItemDto);
+  create(
+    @Body() createItemDto: CreateItemDto,
+    @UploadedFile() image?: Express.Multer.File,
+  ) {
+    return this.itemsService.create(createItemDto, image);
   }
 
   @Get(':id/availability')
@@ -147,13 +154,15 @@ export class ItemsController {
   @Put(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
+  @UseInterceptors(FileInterceptor('image'))
   @ApiBearerAuth()
   @ApiOperation({ summary: '물품 수정 (관리자)' })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateItemDto: UpdateItemDto,
+    @UploadedFile() image?: Express.Multer.File,
   ) {
-    return this.itemsService.update(id, updateItemDto);
+    return this.itemsService.update(id, updateItemDto, image);
   }
 
   @Delete(':id')
