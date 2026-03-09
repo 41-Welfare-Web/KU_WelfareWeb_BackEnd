@@ -213,8 +213,15 @@ export class PlotterService {
       '2',
     );
     const delayDays = parseInt(delayDaysStr, 10);
+
+    // KST 기준 현재 날짜 (서버 로컬 시간에 영향받지 않도록)
+    const nowKst = new Date(
+      new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }),
+    );
+    nowKst.setHours(0, 0, 0, 0);
+
     const minPickupDate = await this.holidaysService.calculateBusinessDate(
-      new Date(),
+      nowKst,
       delayDays,
     );
 
@@ -224,7 +231,7 @@ export class PlotterService {
     if (pickupDate < minPickupDate) {
       const minDateStr = minPickupDate.toISOString().split('T')[0];
       throw new BadRequestException(
-        `수령 희망 일자가 너무 빠릅니다. 최소 ${delayDays}영업일 이후인 ${minDateStr}부터 가능합니다.`,
+        `수령 희망 일자가 너무 빠릅니다. 최소 ${delayDays}근무일 이후인 ${minDateStr}부터 가능합니다.`,
       );
     }
 
