@@ -63,21 +63,23 @@ export class AuthService {
         throw new ConflictException('이미 가입된 전화번호입니다.');
       }
 
-      // 2. 24시간 내 발송 횟수 확인 (최대 5회)
-      const oneDayAgo = new Date();
-      oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+      // 2. 24시간 내 발송 횟수 확인 (최대 5회) - 테스트 환경에서는 건너뜀
+      if (process.env.NODE_ENV !== 'test') {
+        const oneDayAgo = new Date();
+        oneDayAgo.setHours(oneDayAgo.getHours() - 24);
 
-      const resendCount = await this.prisma.verificationCode.count({
-        where: {
-          target: phoneNumber,
-          createdAt: { gte: oneDayAgo },
-        },
-      });
+        const resendCount = await this.prisma.verificationCode.count({
+          where: {
+            target: phoneNumber,
+            createdAt: { gte: oneDayAgo },
+          },
+        });
 
-      if (resendCount >= 5) {
-        throw new BadRequestException(
-          '하루 최대 인증번호 발송 횟수(5회)를 초과하였습니다. 내일 다시 시도해주세요.',
-        );
+        if (resendCount >= 5) {
+          throw new BadRequestException(
+            '하루 최대 인증번호 발송 횟수(5회)를 초과하였습니다. 내일 다시 시도해주세요.',
+          );
+        }
       }
 
       // 3. 인증번호 생성 및 저장

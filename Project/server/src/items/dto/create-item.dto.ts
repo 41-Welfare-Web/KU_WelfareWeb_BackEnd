@@ -44,6 +44,15 @@ export class CreateItemDto {
   imageUrl?: string;
 
   @ApiProperty({
+    example: 'https://www.youtube.com/watch?v=example',
+    description: '사용법 영상 URL (유튜브 등)',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  videoUrl?: string;
+
+  @ApiProperty({
     enum: ManagementType,
     example: 'INDIVIDUAL',
     description: '관리 타입 (INDIVIDUAL, BULK)',

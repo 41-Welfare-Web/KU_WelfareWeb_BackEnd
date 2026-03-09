@@ -61,6 +61,7 @@ model Item {
   description    String?        @db.Text
   rentalCount    Int            @default(0) @map("rental_count")
   imageUrl       String?        @map("image_url") @db.Text
+  videoUrl       String?        @map("video_url") @db.Text
   managementType ManagementType @map("management_type")
   totalQuantity  Int?           @map("total_quantity")
   deletedAt      DateTime?      @map("deleted_at") @db.Timestamptz
