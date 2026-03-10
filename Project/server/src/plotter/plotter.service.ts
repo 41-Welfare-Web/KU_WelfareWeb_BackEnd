@@ -173,16 +173,22 @@ export class PlotterService {
     }
 
     const {
-      purpose,
-      paperSize,
-      pageCount,
-      departmentType,
-      departmentName,
+      purpose: rawPurpose,
+      paperSize: rawPaperSize,
+      pageCount: rawPageCount,
+      departmentType: rawDeptType,
+      departmentName: rawDeptName,
       pickupDate: requestedPickupDate,
     } = createOrderDto;
 
-    // 3. 가격 계산 및 유/무료 판별 로직 호출 (user 조회 포함)
-    // DTO에서 받은 소속 정보를 모두 넘겨줌으로써 무료 판정 정확도 개선
+    // multipart/form-data 특성상 섞일 수 있는 불필요한 따옴표나 양끝 공백 제거
+    const purpose = rawPurpose.replace(/['"]/g, '').trim();
+    const paperSize = rawPaperSize.replace(/['"]/g, '').trim();
+    const departmentType = rawDeptType.replace(/['"]/g, '').trim();
+    const departmentName = (rawDeptName || '').replace(/['"]/g, '').trim();
+    const pageCount = Number(rawPageCount);
+
+    // 3. 가격 계산 및 유/무료 판별 로직 호출 (정제된 데이터 전달)
     const { price: totalPrice } = await this.calculateEstimatedPrice(
       {
         purpose,
