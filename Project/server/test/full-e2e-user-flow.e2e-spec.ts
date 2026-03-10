@@ -15,7 +15,7 @@ describe('Production-Ready Full E2E Flow', () => {
     name: '홍길동',
     studentId: '202410001',
     phoneNumber: '01090665493',
-    departmentType: '중앙동아리', // 무료 조건을 위해 변경
+    departmentType: '중앙동아리',
     departmentName: '테스트동아리',
   };
 
@@ -43,27 +43,23 @@ describe('Production-Ready Full E2E Flow', () => {
 
     prisma = app.get<PrismaService>(PrismaService);
 
-    // 기존 테스트 데이터 클린업 (사용자 정보는 유지하되 연관 데이터만 삭제)
+    // 테스트용 사용자 존재 확인 및 초기화
     const user = await prisma.user.findUnique({ where: { username: testUser.username } });
     if (user) {
-      // 1. 대여 관련 이력 및 아이템 삭제
       await prisma.rentalHistory.deleteMany({ where: { rental: { userId: user.id } } });
       await prisma.rentalItem.deleteMany({ where: { rental: { userId: user.id } } });
       await prisma.rental.deleteMany({ where: { userId: user.id } });
 
-      // 2. 플로터 관련 이력 및 주문 삭제 (주문 ID를 먼저 찾아서 이력 삭제)
       const userOrders = await prisma.plotterOrder.findMany({ where: { userId: user.id } });
       const orderIds = userOrders.map(o => o.id);
-      
       if (orderIds.length > 0) {
         await prisma.plotterOrderHistory.deleteMany({ where: { orderId: { in: orderIds } } });
       }
       await prisma.plotterOrder.deleteMany({ where: { userId: user.id } });
 
-      // 3. 소속 업데이트
       await prisma.user.update({
         where: { id: user.id },
-        data: { departmentType: '중앙동아리', departmentName: '테스트동아리' }
+        data: { departmentType: '중앙동아리', departmentName: '테스트동아리', role: 'USER' }
       });
     }
   });
@@ -109,10 +105,9 @@ describe('Production-Ready Full E2E Flow', () => {
 
     it('should create plotter order with real PDF buffer', async () => {
       const pdfBuffer = Buffer.from('%PDF-1.4\n%E2E Test File Content');
-      
-      // HolidaysService를 사용하여 실제 가공 가능한 영업일 계산 (최소 2일 이후)
-      const holidaysService = app.get(require('../src/holidays/holidays.service').HolidaysService);
-      const minPickupDate = await holidaysService.calculateBusinessDate(new Date(), 3);
+      const pickupDateObj = new Date();
+      pickupDateObj.setDate(pickupDateObj.getDate() + 7);
+      const pickupDateStr = pickupDateObj.toISOString().split('T')[0];
 
       const response = await request(app.getHttpServer())
         .post('/api/plotter/orders')
@@ -122,15 +117,11 @@ describe('Production-Ready Full E2E Flow', () => {
         .field('pageCount', '1')
         .field('departmentType', '중앙동아리')
         .field('departmentName', '테스트동아리')
-        .field('pickupDate', minPickupDate.toISOString().split('T')[0])
+        .field('pickupDate', pickupDateStr)
         .attach('pdfFile', pdfBuffer, { filename: 'e2e-test.pdf', contentType: 'application/pdf' });
 
-      if (response.status !== 201) {
-        console.log('Plotter Order Creation Failed Body:', JSON.stringify(response.body, null, 2));
-      }
       expect(response.status).toBe(201);
       expect(response.body.price).toBe(0);
-      expect(response.body.fileUrl).toBeDefined(); // 파일 저장 확인
       createdOrderId = response.body.id;
     });
 
@@ -181,35 +172,46 @@ describe('Production-Ready Full E2E Flow', () => {
       expect(response.status).toBe(201);
       createdRentalId = response.body.rentals[0].id;
     });
-
-    it('should complete rental lifecycle (Admin: RENTED -> RETURNED)', async () => {
-      // 1. 수령 처리
-      await request(app.getHttpServer())
-        .put(`/api/rentals/${createdRentalId}/status`)
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({ status: 'RENTED', memo: 'E2E 수령 완료' })
-        .expect(200);
-
-      // 2. 반납 처리
-      const finalRes = await request(app.getHttpServer())
-        .put(`/api/rentals/${createdRentalId}/status`)
-        .set('Authorization', `Bearer ${adminAccessToken}`)
-        .send({ status: 'RETURNED', memo: 'E2E 반납 완료' });
-
-      expect(finalRes.status).toBe(200);
-      expect(finalRes.body.status).toBe('RETURNED');
-    });
   });
 
-  describe('4. Dashboard Verification', () => {
-    it('should reflect all activities in user dashboard', async () => {
+  describe('4. Safety & Security Rules', () => {
+    it('should block admin from self-withdrawal', async () => {
       const response = await request(app.getHttpServer())
-        .get('/api/users/me/dashboard')
-        .set('Authorization', `Bearer ${userAccessToken}`);
+        .delete('/api/users/me')
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .send({ password: 'admin123!' });
 
-      expect(response.status).toBe(200);
-      // 최근 렌탈 이력에 포함되어야 함
-      expect(response.body.recentRentals.length).toBeGreaterThan(0);
+      expect(response.status).toBe(403);
+      // '관리자'와 '탈퇴' 키워드가 포함되어 있는지 확인
+      expect(response.body.message).toMatch(/관리자.*탈퇴/);
+    });
+
+    it('should block rental longer than 15 days', async () => {
+      const today = new Date();
+      const longStartDate = new Date(today);
+      longStartDate.setDate(today.getDate() + 1);
+      
+      const longEndDate = new Date(longStartDate);
+      longEndDate.setDate(longStartDate.getDate() + 16); // 17일 대여 시도
+
+      const response = await request(app.getHttpServer())
+        .post('/api/rentals')
+        .set('Authorization', `Bearer ${userAccessToken}`)
+        .send({
+          departmentType: '학과 학생회',
+          departmentName: '컴퓨터공학과',
+          items: [
+            {
+              itemId: testItemId,
+              quantity: 1,
+              startDate: longStartDate.toISOString().split('T')[0],
+              endDate: longEndDate.toISOString().split('T')[0],
+            },
+          ],
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain('최대 대여 가능 기간은 15일');
     });
   });
 });

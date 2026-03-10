@@ -118,13 +118,19 @@ export class PlotterService {
     let totalPrice = unitPrice * Number(pageCount);
 
     // MetaData API에서 내려주는 값과 100% 동일한 기준으로 검증
-    // 1. 소속 검증: 입력된 소속명이 무료 대상 소속 리스트(학과 학생회 등)에 포함되는지 확인
-    const isFreeDept = metadata.freeDepartments.some(freeDept => 
-      departmentType.trim() === freeDept || departmentType.trim().includes(freeDept)
-    );
+    // 1. 소속 검증: 입력된 소속명이 무료 대상 소속 리스트에 포함되는지 확인 (공백 제거 후 비교)
+    const normalizedDept = departmentType.replace(/\s+/g, '');
+    const isFreeDept = metadata.freeDepartments.some(freeDept => {
+      const normalizedFreeDept = freeDept.replace(/\s+/g, '');
+      return normalizedDept.includes(normalizedFreeDept) || normalizedFreeDept.includes(normalizedDept);
+    });
 
-    // 2. 목적 검증: 입력된 목적이 무료 목적 리스트에 정확히 포함되는지 확인
-    const isFreePurpose = metadata.freePurposes.includes(purpose.trim());
+    // 2. 목적 검증: 입력된 목적이 무료 목적 리스트에 포함되는지 확인 (공백 제거 후 비교)
+    const normalizedPurpose = purpose.replace(/\s+/g, '');
+    const isFreePurpose = metadata.freePurposes.some(freePurpose => {
+      const normalizedFreePurpose = freePurpose.replace(/\s+/g, '');
+      return normalizedPurpose.includes(normalizedFreePurpose) || normalizedFreePurpose.includes(normalizedPurpose);
+    });
 
     let message = `인쇄 비용은 총 ${totalPrice.toLocaleString()}원입니다.`;
     
