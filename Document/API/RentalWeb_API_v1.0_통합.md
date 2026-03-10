@@ -1808,6 +1808,7 @@
 
 ## **ENDPOINT:** `POST /api/plotter/orders`
 **Description:** 인쇄 목적, 용지 크기, 인쇄 장수 등의 정보와 PDF 파일을 받아 플로터 주문을 신청합니다. 파일 업로드를 위해 `multipart/form-data` 형식을 사용합니다.
+**Security Note:** `FR-27`에 따라, 서버는 업로드된 파일의 **Magic Number(`%PDF-`)**를 직접 검사하여 실제 PDF 파일인지 확인합니다. 확장자만 위조된 파일은 업로드할 수 없습니다.
 **Required Permissions:** Authenticated Users
 
 ---
@@ -1998,6 +1999,32 @@
 ### **6. 관리 (Admin)**
 
 # 통계 데이터 조회 (Get Statistics)
+
+---
+
+### **7. 시스템 설정 및 관리 (System & Configs)**
+
+# 휴무일 목록 조회 (Get Holidays)
+
+## **ENDPOINT:** `GET /api/holidays`
+**Description:** 주말(토, 일)을 제외하고 관리자가 직접 지정한 추가 공휴일/휴무일 목록을 조회합니다.
+**Required Permissions:** All Users
+
+---
+
+# 휴무일 등록 (Create Holiday)
+
+## **ENDPOINT:** `POST /api/holidays`
+**Description:** 관리자가 새로운 휴무일을 지정합니다.
+**Required Permissions:** Admin Only
+
+---
+
+# 시스템 설정 목록 조회 (Get Configurations)
+
+## **ENDPOINT:** `GET /api/configurations`
+**Description:** `configurations` 테이블에 저장된 모든 시스템 정책 설정값을 조회합니다.
+**Required Permissions:** Admin Only
 
 관리자가 시스템의 주요 통계 데이터를 조회합니다.
 
