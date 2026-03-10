@@ -54,10 +54,26 @@ export class RentalsService {
     const maxDate = new Date(today);
     maxDate.setMonth(maxDate.getMonth() + maxMonths);
 
+    const maxDurationStr = await this.configService.getValue(
+      'rental_max_duration_days',
+      '15',
+    );
+    const maxDuration = parseInt(maxDurationStr, 10);
+
     // 1) 모든 품목 날짜 사전 검증
     for (const item of items) {
       const start = new Date(item.startDate);
       const end = new Date(item.endDate);
+
+      // 기간 계산 (단순 차이 + 1일)
+      const diffTime = Math.abs(end.getTime() - start.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+      if (diffDays > maxDuration) {
+        throw new BadRequestException(
+          `최대 대여 가능 기간은 ${maxDuration}일입니다. (현재 요청: ${diffDays}일)`,
+        );
+      }
 
       if (start > end) {
         throw new BadRequestException(
@@ -570,6 +586,20 @@ export class RentalsService {
         if (firstStartDate) start = new Date(firstStartDate);
         if (firstEndDate) end = new Date(firstEndDate);
       }
+    }
+
+    const maxDurationStr = await this.configService.getValue(
+      'rental_max_duration_days',
+      '15',
+    );
+    const maxDuration = parseInt(maxDurationStr, 10);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+    if (diffDays > maxDuration) {
+      throw new BadRequestException(
+        `최대 대여 가능 기간은 ${maxDuration}일입니다. (현재 요청: ${diffDays}일)`,
+      );
     }
 
     if (start > end) {

@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
   ConflictException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -108,6 +109,12 @@ export class UsersService {
     });
 
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+
+    if (user.role === Role.ADMIN) {
+      throw new ForbiddenException(
+        '관리자 계정은 보안 및 시스템 관리상의 이유로 직접 탈퇴할 수 없습니다. 관리자 권한 해제 후 다시 시도하거나 다른 관리자에게 문의하세요.',
+      );
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {

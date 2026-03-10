@@ -59,7 +59,12 @@ describe('RentalsService', () => {
         { provide: PrismaService, useValue: mockPrisma },
         {
           provide: ConfigurationsService,
-          useValue: { getValue: jest.fn().mockResolvedValue('2') },
+          useValue: { 
+            getValue: jest.fn().mockImplementation((key, defaultVal) => {
+              if (key === 'rental_max_duration_days') return Promise.resolve('15');
+              return Promise.resolve(defaultVal || '2');
+            }) 
+          },
         },
         {
           provide: HolidaysService,
