@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
@@ -242,7 +243,7 @@ export class AuthService {
       const remainingMinutes = Math.ceil(
         (user.lockUntil.getTime() - new Date().getTime()) / 60000,
       );
-      throw new UnauthorizedException(
+      throw new ForbiddenException(
         `잦은 로그인 실패로 인해 계정이 잠겼습니다. ${remainingMinutes}분 후 다시 시도해주세요.`,
       );
     }
@@ -271,14 +272,20 @@ export class AuthService {
       if (newAttempts >= 5) {
         lockUntil = new Date();
         lockUntil.setMinutes(lockUntil.getMinutes() + 10);
+        
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: { loginAttempts: newAttempts, lockUntil },
+        });
+
+        throw new ForbiddenException(
+          '비밀번호 5회 오류로 계정이 10분간 잠겼습니다. 잠시 후 다시 시도해주세요.',
+        );
       }
 
       await this.prisma.user.update({
         where: { id: user.id },
-        data: {
-          loginAttempts: newAttempts,
-          lockUntil,
-        },
+        data: { loginAttempts: newAttempts, lockUntil },
       });
 
       throw new UnauthorizedException(
