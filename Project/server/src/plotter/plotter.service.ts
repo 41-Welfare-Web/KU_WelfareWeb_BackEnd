@@ -182,13 +182,14 @@ export class PlotterService {
     } = createOrderDto;
 
     // 3. 가격 계산 및 유/무료 판별 로직 호출 (user 조회 포함)
-    // DTO에서 받은 departmentType을 명시적으로 넘겨줌으로써 무료 판정 정확도 개선
+    // DTO에서 받은 소속 정보를 모두 넘겨줌으로써 무료 판정 정확도 개선
     const { price: totalPrice } = await this.calculateEstimatedPrice(
       {
         purpose,
         paperSize,
         pageCount,
         departmentType,
+        departmentName,
       },
       userId,
     );

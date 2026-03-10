@@ -28,4 +28,13 @@ export class PlotterPriceCheckDto {
   @IsString()
   @IsOptional()
   departmentType?: string;
+
+  @ApiProperty({
+    example: '테스트동아리',
+    description: '상세 소속명 (선택 사항)',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  departmentName?: string;
 }
