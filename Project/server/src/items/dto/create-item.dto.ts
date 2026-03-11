@@ -40,12 +40,20 @@ export class CreateItemDto {
 
   @ApiProperty({
     example: 'https://example.com/image.jpg',
-    description: '이미지 URL',
+    description: '대표 이미지 URL',
     required: false,
   })
   @IsString()
   @IsOptional()
   imageUrl?: string;
+
+  @ApiProperty({
+    example: ['https://example.com/img1.jpg', 'https://example.com/img2.jpg'],
+    description: '추가 이미지 URL 목록',
+    required: false,
+  })
+  @IsOptional()
+  imageUrls?: string[];
 
   @ApiProperty({
     example: 'https://www.youtube.com/watch?v=example',

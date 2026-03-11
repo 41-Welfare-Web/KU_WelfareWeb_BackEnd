@@ -26,6 +26,7 @@ export class ItemsService {
       name,
       description,
       imageUrl: dtoImageUrl,
+      imageUrls,
       videoUrl,
       managementType,
       totalQuantity,
@@ -36,19 +37,28 @@ export class ItemsService {
     });
     if (!category) throw new NotFoundException('존재하지 않는 카테고리입니다.');
 
-    // TODO: 아이템 코드 명명 규칙 및 관리 방식에 대한 추후 논의 필요 (현재는 자동 증가 방식)
-    // itemCode 자동 생성 로직 (마지막 번호 + 1)
-    let finalItemCode = '';
-    const lastItem = await this.prisma.item.findFirst({
-      where: { itemCode: { startsWith: 'ITEM-' } },
+    // itemCode 자동 생성 로직 (카테고리별 접두사 방식)
+    // 26(행사): 100, 28(음향): 200, 27(체육): 300, 29(기타): 400
+    const prefixMap = { 26: 100, 28: 200, 27: 300, 29: 400 };
+    const prefix = prefixMap[Number(categoryId)] || 900;
+
+    const lastItemInCategory = await this.prisma.item.findFirst({
+      where: {
+        categoryId: Number(categoryId),
+        itemCode: {
+          gte: prefix.toString(),
+          lt: (prefix + 100).toString(),
+        },
+      },
       orderBy: { itemCode: 'desc' },
     });
 
-    if (lastItem) {
-      const lastNum = parseInt(lastItem.itemCode.replace('ITEM-', ''));
-      finalItemCode = `ITEM-${(lastNum + 1).toString().padStart(3, '0')}`;
+    let finalItemCode = '';
+    if (lastItemInCategory) {
+      const lastNum = parseInt(lastItemInCategory.itemCode);
+      finalItemCode = (lastNum + 1).toString();
     } else {
-      finalItemCode = 'ITEM-001';
+      finalItemCode = (prefix + 1).toString();
     }
 
     let imageUrl = dtoImageUrl;
@@ -68,8 +78,16 @@ export class ItemsService {
         category: {
           connect: { id: Number(categoryId) },
         },
+        itemImages: imageUrls
+          ? {
+              create: imageUrls.map((url, index) => ({
+                imageUrl: url,
+                order: index,
+              })),
+            }
+          : undefined,
       },
-      include: { category: true },
+      include: { category: true, itemImages: true },
     });
   }
 
@@ -120,6 +138,9 @@ export class ItemsService {
       orderBy,
       include: {
         category: true,
+        itemImages: {
+          orderBy: { order: 'asc' },
+        },
         rentalItems: {
           where: {
             rental: {
@@ -149,7 +170,13 @@ export class ItemsService {
   async findOne(id: number) {
     const item = await this.prisma.item.findFirst({
       where: { id, deletedAt: null },
-      include: { category: true, components: { include: { component: true } } },
+      include: {
+        category: true,
+        itemImages: {
+          orderBy: { order: 'asc' },
+        },
+        components: { include: { component: true } },
+      },
     });
 
     if (!item) throw new NotFoundException('물품을 찾을 수 없습니다.');
@@ -167,15 +194,17 @@ export class ItemsService {
     });
     if (!item) throw new NotFoundException('물품을 찾을 수 없습니다.');
 
-    if (updateItemDto.itemCode && updateItemDto.itemCode !== item.itemCode) {
+    const { imageUrls, ...dtoData } = updateItemDto;
+
+    if (dtoData.itemCode && dtoData.itemCode !== item.itemCode) {
       const existing = await this.prisma.item.findUnique({
-        where: { itemCode: updateItemDto.itemCode },
+        where: { itemCode: dtoData.itemCode },
       });
       if (existing && !existing.deletedAt)
         throw new ConflictException('이미 존재하는 물품 코드입니다.');
     }
 
-    const updateData: any = { ...updateItemDto };
+    const updateData: any = { ...dtoData };
 
     if (image) {
       updateData.imageUrl = await this.filesService.uploadFile(image, 'items');
@@ -189,10 +218,21 @@ export class ItemsService {
       updateData.categoryId = Number(updateData.categoryId);
     }
 
+    // 이미지 배열 처리 (전체 교체 방식)
+    if (imageUrls) {
+      updateData.itemImages = {
+        deleteMany: {}, // 기존 이미지 모두 삭제
+        create: imageUrls.map((url, index) => ({
+          imageUrl: url,
+          order: index,
+        })),
+      };
+    }
+
     return this.prisma.item.update({
       where: { id },
       data: updateData,
-      include: { category: true },
+      include: { category: true, itemImages: true },
     });
   }
 
