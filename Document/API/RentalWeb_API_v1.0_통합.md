@@ -849,10 +849,14 @@
     "name": "촬영장비"
   },
   "name": "DSLR 카메라",
-  "itemCode": "CAM-001",
+  "itemCode": "101",
   "description": "<h1>고화질 DSLR 카메라</h1><p>제품 특징: ...</p><img src='...' />",
   "rentalCount": 120,
-  "imageUrl": "https://example.com/images/camera.jpg",
+  "imageUrl": "https://example.com/images/101_1.jpg",
+  "itemImages": [
+    { "id": 1, "imageUrl": "https://example.com/images/101_1.jpg", "order": 1 },
+    { "id": 2, "imageUrl": "https://example.com/images/101_2.jpg", "order": 2 }
+  ],
   "managementType": "INDIVIDUAL",
   "totalQuantity": 5,
   "createdAt": "2024-01-10T10:00:00Z"
@@ -872,7 +876,7 @@
 `FR-19` 요구사항에 따라, 관리자가 새로운 물품을 시스템에 등록합니다.
 
 ## **ENDPOINT:** `POST /api/items`
-**Description:** 새로운 물품 정보를 받아 `items` 테이블에 저장합니다.
+**Description:** 새로운 물품 정보를 받아 `items` 테이블에 저장합니다. `itemCode`는 카테고리에 따라 자동 생성됩니다. (행사: 100~, 음향: 200~, 체육: 300~, 기타: 400~)
 **Required Permissions:** Admin Only
 
 ---
@@ -883,18 +887,20 @@
 {
   "categoryId": 2,
   "name": "새로운 삼각대",
-  "itemCode": "TRI-005",
+  "itemCode": "205",
   "description": "가볍고 튼튼한 전문가용 삼각대입니다.",
-  "imageUrl": "https://example.com/images/tripod.jpg",
+  "imageUrl": "https://example.com/images/205_1.jpg",
+  "imageUrls": ["https://example.com/images/205_1.jpg", "https://example.com/images/205_2.jpg"],
   "managementType": "BULK",
   "totalQuantity": 10
 }
 ```
 * `categoryId`: (integer, required)
 * `name`: (string, required)
-* `itemCode`: (string, required, unique)
+* `itemCode`: (string, optional) 미입력 시 카테고리별 다음 번호가 자동 할당됩니다.
 * `description`: (string, optional)
-* `imageUrl`: (string, optional)
+* `imageUrl`: (string, optional) 대표 이미지 URL
+* `imageUrls`: (array of strings, optional) 추가 이미지 URL 목록
 * `managementType`: (string, required) 'INDIVIDUAL' 또는 'BULK'
 * `totalQuantity`: (integer, optional) `managementType`이 'BULK'일 때 필요합니다.
 
@@ -935,6 +941,7 @@
 
 #### **Request Body**
 *   물품 생성(Create Item)의 Request Body와 동일하며, 모든 필드는 선택적(optional)입니다.
+*   **imageUrls 제공 시:** 기존에 등록된 추가 이미지 목록은 모두 삭제되고 새 목록으로 교체됩니다.
 
 ---
 

@@ -49,15 +49,25 @@
 | `id` | `serial` | ID | **Primary Key** |
 | `category_id` | `integer` | 카테고리 ID | Foreign Key (`categories.id`) |
 | `name` | `varchar(100)` | 물품명 | Not Null |
-| `item_code` | `varchar(20)` | 물품 코드 | **Unique**, Not Null |
+| `item_code` | `varchar(20)` | 물품 코드 (카테고리별 100, 200, 300, 400 접두사 사용) | **Unique**, Not Null |
 | `description` | `text` | 상세 설명 | |
 | `rental_count` | `integer` | 총 대여 횟수 | Default: 0 |
-| `image_url` | `text` | 이미지 URL | |
+| `image_url` | `text` | 대표 이미지 URL | |
 | `video_url` | `text` | 가이드 영상 URL | |
 | `management_type` | `enum(ManagementType)` | 관리 방식 | Not Null |
 | `total_quantity` | `integer` | 총 보유 수량 (BULK 전용) | |
 | `deleted_at` | `timestampz` | 소프트 삭제 시간 | |
 | `created_at` | `timestampz` | 생성일 | Default: `now()` |
+
+#### **3-1. `item_images` (물품 추가 이미지)**
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `id` | `serial` | ID | **Primary Key** |
+| `item_id` | `integer` | 물품 ID | Foreign Key (`items.id`, On Delete Cascade) |
+| `image_url` | `text` | 이미지 URL | Not Null |
+| `order` | `integer` | 출력 순서 | Default: 0 |
+| `created_at` | `timestampz` | 등록 시간 | Default: `now()` |
 
 #### **4. `item_instances` (개별 재고)**
 
