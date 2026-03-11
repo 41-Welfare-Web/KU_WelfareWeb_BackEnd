@@ -37,29 +37,19 @@ export class ItemsService {
     });
     if (!category) throw new NotFoundException('존재하지 않는 카테고리입니다.');
 
-    // itemCode 자동 생성 로직 (카테고리별 접두사 방식)
-    // 26(행사): 100, 28(음향): 200, 27(체육): 300, 29(기타): 400
-    const prefixMap = { 26: 100, 28: 200, 27: 300, 29: 400 };
-    const prefix = prefixMap[Number(categoryId)] || 900;
-
-    const lastItemInCategory = await this.prisma.item.findFirst({
-      where: {
-        categoryId: Number(categoryId),
-        itemCode: {
-          gte: prefix.toString(),
-          lt: (prefix + 100).toString(),
-        },
-      },
-      orderBy: { itemCode: 'desc' },
+    // itemCode 자동 생성: 카테고리번호(1자리) + 고유번호(2자리) = 총 3자리
+    // 예) 카테고리1 → 101, 102 ... / 카테고리2 → 201, 202 ...
+    const existingItems = await this.prisma.item.findMany({
+      where: { categoryId: Number(categoryId) },
+      select: { itemCode: true },
     });
 
-    let finalItemCode = '';
-    if (lastItemInCategory) {
-      const lastNum = parseInt(lastItemInCategory.itemCode);
-      finalItemCode = (lastNum + 1).toString();
-    } else {
-      finalItemCode = (prefix + 1).toString();
+    let uniqueNum = 1;
+    if (existingItems.length > 0) {
+      const maxCode = Math.max(...existingItems.map((i) => parseInt(i.itemCode) || 0));
+      uniqueNum = (maxCode % 100) + 1;
     }
+    const finalItemCode = `${Number(categoryId)}${String(uniqueNum).padStart(2, '0')}`;
 
     let imageUrl = dtoImageUrl;
     if (image) {

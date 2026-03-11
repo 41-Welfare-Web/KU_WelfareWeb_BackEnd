@@ -853,6 +853,7 @@
   "description": "<h1>고화질 DSLR 카메라</h1><p>제품 특징: ...</p><img src='...' />",
   "rentalCount": 120,
   "imageUrl": "https://example.com/images/101_1.jpg",
+  "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   "itemImages": [
     { "id": 1, "imageUrl": "https://example.com/images/101_1.jpg", "order": 1 },
     { "id": 2, "imageUrl": "https://example.com/images/101_2.jpg", "order": 2 }
@@ -890,6 +891,7 @@
   "itemCode": "205",
   "description": "가볍고 튼튼한 전문가용 삼각대입니다.",
   "imageUrl": "https://example.com/images/205_1.jpg",
+  "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   "imageUrls": ["https://example.com/images/205_1.jpg", "https://example.com/images/205_2.jpg"],
   "managementType": "BULK",
   "totalQuantity": 10
@@ -900,6 +902,7 @@
 * `itemCode`: (string, optional) 미입력 시 카테고리별 다음 번호가 자동 할당됩니다.
 * `description`: (string, optional)
 * `imageUrl`: (string, optional) 대표 이미지 URL
+* `videoUrl`: (string, optional) 가이드 영상 URL
 * `imageUrls`: (array of strings, optional) 추가 이미지 URL 목록
 * `managementType`: (string, required) 'INDIVIDUAL' 또는 'BULK'
 * `totalQuantity`: (integer, optional) `managementType`이 'BULK'일 때 필요합니다.
