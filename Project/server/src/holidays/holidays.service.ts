@@ -43,13 +43,19 @@ export class HolidaysService {
 
   // Check if a specific date is a holiday (Weekend or Registered Holiday)
   async isHoliday(date: Date): Promise<boolean> {
-    const day = date.getDay();
+    // 1. 강제 KST 변환 (싱가포르 서버 시차 극복)
+    const kstDate = new Date(
+      date.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }),
+    );
+
+    const day = kstDate.getDay();
     if (day === 0 || day === 6) {
       return true; // Weekend
     }
 
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
+    // 2. 시간 정보를 제거한 날짜 문자열로 변환하여 DB 조회
+    const dateStr = kstDate.toISOString().split('T')[0];
+    const startOfDay = new Date(`${dateStr}T00:00:00.000Z`);
 
     const holiday = await this.prisma.holiday.findUnique({
       where: { holidayDate: startOfDay },

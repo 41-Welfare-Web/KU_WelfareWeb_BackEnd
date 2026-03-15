@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-// 서버 시간 서울로 고정
+// 서버 시간 서울로 고정 (반드시 최상단)
 process.env.TZ = 'Asia/Seoul';
 
 // BigInt JSON 직렬화 해결

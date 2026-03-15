@@ -26,6 +26,16 @@ export class RentalsService {
     private cartService: CartService,
   ) {}
 
+  // 오늘 날짜를 KST(UTC+9) 00:00:00으로 가져오는 헬퍼
+  private getTodayKst(): Date {
+    const now = new Date();
+    const kst = new Date(
+      now.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }),
+    );
+    kst.setHours(0, 0, 0, 0);
+    return kst;
+  }
+
   // 1. 대여 예약 생성 (날짜별 그룹핑 → 다중 rental 생성)
   async create(
     userId: string,
@@ -43,8 +53,7 @@ export class RentalsService {
     const { items, departmentType, departmentName } = createRentalDto;
     const actualActorId = actorId || userId;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = this.getTodayKst();
 
     const maxMonthsStr = await this.configService.getValue(
       'rental_max_period_months',
