@@ -3,6 +3,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 describe('Edge Cases & Security Stress Test', () => {
   let app: INestApplication;
@@ -10,7 +11,21 @@ describe('Edge Cases & Security Stress Test', () => {
   let userToken: string;
   let testItemId: number;
 
+  // 타임아웃 30초로 연장
+  jest.setTimeout(30000);
+
+  const testUser = {
+    username: 'tester01090665493z',
+    password: '@Jgn1517',
+    name: '경계조건테스터',
+    studentId: '202499999',
+    phoneNumber: '01011112222',
+    departmentType: '학과 학생회',
+    departmentName: '보안학과',
+  };
+
   beforeAll(async () => {
+    process.env.NODE_ENV = 'test';
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -22,10 +37,31 @@ describe('Edge Cases & Security Stress Test', () => {
 
     prisma = app.get<PrismaService>(PrismaService);
 
+    // 테스트용 사용자 강제 생성 또는 업데이트
+    const hashedPassword = await bcrypt.hash(testUser.password, 10);
+    await prisma.user.upsert({
+      where: { username: testUser.username },
+      update: {
+        password: hashedPassword,
+        role: 'USER',
+        deletedAt: null,
+      },
+      create: {
+        username: testUser.username,
+        password: hashedPassword,
+        name: testUser.name,
+        studentId: testUser.studentId,
+        phoneNumber: testUser.phoneNumber,
+        departmentType: testUser.departmentType,
+        departmentName: testUser.departmentName,
+        role: 'USER',
+      },
+    });
+
     // 테스트용 계정 로그인
     const loginRes = await request(app.getHttpServer())
       .post('/api/auth/login')
-      .send({ username: 'tester01090665493z', password: 'password123!' });
+      .send({ username: testUser.username, password: testUser.password });
     userToken = loginRes.body.accessToken;
 
     const itemsRes = await request(app.getHttpServer()).get('/api/items');

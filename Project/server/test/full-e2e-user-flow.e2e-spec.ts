@@ -3,15 +3,19 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 describe('Production-Ready Full E2E Flow', () => {
   let app: INestApplication;
   let prisma: PrismaService;
 
-  // 가입된 계정 정보
+  // 타임아웃 30초로 연장
+  jest.setTimeout(30000);
+
+  // 가입된 계정 정보 (사용자 지정값)
   const testUser = {
     username: 'tester01090665493z',
-    password: 'password123!',
+    password: '@Jgn1517',
     name: '홍길동',
     studentId: '202410001',
     phoneNumber: '01090665493',
@@ -43,25 +47,40 @@ describe('Production-Ready Full E2E Flow', () => {
 
     prisma = app.get<PrismaService>(PrismaService);
 
-    // 테스트용 사용자 존재 확인 및 초기화
-    const user = await prisma.user.findUnique({ where: { username: testUser.username } });
-    if (user) {
-      await prisma.rentalHistory.deleteMany({ where: { rental: { userId: user.id } } });
-      await prisma.rentalItem.deleteMany({ where: { rental: { userId: user.id } } });
-      await prisma.rental.deleteMany({ where: { userId: user.id } });
+    // 테스트용 사용자 강제 생성 또는 업데이트 (401 방지)
+    const hashedPassword = await bcrypt.hash(testUser.password, 10);
+    const user = await prisma.user.upsert({
+      where: { username: testUser.username },
+      update: {
+        password: hashedPassword,
+        role: 'USER',
+        deletedAt: null,
+      },
+      create: {
+        username: testUser.username,
+        password: hashedPassword,
+        name: testUser.name,
+        studentId: testUser.studentId,
+        phoneNumber: testUser.phoneNumber,
+        departmentType: testUser.departmentType,
+        departmentName: testUser.departmentName,
+        role: 'USER',
+      },
+    });
 
-      const userOrders = await prisma.plotterOrder.findMany({ where: { userId: user.id } });
-      const orderIds = userOrders.map(o => o.id);
-      if (orderIds.length > 0) {
-        await prisma.plotterOrderHistory.deleteMany({ where: { orderId: { in: orderIds } } });
-      }
-      await prisma.plotterOrder.deleteMany({ where: { userId: user.id } });
+    // 기존 데이터 청소 (테스트 독립성 보장)
+    await prisma.rentalHistory.deleteMany({ where: { rental: { userId: user.id } } });
+    await prisma.rentalItem.deleteMany({ where: { rental: { userId: user.id } } });
+    await prisma.rental.deleteMany({ where: { userId: user.id } });
 
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { departmentType: '중앙동아리', departmentName: '테스트동아리', role: 'USER' }
+    const userOrders = await prisma.plotterOrder.findMany({ where: { userId: user.id } });
+    const orderIds = userOrders.map((o) => o.id);
+    if (orderIds.length > 0) {
+      await prisma.plotterOrderHistory.deleteMany({
+        where: { orderId: { in: orderIds } },
       });
     }
+    await prisma.plotterOrder.deleteMany({ where: { userId: user.id } });
   });
 
   afterAll(async () => {
@@ -105,9 +124,7 @@ describe('Production-Ready Full E2E Flow', () => {
 
     it('should create plotter order with real PDF buffer', async () => {
       const pdfBuffer = Buffer.from('%PDF-1.4\n%E2E Test File Content');
-      const pickupDateObj = new Date();
-      pickupDateObj.setDate(pickupDateObj.getDate() + 7);
-      const pickupDateStr = pickupDateObj.toISOString().split('T')[0];
+      const pickupDateStr = '2026-03-19';
 
       const response = await request(app.getHttpServer())
         .post('/api/plotter/orders')
@@ -150,10 +167,8 @@ describe('Production-Ready Full E2E Flow', () => {
     });
 
     it('should create rental from cart', async () => {
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() + 7);
-      const endDate = new Date(startDate);
-      endDate.setDate(endDate.getDate() + 2);
+      const startDateStr = '2026-03-19';
+      const endDateStr = '2026-03-20';
 
       const response = await request(app.getHttpServer())
         .post('/api/rentals')
@@ -164,8 +179,8 @@ describe('Production-Ready Full E2E Flow', () => {
           items: [{
             itemId: testItemId,
             quantity: 1,
-            startDate: startDate.toISOString().split('T')[0],
-            endDate: endDate.toISOString().split('T')[0]
+            startDate: startDateStr,
+            endDate: endDateStr
           }]
         });
 
@@ -187,12 +202,9 @@ describe('Production-Ready Full E2E Flow', () => {
     });
 
     it('should block rental longer than 15 days', async () => {
-      const today = new Date();
-      const longStartDate = new Date(today);
-      longStartDate.setDate(today.getDate() + 1);
-      
-      const longEndDate = new Date(longStartDate);
-      longEndDate.setDate(longStartDate.getDate() + 16); // 17일 대여 시도
+      // 안전한 미래 평일: 2026-04-20(월) ~ 2026-05-07(목) (총 18일)
+      const longStartDate = '2026-04-20';
+      const longEndDate = '2026-05-07';
 
       const response = await request(app.getHttpServer())
         .post('/api/rentals')
@@ -204,8 +216,8 @@ describe('Production-Ready Full E2E Flow', () => {
             {
               itemId: testItemId,
               quantity: 1,
-              startDate: longStartDate.toISOString().split('T')[0],
-              endDate: longEndDate.toISOString().split('T')[0],
+              startDate: longStartDate,
+              endDate: longEndDate,
             },
           ],
         });

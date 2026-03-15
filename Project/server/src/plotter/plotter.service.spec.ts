@@ -51,7 +51,9 @@ describe('PlotterService', () => {
         {
           provide: HolidaysService,
           useValue: {
-            calculateBusinessDate: jest.fn().mockResolvedValue(new Date()),
+            calculateBusinessDate: jest
+              .fn()
+              .mockResolvedValue(new Date('2000-01-01')),
             isHoliday: jest.fn().mockResolvedValue(false),
           },
         },
