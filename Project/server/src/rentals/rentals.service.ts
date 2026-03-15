@@ -71,8 +71,10 @@ export class RentalsService {
 
     // 1) 모든 품목 날짜 사전 검증
     for (const item of items) {
-      const start = new Date(`${item.startDate.split('T')[0]}T00:00:00+09:00`);
-      const end = new Date(`${item.endDate.split('T')[0]}T00:00:00+09:00`);
+      const startStr = item.startDate.split('T')[0];
+      const endStr = item.endDate.split('T')[0];
+      const start = new Date(`${startStr}T00:00:00.000Z`);
+      const end = new Date(`${endStr}T00:00:00.000Z`);
 
       // 기간 계산 (단순 차이 + 1일)
       const diffTime = Math.abs(end.getTime() - start.getTime());
@@ -593,9 +595,9 @@ export class RentalsService {
         }
 
         if (firstStartDate)
-          start = new Date(`${firstStartDate.split('T')[0]}T00:00:00+09:00`);
+          start = new Date(`${firstStartDate.split('T')[0]}T00:00:00.000Z`);
         if (firstEndDate)
-          end = new Date(`${firstEndDate.split('T')[0]}T00:00:00+09:00`);
+          end = new Date(`${firstEndDate.split('T')[0]}T00:00:00.000Z`);
       }
     }
 

@@ -238,10 +238,10 @@ export class PlotterService {
       delayDays,
     );
 
-    // 사용자가 입력한 날짜를 KST(UTC+9) 기준 자정으로 강제 고정
-    const pickupDate = new Date(
-      `${requestedPickupDate.split('T')[0]}T00:00:00+09:00`,
-    );
+    // 사용자가 입력한 날짜를 서버 타임존과 관계없이 순수 날짜 숫자로 보존하기 위해 UTC 00:00:00으로 설정
+    // 이렇게 하면 DB에 저장될 때 해당 날짜가 그대로 유지됨
+    const pickupDateStr = requestedPickupDate.split('T')[0];
+    const pickupDate = new Date(`${pickupDateStr}T00:00:00.000Z`);
 
     if (pickupDate < minPickupDate) {
       const minDateStr = minPickupDate.toISOString().split('T')[0];
