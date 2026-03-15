@@ -5,11 +5,13 @@ import {
   Body,
   Param,
   Delete,
+  Query,
   UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
 import { HolidaysService } from './holidays.service';
 import { CreateHolidayDto } from './dto/create-holiday.dto';
+import { HolidayCalendarQueryDto } from './dto/holiday-calendar-query.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -30,6 +32,11 @@ export class HolidaysController {
   // 누구나 조회 가능 (로그인 불필요 or 필요 여부는 정책에 따라. 명세엔 All Users)
   findAll() {
     return this.holidaysService.findAll();
+  }
+
+  @Get('calendar')
+  getCalendar(@Query() query: HolidayCalendarQueryDto) {
+    return this.holidaysService.getCalendar(query.year, query.month);
   }
 
   @Delete(':id')

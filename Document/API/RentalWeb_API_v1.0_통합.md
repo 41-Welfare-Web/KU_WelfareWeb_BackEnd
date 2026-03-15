@@ -184,10 +184,18 @@
 
 ```json
 {
-  "message": "요청이 접수되었습니다. 가입된 정보와 일치하는 경우, SMS로 아이디를 발송해 드립니다."
+  "message": "SMS로 아이디를 발송하였습니다."
 }
 ```
-*   **Note:** 사용자 정보 존재 여부를 알려주지 않기 위해, 성공/실패 시 모두 동일한 메시지를 반환합니다.
+
+*   **Error Response (`404 Not Found`)** — 이름 또는 전화번호가 일치하는 사용자 없음
+
+```json
+{
+  "statusCode": 404,
+  "message": "이름 또는 전화번호가 일치하는 사용자를 찾을 수 없습니다."
+}
+```
 
 ---
 # 비밀번호 재설정 요청 (Request Password Reset)
@@ -219,7 +227,25 @@
 
 ```json
 {
-  "message": "요청이 접수되었습니다. 가입된 정보와 일치하는 경우, SMS로 인증 코드를 발송해 드립니다."
+  "message": "인증 코드가 발송되었습니다."
+}
+```
+
+*   **Error Response (`404 Not Found`)** — 아이디 또는 전화번호가 일치하는 사용자 없음
+
+```json
+{
+  "statusCode": 404,
+  "message": "아이디 또는 전화번호가 일치하는 사용자를 찾을 수 없습니다."
+}
+```
+
+*   **Error Response (`400 Bad Request`)** — 하루 최대 발송 횟수(5회) 초과
+
+```json
+{
+  "statusCode": 400,
+  "message": "하루 최대 인증번호 발송 횟수(5회)를 초과하였습니다. 내일 다시 시도해주세요."
 }
 ```
 
@@ -2098,6 +2124,57 @@
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
 | `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
+
+---
+# 휴무일 캘린더 조회 (Get Holiday Calendar)
+
+`FR-31` 요구사항에 따라, 특정 월의 모든 휴무일(주말 + 등록 휴무일)을 한 번에 조회합니다.
+
+## **ENDPOINT:** `GET /api/admin/holidays/calendar`
+**Description:** 지정한 연/월의 토요일·일요일과 관리자가 등록한 휴무일을 합산하여 반환합니다. 프론트엔드 달력 UI에서 예약 불가 날짜 표시에 활용합니다.
+**Required Permissions:** All Users
+
+---
+
+#### **Query Parameters**
+
+| 파라미터 | 타입 | 필수 | 설명 |
+| :--- | :--- | :--- | :--- |
+| `year` | integer | ✅ | 조회 연도 (2020 ~ 2099) |
+| `month` | integer | ✅ | 조회 월 (1 ~ 12) |
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "year": 2026,
+  "month": 3,
+  "holidays": [
+    { "date": "2026-03-07", "type": "WEEKEND" },
+    { "date": "2026-03-08", "type": "WEEKEND" },
+    { "date": "2026-03-14", "type": "WEEKEND" },
+    { "date": "2026-03-15", "type": "WEEKEND" },
+    { "date": "2026-03-17", "type": "HOLIDAY", "description": "삼일절 대체휴일" },
+    { "date": "2026-03-21", "type": "WEEKEND" },
+    { "date": "2026-03-22", "type": "WEEKEND" },
+    { "date": "2026-03-28", "type": "WEEKEND" },
+    { "date": "2026-03-29", "type": "WEEKEND" }
+  ]
+}
+```
+
+* `type`: `WEEKEND` (토/일) 또는 `HOLIDAY` (관리자 등록 휴무일)
+* `description`: `HOLIDAY` 타입일 때만 포함, 등록 시 설명이 없으면 생략
+
+*   **Error Responses**
+
+| HTTP Code | 설명 |
+| :--- | :--- |
+| `400 Bad Request` | `year` / `month` 누락 또는 범위 초과 |
 
 ---
 # 휴무일 추가 (Add Holiday)

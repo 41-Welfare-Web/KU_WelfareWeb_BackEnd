@@ -58,9 +58,20 @@ cd Project/server; .\verify_auth_plotter.ps1
 # 모든 단위 테스트 실행
 cd Project/server; npm run test
 
-# E2E(End-to-End) 테스트 실행
+# E2E(End-to-End) 테스트 실행 (전체)
 cd Project/server; npm run test:e2e
+
+# 아이디 찾기 / 비밀번호 재설정 요청 전용 테스트
+cd Project/server; npx jest --config ./test/jest-e2e.json "auth-find-reset"
 ```
+
+### E2E 테스트 파일 목록
+
+| 파일 | 설명 |
+|------|------|
+| `test/full-e2e-user-flow.e2e-spec.ts` | 로그인, 플로터 주문, 대여, 관리자 기능 전체 플로우 |
+| `test/edge-cases.e2e-spec.ts` | 엣지 케이스 및 예외 처리 검증 |
+| `test/auth-find-reset.e2e-spec.ts` | 아이디 찾기 / 비밀번호 재설정 요청 — 일치/불일치 케이스 |
 
 ---
 
@@ -97,8 +108,11 @@ Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/verify-signup-code" -ContentT
 # 3. 회원가입 (Register)
 Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/register" -ContentType "application/json" -Body '{"username":"newuser01","password":"password123!","name":"홍길동","studentId":"20260001","phoneNumber":"01090665493","departmentType":"공과대학","departmentName":"컴퓨터공학과","verificationCode":"123456"}'
 
-# 4. 아이디 찾기 (Find Username)
+# 4. 아이디 찾기 (Find Username) — 일치하면 200 + SMS 발송, 불일치하면 404
 Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/find-username" -ContentType "application/json" -Body '{"name":"홍길동","phoneNumber":"01090665493"}'
+
+# 5. 비밀번호 재설정 요청 — 일치하면 200 + SMS 발송, 불일치하면 404
+Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/password-reset/request" -ContentType "application/json" -Body '{"username":"testuser","phoneNumber":"01090665493"}'
 
 # 토큰 갱신 (Refresh Token)
 $res = Invoke-RestMethod -Method Post -Uri "$baseUrl/auth/refresh" -ContentType "application/json" -Body @{ refreshToken = $refreshToken }; $token = $res.accessToken

@@ -211,6 +211,7 @@ RentalWeb/
 - `POST /api/admin/upload-image` — 물품 이미지 업로드 **[Admin]** (5MB, png/jpeg/jpg/webp, `items` 버킷)
 - `GET /api/admin/stats` — 통계 데이터 **[Admin]**
 - `GET /api/admin/holidays` — 휴무일 목록 (All Users)
+- `GET /api/admin/holidays/calendar` — 월별 휴무일 캘린더 조회 (All Users, `?year=&month=`, 주말+등록휴무일 합산)
 - `POST /api/admin/holidays` — 휴무일 추가 **[Admin]**
 - `DELETE /api/admin/holidays/:id` — 휴무일 삭제 **[Admin]**
 - `GET /api/admin/configurations` — 시스템 설정 **[Admin]**
