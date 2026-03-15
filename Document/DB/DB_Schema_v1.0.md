@@ -39,7 +39,7 @@
 | 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
 | :--- | :--- | :--- | :--- |
 | `id` | `serial` | ID | **Primary Key** |
-| `name` | `varchar(50)` | 카테고리명 | **Unique**, Not Null |
+| `name` | `varchar(50)` | 카테고리명 (행사, 체육, 음향기기, 기타 등) | **Unique**, Not Null |
 | `deleted_at` | `timestampz` | 소프트 삭제 시간 | |
 
 #### **3. `items` (물품 종류)**
@@ -48,8 +48,8 @@
 | :--- | :--- | :--- | :--- |
 | `id` | `serial` | ID | **Primary Key** |
 | `category_id` | `integer` | 카테고리 ID | Foreign Key (`categories.id`) |
-| `name` | `varchar(100)` | 물품명 | Not Null |
-| `item_code` | `varchar(20)` | 물품 코드 (카테고리별 100, 200, 300, 400 접두사 사용) | **Unique**, Not Null |
+| `name` | `varchar(100)` | 물품명 (예: 천막, 피구공, 유선마이크) | Not Null |
+| `item_code` | `varchar(20)` | 물품 코드 (카테고리 ID를 백의 자리로 사용: 101, 202, 303 등) | **Unique**, Not Null |
 | `description` | `text` | 상세 설명 | |
 | `rental_count` | `integer` | 총 대여 횟수 | Default: 0 |
 | `image_url` | `text` | 대표 이미지 URL | |
