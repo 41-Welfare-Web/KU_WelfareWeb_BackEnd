@@ -238,8 +238,10 @@ export class PlotterService {
       delayDays,
     );
 
-    const pickupDate = new Date(requestedPickupDate);
-    pickupDate.setHours(0, 0, 0, 0);
+    // 사용자가 입력한 날짜를 KST(UTC+9) 기준 자정으로 강제 고정
+    const pickupDate = new Date(
+      `${requestedPickupDate.split('T')[0]}T00:00:00+09:00`,
+    );
 
     if (pickupDate < minPickupDate) {
       const minDateStr = minPickupDate.toISOString().split('T')[0];
