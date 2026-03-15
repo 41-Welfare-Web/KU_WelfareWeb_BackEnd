@@ -1,0 +1,146 @@
+[
+  {
+    "configKey": "rental_max_period_months",
+    "configValue": "2",
+    "description": "최대 대여 가능 기간 (개월)",
+    "updatedAt": "2026-01-22T11:01:12.059Z"
+  },
+  {
+    "configKey": "login_attempt_limit",
+    "configValue": "5",
+    "description": "로그인 시도 횟수 제한",
+    "updatedAt": "2026-01-22T11:01:12.620Z"
+  },
+  {
+    "configKey": "plotter_pickup_delay_days",
+    "configValue": "2",
+    "description": "플로터 신청 후 수령까지 걸리는 근무일 수",
+    "updatedAt": "2026-02-03T15:52:00.304Z"
+  },
+  {
+    "configKey": "verification_code_ttl_minutes",
+    "configValue": "5",
+    "description": "인증번호 유효 시간 (분)",
+    "updatedAt": "2026-02-03T15:52:00.728Z"
+  },
+  {
+    "configKey": "plotter_price_a1",
+    "configValue": "1500",
+    "description": "A1 용지 인쇄 단가 (원)",
+    "updatedAt": "2026-02-25T14:41:12.840Z"
+  },
+  {
+    "configKey": "plotter_purposes",
+    "configValue": "회칙 명시 사항 인쇄(예산안 등),학과 행사 목적,동아리 홍보물,기타",
+    "description": "플로터 인쇄 목적 전체 리스트 (쉼표 구분)",
+    "updatedAt": "2026-03-02T15:38:47.220Z"
+  },
+  {
+    "configKey": "plotter_departments_list",
+    "configValue": "총학생회,중앙자치기구,문과대학,이과대학,공과대학,건축대학,경영대학,사회과학대학,생명과학대학,융합과학기술원,부동산과학원,사범대학,수의과대학,상허교양대학,예술디자인대학,중앙동아리,단과대동아리,학과동아리,기타",
+    "description": "서비스 이용 가능 소속 단위 리스트 (쉼표 구분)",
+    "updatedAt": "2026-02-25T14:41:13.879Z"
+  },
+  {
+    "configKey": "dept_list_중앙자치기구",
+    "configValue": "중앙자치기구,건국문화예술학생연합,동아리연합회,졸업준비위원회,학생복지위원회",
+    "description": "중앙자치기구 세부 목록",
+    "updatedAt": "2026-02-27T17:37:06.138Z"
+  },
+  {
+    "configKey": "dept_list_문과대학",
+    "configValue": "문과대학,국어국문학과,영어영문학과,중어중문학과,철학과,사학과,지리학과,미디어커뮤니케이션학과,문화콘텐츠학과,문과대학자유전공학부",
+    "description": "문과대학 학과 목록",
+    "updatedAt": "2026-03-02T15:38:47.501Z"
+  },
+  {
+    "configKey": "dept_list_이과대학",
+    "configValue": "이과대학,수학과,화학과,물리학과,이과대학자유전공학부",
+    "description": "이과대학 학과 목록",
+    "updatedAt": "2026-03-02T15:38:47.571Z"
+  },
+  {
+    "configKey": "dept_list_공과대학",
+    "configValue": "공과대학,사회환경공학부,기계항공공학부,전기전자공학부,화학공학부,컴퓨터공학부,산업경영공학부 산업공학과,산업경영공학부 신산업융합학과,생물공학과,K뷰티산업융합학과",
+    "description": "공과대학 학과 목록",
+    "updatedAt": "2026-03-02T15:38:47.641Z"
+  },
+  {
+    "configKey": "dept_list_경영대학",
+    "configValue": "경영대학,경영학과,기술경영학과",
+    "description": "경영대학 학과 목록",
+    "updatedAt": "2026-03-02T15:38:47.712Z"
+  },
+  {
+    "configKey": "dept_list_사회과학대학",
+    "configValue": "사회과학대학,정치외교학과,경제학과,행정학과,국제무역학과,응용통계학과,융합인재학과,글로벌비즈니스학과",
+    "description": "사회과학대학 학과 목록",
+    "updatedAt": "2026-03-02T15:38:47.782Z"
+  },
+  {
+    "configKey": "dept_list_생명과학대학",
+    "configValue": "생명과학대학,생명과학특성학과,동물자원과학과,동물자원전공,식량자원과학과,축산식품생명공학과,식품유통공학과,식품유통전공,식품과학전공,환경보건과학과,환경보건전공,산림조경학과,산림조경전공,생명과학대학자유전공학부",
+    "description": "생명과학대학 학과 목록",
+    "updatedAt": "2026-03-02T15:38:47.853Z"
+  },
+  {
+    "configKey": "dept_list_융합과학기술원",
+    "configValue": "융합과학기술원,미래에너지공학과,스마트운행체공학과,스마트ICT융합공학과,화장품공학과,줄기세포재생공학과,의생명공학과,첨단바이오공학부,시스템생명공학과,융합생명공학과",
+    "description": "융합과학기술원 학과 목록",
+    "updatedAt": "2026-03-02T15:38:47.923Z"
+  },
+  {
+    "configKey": "dept_list_부동산과학원",
+    "configValue": "부동산과학원,부동산학과",
+    "description": "부동산과학원 학과 목록",
+    "updatedAt": "2026-03-02T15:38:47.993Z"
+  },
+  {
+    "configKey": "dept_list_사범대학",
+    "configValue": "사범대학,일어교육과,수학교육과,체육교육과,음악교육과,교육공학과,영어교육과",
+    "description": "사범대학 학과 목록",
+    "updatedAt": "2026-03-02T15:38:48.063Z"
+  },
+  {
+    "configKey": "dept_list_수의과대학",
+    "configValue": "수의과대학,수의예과,수의학과",
+    "description": "수의과대학 학과 목록",
+    "updatedAt": "2026-03-02T15:38:48.133Z"
+  },
+  {
+    "configKey": "dept_list_상허교양대학",
+    "configValue": "상허교양대학,KU자유전공학부",
+    "description": "상허교양대학 학과 목록",
+    "updatedAt": "2026-03-02T15:38:48.203Z"
+  },
+  {
+    "configKey": "dept_list_예술디자인대학",
+    "configValue": "예술디자인대학,커뮤니케이션디자인학과,산업디자인학과,의상디자인학과,리빙디자인학과,현대미술학과,영상학과,매체연기학과",
+    "description": "예술디자인대학 학과 목록",
+    "updatedAt": "2026-03-02T15:38:48.273Z"
+  },
+  {
+    "configKey": "plotter_price_a0",
+    "configValue": "2000",
+    "description": "A0 용지 인쇄 단가 (원)",
+    "updatedAt": "2026-02-25T14:41:12.424Z"
+  },
+  {
+    "configKey": "sms_notifications_enabled",
+    "configValue": "false",
+    "description": "알림 문자 발송 활성화 여부 (true/false)",
+    "updatedAt": "2026-03-09T02:52:27.996Z"
+  },
+  {
+    "configKey": "plotter_free_departments",
+    "configValue": "학과 학생회, 단과대 학생회, 중앙자치기구, 중앙동아리, 총학생회, 자치기구",
+    "description": "무료 인쇄 대상 소속 단위 (쉼표 구분)",
+    "updatedAt": "2026-02-25T14:41:13.186Z"
+  },
+  {
+    "configKey": "plotter_free_purposes",
+    "configValue": "회칙 명시 사항 인쇄(예산안 등),학과 행사 목적",
+    "description": "무료 인쇄 대상 목적 (쉼표 구분)",
+    "updatedAt": "2026-02-25T14:41:13.534Z"
+  }
+]
