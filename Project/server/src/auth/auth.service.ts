@@ -301,24 +301,27 @@ export class AuthService {
       where: { name, phoneNumber, deletedAt: null },
     });
 
-    if (user) {
-      try {
-        await this.smsService.sendSMS(
-          phoneNumber,
-          `[RentalWeb] 회원님의 아이디는 [${user.username}] 입니다.`,
-          true, // 아이디 찾기는 필수 기능이므로 설정 무시하고 발송
-        );
-      } catch (smsError) {
-        console.error(
-          '[AuthService] 아이디 찾기 SMS 발송 실패 (무시):',
-          smsError.message,
-        );
-      }
+    if (!user) {
+      throw new NotFoundException(
+        '이름 또는 전화번호가 일치하는 사용자를 찾을 수 없습니다.',
+      );
+    }
+
+    try {
+      await this.smsService.sendSMS(
+        phoneNumber,
+        `[RentalWeb] 회원님의 아이디는 [${user.username}] 입니다.`,
+        true, // 아이디 찾기는 필수 기능이므로 설정 무시하고 발송
+      );
+    } catch (smsError) {
+      console.error(
+        '[AuthService] 아이디 찾기 SMS 발송 실패 (무시):',
+        smsError.message,
+      );
     }
 
     return {
-      message:
-        '요청이 접수되었습니다. 가입된 정보와 일치하는 경우, SMS로 아이디를 발송해 드립니다.',
+      message: 'SMS로 아이디를 발송하였습니다.',
     };
   }
 
@@ -329,41 +332,44 @@ export class AuthService {
       where: { username, phoneNumber, deletedAt: null },
     });
 
-    if (user) {
-      const oneDayAgo = new Date();
-      oneDayAgo.setHours(oneDayAgo.getHours() - 24);
-
-      const resendCount = await this.prisma.verificationCode.count({
-        where: {
-          target: username,
-          createdAt: { gte: oneDayAgo },
-        },
-      });
-
-      if (resendCount >= 5) {
-        throw new BadRequestException(
-          '하루 최대 인증번호 발송 횟수(5회)를 초과하였습니다. 내일 다시 시도해주세요.',
-        );
-      }
-
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      const expiresAt = new Date();
-      expiresAt.setMinutes(expiresAt.getMinutes() + 5);
-
-      await this.prisma.verificationCode.create({
-        data: {
-          target: username,
-          code,
-          expiresAt,
-        },
-      });
-
-      await this.smsService.sendVerificationCode(phoneNumber, code);
+    if (!user) {
+      throw new NotFoundException(
+        '아이디 또는 전화번호가 일치하는 사용자를 찾을 수 없습니다.',
+      );
     }
 
+    const oneDayAgo = new Date();
+    oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+
+    const resendCount = await this.prisma.verificationCode.count({
+      where: {
+        target: username,
+        createdAt: { gte: oneDayAgo },
+      },
+    });
+
+    if (resendCount >= 5) {
+      throw new BadRequestException(
+        '하루 최대 인증번호 발송 횟수(5회)를 초과하였습니다. 내일 다시 시도해주세요.',
+      );
+    }
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 5);
+
+    await this.prisma.verificationCode.create({
+      data: {
+        target: username,
+        code,
+        expiresAt,
+      },
+    });
+
+    await this.smsService.sendVerificationCode(phoneNumber, code);
+
     return {
-      message:
-        '요청이 접수되었습니다. 가입된 정보와 일치하는 경우, SMS로 인증 코드를 발송해 드립니다.',
+      message: '인증 코드가 발송되었습니다.',
     };
   }
 
