@@ -16,25 +16,38 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '@prisma/client';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 
-@Controller('admin/holidays') // API 명세에 따라 경로 설정 (/api/admin/holidays)
+@ApiTags('휴무일 (Holidays)')
+@Controller('admin/holidays')
 export class HolidaysController {
   constructor(private readonly holidaysService: HolidaysService) {}
 
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '휴무일 등록 [Admin]' })
   create(@Body() createHolidayDto: CreateHolidayDto) {
     return this.holidaysService.create(createHolidayDto);
   }
 
   @Get()
-  // 누구나 조회 가능 (로그인 불필요 or 필요 여부는 정책에 따라. 명세엔 All Users)
+  @ApiOperation({ summary: '휴무일 전체 목록 조회 (All Users)' })
   findAll() {
     return this.holidaysService.findAll();
   }
 
   @Get('calendar')
+  @ApiOperation({ summary: '월별 휴무일 캘린더 조회 (주말 + 등록 휴무일 합산, All Users)' })
+  @ApiQuery({ name: 'year', type: Number, example: 2026 })
+  @ApiQuery({ name: 'month', type: Number, example: 3 })
   getCalendar(@Query() query: HolidayCalendarQueryDto) {
     return this.holidaysService.getCalendar(query.year, query.month);
   }
@@ -42,6 +55,9 @@ export class HolidaysController {
   @Delete(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '휴무일 삭제 [Admin]' })
+  @ApiParam({ name: 'id', type: Number, description: '휴무일 ID' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.holidaysService.remove(id);
   }

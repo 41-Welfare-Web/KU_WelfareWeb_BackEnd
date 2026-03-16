@@ -80,17 +80,16 @@ export class HolidaysService {
 
   // Check if a specific date is a holiday (Weekend or Registered Holiday)
   async isHoliday(date: Date): Promise<boolean> {
-    // 1. 강제 KST 변환 (싱가포르 서버 시차 극복)
-    const kstDate = new Date(
-      date.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }),
-    );
+    // KST = UTC+9 직접 계산 (toLocaleString 환경 의존성 제거)
+    const kstMs = date.getTime() + 9 * 60 * 60 * 1000;
+    const kstDate = new Date(kstMs);
 
-    const day = kstDate.getDay();
+    const day = kstDate.getUTCDay(); // UTC 메서드로 KST 기준 요일 추출
     if (day === 0 || day === 6) {
       return true; // Weekend
     }
 
-    // 2. 시간 정보를 제거한 날짜 문자열로 변환하여 DB 조회
+    // 시간 정보를 제거한 날짜 문자열로 변환하여 DB 조회
     const dateStr = kstDate.toISOString().split('T')[0];
     const startOfDay = new Date(`${dateStr}T00:00:00.000Z`);
 

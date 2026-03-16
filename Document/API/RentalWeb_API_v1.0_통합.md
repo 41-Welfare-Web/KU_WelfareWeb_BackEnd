@@ -117,7 +117,7 @@
 }
 ```
 * `username`: (string, required) 로그인 아이디. 5~20자의 영문 소문자, 숫자만 가능.
-* `password`: (string, required) 비밀번호. 최소 8자 이상, 영문, 숫자, 특수문자 포함.
+* `password`: (string, required) 비밀번호. 최소 8자 이상, 영문과 숫자 필수 포함. 특수문자는 `!@#$%^&*` 만 허용 (선택).
 * `name`: (string, required) 실제 이름.
 * `studentId`: (string, required) 학번.
 * `phoneNumber`: (string, required) 전화번호. 하이픈 없이 입력.
@@ -311,7 +311,7 @@
 }
 ```
 * `resetToken`: (string, required) verify 단계에서 발급받은 토큰. 10분 유효.
-* `newPassword`: (string, required) 새 비밀번호. 비밀번호 정책을 따라야 함.
+* `newPassword`: (string, required) 새 비밀번호. 최소 8자 이상, 영문과 숫자 필수 포함. 특수문자는 `!@#$%^&*` 만 허용 (선택).
 
 ---
 
