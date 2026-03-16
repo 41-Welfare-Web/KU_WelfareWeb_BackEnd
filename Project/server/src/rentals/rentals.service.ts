@@ -492,24 +492,19 @@ export class RentalsService {
     });
     if (!rental) throw new NotFoundException('대여 건을 찾을 수 없습니다.');
 
-    if (
-      rental.status === RentalStatus.CANCELED ||
-      rental.status === RentalStatus.RETURNED
-    ) {
-      throw new BadRequestException('이미 종료된 대여 건입니다.');
-    }
+    const resolvedStatus = newStatus ?? rental.status;
 
     const updated = await this.prisma.rental.update({
       where: { id },
       data: {
-        status: newStatus,
+        status: resolvedStatus,
         memo: memo,
         rentalHistories: {
           create: {
             changedBy: userId,
             oldStatus: rental.status,
-            newStatus,
-            memo,
+            newStatus: resolvedStatus,
+            memo: memo || (newStatus ? `상태 변경: ${resolvedStatus}` : '메모 변경'),
           },
         },
       },
@@ -536,22 +531,25 @@ export class RentalsService {
         ? `${updated.rentalItems[0].item.name} 외 ${updated.rentalItems.length - 1}건`
         : '물품 없음';
 
-    try {
-      const smsEnabled = await this.configService.getValue('sms_notifications_enabled', 'true');
-      if (smsEnabled === 'true') {
-        await this.smsService.sendRentalStatusNotice(
-          updated.user.phoneNumber,
-          updated.user.name,
-          itemSummary,
-          newStatus,
-          memo,
+    // 실제 상태 변경이 있을 때만 SMS 발송
+    if (newStatus && newStatus !== rental.status) {
+      try {
+        const smsEnabled = await this.configService.getValue('sms_notifications_enabled', 'true');
+        if (smsEnabled === 'true') {
+          await this.smsService.sendRentalStatusNotice(
+            updated.user.phoneNumber,
+            updated.user.name,
+            itemSummary,
+            newStatus,
+            memo,
+          );
+        }
+      } catch (smsError) {
+        console.error(
+          '[RentalsService] 상태 변경 SMS 알림 실패 (무시):',
+          smsError.message,
         );
       }
-    } catch (smsError) {
-      console.error(
-        '[RentalsService] 상태 변경 SMS 알림 실패 (무시):',
-        smsError.message,
-      );
     }
 
     return updated;

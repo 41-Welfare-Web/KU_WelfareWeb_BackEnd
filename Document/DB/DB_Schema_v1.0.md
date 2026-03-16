@@ -95,6 +95,30 @@
 | `deleted_at` | `timestampz` | 소프트 삭제 시간 | |
 | `created_at` | `timestampz` | 생성일 | Default: `now()` |
 
+#### **8. `plotter_orders` (플로터 주문)**
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `id` | `serial` | ID | **Primary Key** |
+| `user_id` | `uuid` | 사용자 ID | Foreign Key (`users.id`) |
+| `purpose` | `varchar(100)` | 인쇄 목적 | Not Null |
+| `paper_size` | `varchar(10)` | 용지 크기 (`A0`, `A1`) | Not Null |
+| `page_count` | `integer` | 출력 페이지 수 | Not Null |
+| `is_paid_service` | `boolean` | 유료 여부 | Not Null |
+| `price` | `integer` | 청구 금액 (원) | Default: 0 |
+| `payment_receipt_url` | `text` | 입금 영수증 이미지 URL | |
+| `department_type` | `varchar(30)` | 신청 당시 소속 유형 | Not Null |
+| `department_name` | `varchar(50)` | 신청 당시 소속 단위명 | |
+| `file_url` | `text` | 업로드된 PDF 파일 URL | Not Null |
+| `original_filename` | `varchar(255)` | 원본 파일명 | |
+| `file_size` | `integer` | 파일 크기 (bytes) | |
+| `pickup_date` | `date` | 수령 예정일 (신청일 기준 근무일 +2) | Not Null |
+| `status` | `enum(PlotterStatus)` | 주문 상태 | Default: `PENDING` |
+| `rejection_reason` | `text` | 반려 사유 (`REJECTED` 시) | |
+| `memo` | `text` | 관리자 메모 | |
+| `deleted_at` | `timestampz` | 소프트 삭제 시간 | |
+| `created_at` | `timestampz` | 생성일 | Default: `now()` |
+
 #### **12. `verification_codes` (인증 코드 - Stateless)**
 
 | 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |

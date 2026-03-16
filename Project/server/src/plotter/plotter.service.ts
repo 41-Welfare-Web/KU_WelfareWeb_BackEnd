@@ -315,7 +315,7 @@ export class PlotterService {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
-        include: { user: { select: { name: true, studentId: true } } },
+        include: { user: { select: { name: true, studentId: true, phoneNumber: true } } },
       }),
       this.prisma.plotterOrder.count({ where }),
     ]);
@@ -370,6 +370,7 @@ export class PlotterService {
     adminId: string,
     status: string,
     rejectionReason?: string,
+    memo?: string,
   ) {
     if (!Object.values(PlotterStatus).includes(status as PlotterStatus)) {
       throw new BadRequestException('유효하지 않은 상태 값입니다.');
@@ -390,12 +391,13 @@ export class PlotterService {
         status: status as PlotterStatus,
         rejectionReason:
           status === PlotterStatus.REJECTED ? rejectionReason : null,
+        memo: memo ?? order.memo,
         plotterOrderHistories: {
           create: {
             changedBy: adminId,
             oldStatus: order.status,
             newStatus: status,
-            memo: rejectionReason || `상태 변경: ${status}`,
+            memo: memo || rejectionReason || `상태 변경: ${status}`,
           },
         },
       },

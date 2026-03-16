@@ -1781,7 +1781,7 @@
 
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
-| `400 Bad Request` | `INVALID_STATUS_TRANSITION` | 유효하지 않은 상태 변경일 때 (예: `RETURNED` -> `RENTED`) |
+| `400 Bad Request` | `INVALID_STATUS_TRANSITION` | 유효하지 않은 상태 변경일 때 |
 | `400 Bad Request` | `MEMO_REQUIRED` | 특정 상태 변경 시(예: 불량, 관리자 취소) `memo`가 누락되었을 때 |
 | (이 외 Get Rental Details의 Error 참조) | | |
 
@@ -1937,7 +1937,7 @@
   "orders": [
     {
       "id": 201,
-      "user": { "name": "김테스트", "studentId": "202412345" },
+      "user": { "name": "김테스트", "studentId": "202412345", "phoneNumber": "01012345678" },
       "departmentType": "학과 학생회",
       "departmentName": "컴퓨터공학과",
       "purpose": "졸업 작품 포스터",
@@ -2006,11 +2006,13 @@
 ```json
 {
   "status": "CONFIRMED",
-  "rejectionReason": "PDF 파일에 문제가 있습니다."
+  "rejectionReason": "PDF 파일에 문제가 있습니다.",
+  "memo": "특수 용지 사용 필요"
 }
 ```
 * `status`: (string, required) 변경할 상태. (`PENDING`, `CONFIRMED`, `PRINTED`, `REJECTED`, `COMPLETED`)
 * `rejectionReason`: (string, optional) `status`가 `REJECTED`일 경우 필수.
+* `memo`: (string, optional) 관리자 메모. 이전 메모가 있을 경우 덮어씀. 히스토리에도 기록됨.
 
 ---
 

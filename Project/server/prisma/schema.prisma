@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // 1. Users
@@ -214,6 +215,7 @@ model PlotterOrder {
   pickupDate        DateTime      @map("pickup_date") @db.Date
   status            PlotterStatus @default(PENDING)
   rejectionReason   String?       @map("rejection_reason") @db.Text
+  memo              String?       @db.Text
   deletedAt         DateTime?     @map("deleted_at") @db.Timestamptz
   createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz
 

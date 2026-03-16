@@ -151,6 +151,29 @@ describe('Production-Ready Full E2E Flow', () => {
       expect(response.status).toBe(200);
       expect(response.body.status).toBe('CONFIRMED');
     });
+
+    it('should save memo when admin updates plotter status', async () => {
+      const response = await request(app.getHttpServer())
+        .put(`/api/plotter/orders/${createdOrderId}/status`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .send({ status: 'PRINTED', memo: '특수 용지 사용 완료' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.status).toBe('PRINTED');
+      expect(response.body.memo).toBe('특수 용지 사용 완료');
+    });
+
+    it('should include phoneNumber in admin plotter orders list', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/plotter/orders')
+        .set('Authorization', `Bearer ${adminAccessToken}`);
+
+      expect(response.status).toBe(200);
+      const order = response.body.orders.find((o: any) => o.id === createdOrderId);
+      expect(order).toBeDefined();
+      expect(order.user.phoneNumber).toBeDefined();
+      expect(order.user.phoneNumber).toBe(testUser.phoneNumber);
+    });
   });
 
   describe('3. Rental & Cart Flow', () => {
@@ -189,7 +212,79 @@ describe('Production-Ready Full E2E Flow', () => {
     });
   });
 
-  describe('4. Safety & Security Rules', () => {
+  describe('4. Rental Status Unlock (RETURNED/CANCELED Re-transition)', () => {
+    it('should allow admin to change status of a RETURNED rental', async () => {
+      // RESERVED → RENTED → RETURNED 순서로 상태 변경
+      await request(app.getHttpServer())
+        .put(`/api/rentals/${createdRentalId}/status`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .send({ status: 'RENTED' });
+
+      await request(app.getHttpServer())
+        .put(`/api/rentals/${createdRentalId}/status`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .send({ status: 'RETURNED' });
+
+      // RETURNED 상태에서 다시 상태 변경 (잠금 해제 확인)
+      const response = await request(app.getHttpServer())
+        .put(`/api/rentals/${createdRentalId}/status`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .send({ status: 'OVERDUE', memo: '테스트 목적 재변경' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.status).toBe('OVERDUE');
+    });
+
+    it('should allow admin to update memo only without changing status', async () => {
+      const before = await request(app.getHttpServer())
+        .get(`/api/rentals/${createdRentalId}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`);
+      const statusBefore = before.body.status;
+
+      const response = await request(app.getHttpServer())
+        .put(`/api/rentals/${createdRentalId}/status`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .send({ memo: '메모만 변경 테스트' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.status).toBe(statusBefore); // 상태 유지
+      expect(response.body.memo).toBe('메모만 변경 테스트');
+    });
+
+    it('should allow admin to change status of a CANCELED rental', async () => {
+      // 새 대여 생성 후 CANCELED → 다시 상태 변경 테스트
+      const startDateStr = '2026-04-07';
+      const endDateStr = '2026-04-08';
+
+      const rentalRes = await request(app.getHttpServer())
+        .post('/api/rentals')
+        .set('Authorization', `Bearer ${userAccessToken}`)
+        .send({
+          departmentType: testUser.departmentType,
+          departmentName: testUser.departmentName,
+          items: [{ itemId: testItemId, quantity: 1, startDate: startDateStr, endDate: endDateStr }],
+        });
+      expect(rentalRes.status).toBe(201);
+      const cancelRentalId = rentalRes.body.rentals[0].id;
+
+      // CANCELED로 변경
+      await request(app.getHttpServer())
+        .put(`/api/rentals/${cancelRentalId}/status`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .send({ status: 'CANCELED' });
+
+      // CANCELED 상태에서 다시 상태 변경 (잠금 해제 확인)
+      const response = await request(app.getHttpServer())
+        .put(`/api/rentals/${cancelRentalId}/status`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .send({ status: 'RESERVED', memo: '취소 후 재활성화' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.status).toBe('RESERVED');
+    });
+  });
+
+  describe('5. Safety & Security Rules', () => {
     it('should block admin from self-withdrawal', async () => {
       const response = await request(app.getHttpServer())
         .delete('/api/users/me')

@@ -130,6 +130,11 @@ export class PlotterController {
           example: 'PDF 파일 깨짐',
           nullable: true,
         },
+        memo: {
+          type: 'string',
+          example: '특수 용지 사용 필요',
+          nullable: true,
+        },
       },
       required: ['status'],
     },
@@ -137,13 +142,14 @@ export class PlotterController {
   updateStatus(
     @GetUser() user: any,
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: { status: string; rejectionReason?: string },
+    @Body() body: { status: string; rejectionReason?: string; memo?: string },
   ) {
     return this.plotterService.updateStatus(
       id,
       user.userId,
       body.status,
       body.rejectionReason,
+      body.memo,
     );
   }
 }

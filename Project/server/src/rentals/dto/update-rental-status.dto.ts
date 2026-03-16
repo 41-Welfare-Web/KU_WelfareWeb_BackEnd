@@ -6,10 +6,12 @@ export class UpdateRentalStatusDto {
   @ApiProperty({
     enum: RentalStatus,
     example: 'RENTED',
-    description: '변경할 대여 상태',
+    description: '변경할 대여 상태. 생략 시 현재 상태를 유지하고 메모만 업데이트',
+    required: false,
   })
   @IsEnum(RentalStatus)
-  status: RentalStatus;
+  @IsOptional()
+  status?: RentalStatus;
 
   @ApiProperty({
     example: '물품 정상 반납 확인',
