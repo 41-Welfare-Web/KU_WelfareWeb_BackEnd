@@ -95,6 +95,29 @@
 | `deleted_at` | `timestampz` | 소프트 삭제 시간 | |
 | `created_at` | `timestampz` | 생성일 | Default: `now()` |
 
+#### **6. `rental_items` (대여 품목)**
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `id` | `serial` | ID | **Primary Key** |
+| `rental_id` | `integer` | 대여 ID | Foreign Key (`rentals.id`) |
+| `item_id` | `integer` | 물품 ID | Foreign Key (`items.id`) |
+| `quantity` | `integer` | 대여 수량 | Default: 1 |
+| `instance_id` | `integer` | 개별 실물 ID (INDIVIDUAL 물품) | Foreign Key (`item_instances.id`), Nullable |
+
+#### **7. `rental_history` (대여 상태 변경 이력)**
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `id` | `serial` | ID | **Primary Key** |
+| `rental_id` | `integer` | 대여 ID | Foreign Key (`rentals.id`) |
+| `rental_item_id` | `integer` | 대여 품목 ID | Foreign Key (`rental_items.id`), Nullable |
+| `changed_by` | `uuid` | 변경한 사용자 ID | Foreign Key (`users.id`) |
+| `old_status` | `varchar(20)` | 변경 전 상태 | Nullable |
+| `new_status` | `varchar(20)` | 변경 후 상태 | Not Null |
+| `memo` | `text` | 변경 메모 | Nullable |
+| `changed_at` | `timestampz` | 변경 시각 | Default: `now()` |
+
 #### **8. `plotter_orders` (플로터 주문)**
 
 | 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
@@ -119,6 +142,35 @@
 | `deleted_at` | `timestampz` | 소프트 삭제 시간 | |
 | `created_at` | `timestampz` | 생성일 | Default: `now()` |
 
+#### **9. `plotter_order_history` (플로터 상태 변경 이력)**
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `id` | `serial` | ID | **Primary Key** |
+| `order_id` | `integer` | 플로터 주문 ID | Foreign Key (`plotter_orders.id`) |
+| `changed_by` | `uuid` | 변경한 관리자 ID | Foreign Key (`users.id`) |
+| `old_status` | `varchar(20)` | 변경 전 상태 | Nullable |
+| `new_status` | `varchar(20)` | 변경 후 상태 | Not Null |
+| `memo` | `text` | 변경 메모 | Nullable |
+| `changed_at` | `timestampz` | 변경 시각 | Default: `now()` |
+
+#### **10. `holidays` (휴무일)**
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `id` | `serial` | ID | **Primary Key** |
+| `holiday_date` | `date` | 휴무일 날짜 | **Unique**, Not Null |
+| `description` | `varchar(100)` | 휴무일 설명 | Nullable |
+
+#### **11. `configurations` (시스템 설정)**
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `config_key` | `varchar(50)` | 설정 키 | **Primary Key** |
+| `config_value` | `varchar(255)` | 설정 값 | Not Null |
+| `description` | `text` | 설명 | Nullable |
+| `updated_at` | `timestampz` | 마지막 수정 시각 | Default: `now()` |
+
 #### **12. `verification_codes` (인증 코드 - Stateless)**
 
 | 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
@@ -130,4 +182,43 @@
 | `expires_at` | `timestampz` | 만료 시간 | Not Null |
 | `created_at` | `timestampz` | 발급 시간 | Default: `now()` |
 
-*(나머지 테이블들은 v1.0과 동일하되, Enum 타입 적용 및 Map 필드 매핑 정보를 최신화하여 유지함)*
+#### **13. `audit_log` (감사 로그)**
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `id` | `bigserial` | ID | **Primary Key** |
+| `user_id` | `uuid` | 요청한 사용자 ID | Foreign Key (`users.id`), Nullable |
+| `action` | `varchar(50)` | 수행된 액션 (예: `CREATE`, `UPDATE`, `DELETE`) | Not Null |
+| `target_type` | `varchar(50)` | 대상 리소스 타입 (예: `rental`, `item`) | Nullable |
+| `target_id` | `text` | 대상 리소스 ID | Nullable |
+| `details` | `jsonb` | 변경 상세 내용 | Nullable |
+| `ip_address` | `varchar(45)` | 요청 IP (IPv6 포함) | Nullable |
+| `created_at` | `timestampz` | 기록 시각 | Default: `now()` |
+
+#### **14. `cart_items` (장바구니)**
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `id` | `serial` | ID | **Primary Key** |
+| `user_id` | `uuid` | 사용자 ID | Foreign Key (`users.id`) |
+| `item_id` | `integer` | 물품 ID | Foreign Key (`items.id`) |
+| `quantity` | `integer` | 수량 | Default: 1 |
+| `start_date` | `date` | 대여 시작일 | Nullable |
+| `end_date` | `date` | 반납 예정일 | Nullable |
+| `created_at` | `timestampz` | 생성일 | Default: `now()` |
+| `updated_at` | `timestampz` | 수정일 | Auto-updated |
+
+> **Unique Constraint**: (`user_id`, `item_id`) — 동일 사용자가 동일 물품을 장바구니에 중복 추가 불가
+
+#### **누락 테이블 (문서화 보류)**
+
+`item_components` 테이블은 아래와 같습니다.
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `id` | `serial` | ID | **Primary Key** |
+| `parent_id` | `integer` | 세트 물품 ID | Foreign Key (`items.id`) |
+| `component_id` | `integer` | 구성품 물품 ID | Foreign Key (`items.id`) |
+| `quantity` | `integer` | 구성품 수량 | Default: 1 |
+
+> **Unique Constraint**: (`parent_id`, `component_id`)

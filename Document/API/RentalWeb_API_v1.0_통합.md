@@ -2042,27 +2042,7 @@
 
 ### **7. 시스템 설정 및 관리 (System & Configs)**
 
-# 휴무일 목록 조회 (Get Holidays)
-
-## **ENDPOINT:** `GET /api/holidays`
-**Description:** 주말(토, 일)을 제외하고 관리자가 직접 지정한 추가 공휴일/휴무일 목록을 조회합니다.
-**Required Permissions:** All Users
-
----
-
-# 휴무일 등록 (Create Holiday)
-
-## **ENDPOINT:** `POST /api/holidays`
-**Description:** 관리자가 새로운 휴무일을 지정합니다.
-**Required Permissions:** Admin Only
-
----
-
-# 시스템 설정 목록 조회 (Get Configurations)
-
-## **ENDPOINT:** `GET /api/configurations`
-**Description:** `configurations` 테이블에 저장된 모든 시스템 정책 설정값을 조회합니다.
-**Required Permissions:** Admin Only
+# 통계 데이터 조회 (Get Statistics)
 
 관리자가 시스템의 주요 통계 데이터를 조회합니다.
 
