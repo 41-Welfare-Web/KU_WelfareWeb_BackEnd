@@ -15,6 +15,7 @@ import { HolidaysService } from '../holidays/holidays.service';
 import { SmsService } from '../sms/sms.service';
 import { CartService } from '../cart/cart.service';
 import { Cron } from '@nestjs/schedule';
+import { getStartOfDayKst, parseDateOnlyKst } from '../common/utils/date.util';
 
 @Injectable()
 export class RentalsService {
@@ -26,17 +27,7 @@ export class RentalsService {
     private cartService: CartService,
   ) {}
 
-  // 오늘 날짜를 KST(UTC+9) 00:00:00으로 가져오는 헬퍼
-  private getTodayKst(): Date {
-    const now = new Date();
-    const kst = new Date(
-      now.toLocaleString('en-US', { timeZone: 'Asia/Seoul' }),
-    );
-    kst.setHours(0, 0, 0, 0);
-    return kst;
-  }
-
-  // 1. 대여 예약 생성 (날짜별 그룹핑 → 다중 rental 생성)
+  // 1. 대여 예약 생성 (날짜별 그룹핑 → 단일 트랜잭션으로 다중 rental 생성)
   async create(
     userId: string,
     createRentalDto: CreateRentalDto,
@@ -53,7 +44,7 @@ export class RentalsService {
     const { items, departmentType, departmentName } = createRentalDto;
     const actualActorId = actorId || userId;
 
-    const today = this.getTodayKst();
+    const today = getStartOfDayKst();
 
     const maxMonthsStr = await this.configService.getValue(
       'rental_max_period_months',
@@ -71,10 +62,8 @@ export class RentalsService {
 
     // 1) 모든 품목 날짜 사전 검증
     for (const item of items) {
-      const startStr = item.startDate.split('T')[0];
-      const endStr = item.endDate.split('T')[0];
-      const start = new Date(`${startStr}T00:00:00.000Z`);
-      const end = new Date(`${endStr}T00:00:00.000Z`);
+      const start = parseDateOnlyKst(item.startDate);
+      const end = parseDateOnlyKst(item.endDate);
 
       // 기간 계산 (단순 차이 + 1일)
       const diffTime = Math.abs(end.getTime() - start.getTime());
@@ -123,15 +112,15 @@ export class RentalsService {
       groups.get(key)!.push(item);
     }
 
-    // 3) 그룹별 rental 생성
-    const createdRentals: any[] = [];
+    // 3) 모든 그룹 생성을 하나의 트랜잭션으로 묶어 부분 실패 방지
+    const createdRentals = await this.prisma.$transaction(async (tx) => {
+      const results: any[] = [];
 
-    for (const [key, groupItems] of groups) {
-      const [startDate, endDate] = key.split('__');
-      const start = new Date(startDate);
-      const end = new Date(endDate);
+      for (const [key, groupItems] of groups) {
+        const [startDate, endDate] = key.split('__');
+        const start = parseDateOnlyKst(startDate);
+        const end = parseDateOnlyKst(endDate);
 
-      const rental = await this.prisma.$transaction(async (tx) => {
         const finalItemsToRent: { itemId: number; quantity: number }[] = [];
 
         for (const reqItem of groupItems) {
@@ -161,6 +150,7 @@ export class RentalsService {
           }
         }
 
+        // 재고 검증
         for (const finalItem of finalItemsToRent) {
           const item = await tx.item.findFirst({
             where: { id: finalItem.itemId, deletedAt: null },
@@ -193,7 +183,6 @@ export class RentalsService {
             },
           });
 
-          // 날짜별로 최대 예약 수량 계산
           let maxReservedInPeriod = 0;
           const curr = new Date(start);
           while (curr <= end) {
@@ -264,11 +253,13 @@ export class RentalsService {
             },
           },
         });
+        results.push(created);
+      }
+      return results;
+    });
 
-        return created;
-      });
-
-      // SMS 알림은 트랜잭션 밖에서 best-effort로 발송
+    // SMS 알림 발송 (트랜잭션 성공 후)
+    for (const rental of createdRentals) {
       try {
         const itemSummary =
           rental.rentalItems.length > 1
@@ -287,8 +278,6 @@ export class RentalsService {
           smsError.message,
         );
       }
-
-      createdRentals.push(rental);
     }
 
     await this.cartService.clearCart(userId);
@@ -593,9 +582,9 @@ export class RentalsService {
         }
 
         if (firstStartDate)
-          start = new Date(`${firstStartDate.split('T')[0]}T00:00:00.000Z`);
+          start = parseDateOnlyKst(firstStartDate);
         if (firstEndDate)
-          end = new Date(`${firstEndDate.split('T')[0]}T00:00:00.000Z`);
+          end = parseDateOnlyKst(firstEndDate);
       }
     }
 
@@ -744,8 +733,7 @@ export class RentalsService {
   async handleOverdueRentals() {
     console.log('[RentalsService] Running Automated Overdue Processing...');
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getStartOfDayKst();
 
     const overdueRentals = await this.prisma.rental.findMany({
       where: {
@@ -805,9 +793,8 @@ export class RentalsService {
   async handleRentalReminder() {
     console.log('[RentalsService] Running D-1 Return Reminder Scheduler...');
 
-    const tomorrow = new Date();
+    const tomorrow = getStartOfDayKst();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
 
     const dayAfterTomorrow = new Date(tomorrow);
     dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 1);

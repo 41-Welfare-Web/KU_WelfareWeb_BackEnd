@@ -13,12 +13,19 @@ export class PlotterPriceCheckDto {
   @IsNotEmpty()
   paperSize: string;
 
-  @ApiProperty({ example: 1, description: '인쇄 페이지 수' })
+  @ApiProperty({ example: 1, description: 'PDF 페이지 수' })
   @Transform(({ value }) => parseInt(value))
   @IsInt()
   @IsNotEmpty()
   @Min(1)
   pageCount: number;
+
+  @ApiProperty({ example: 1, description: '출력 부수', default: 1 })
+  @Transform(({ value }) => parseInt(value))
+  @IsInt()
+  @IsNotEmpty()
+  @Min(1)
+  orderQuantity: number;
 
   @ApiProperty({
     example: '자치기구',

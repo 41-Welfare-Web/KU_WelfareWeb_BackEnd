@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateHolidayDto } from './dto/create-holiday.dto';
+import { getStartOfDayKst, parseDateOnlyKst } from '../common/utils/date.util';
 
 @Injectable()
 export class HolidaysService {
@@ -12,7 +13,7 @@ export class HolidaysService {
 
   async create(createHolidayDto: CreateHolidayDto) {
     const { holidayDate, description } = createHolidayDto;
-    const date = new Date(holidayDate);
+    const date = parseDateOnlyKst(holidayDate);
 
     const existing = await this.prisma.holiday.findUnique({
       where: { holidayDate: date },
@@ -43,7 +44,7 @@ export class HolidaysService {
 
   // 특정 월의 모든 휴무일(주말 + 등록 휴무일) 목록 반환
   async getCalendar(year: number, month: number) {
-    const firstDay = new Date(`${year}-${String(month).padStart(2, '0')}-01T00:00:00.000Z`);
+    const firstDay = new Date(Date.UTC(year, month - 1, 1));
     const lastDay = new Date(Date.UTC(year, month, 0)); // 해당 월 마지막 날
 
     // DB에서 해당 월 등록 휴무일 조회
@@ -64,7 +65,7 @@ export class HolidaysService {
     const cursor = new Date(firstDay);
     while (cursor <= lastDay) {
       const dateStr = cursor.toISOString().split('T')[0];
-      const day = cursor.getUTCDay(); // 0=일, 6=토
+      const day = cursor.getUTCDay(); // UTC 기준 (0=일, 6=토)
 
       if (day === 0 || day === 6) {
         result.push({ date: dateStr, type: 'WEEKEND' });
@@ -80,18 +81,13 @@ export class HolidaysService {
 
   // Check if a specific date is a holiday (Weekend or Registered Holiday)
   async isHoliday(date: Date): Promise<boolean> {
-    // KST = UTC+9 직접 계산 (toLocaleString 환경 의존성 제거)
-    const kstMs = date.getTime() + 9 * 60 * 60 * 1000;
-    const kstDate = new Date(kstMs);
-
-    const day = kstDate.getUTCDay(); // UTC 메서드로 KST 기준 요일 추출
+    // date가 이미 자정 기준(UTC 00:00 or KST 00:00) 객체라고 가정
+    const day = date.getDay(); 
     if (day === 0 || day === 6) {
       return true; // Weekend
     }
 
-    // 시간 정보를 제거한 날짜 문자열로 변환하여 DB 조회
-    const dateStr = kstDate.toISOString().split('T')[0];
-    const startOfDay = new Date(`${dateStr}T00:00:00.000Z`);
+    const startOfDay = getStartOfDayKst(date);
 
     const holiday = await this.prisma.holiday.findUnique({
       where: { holidayDate: startOfDay },

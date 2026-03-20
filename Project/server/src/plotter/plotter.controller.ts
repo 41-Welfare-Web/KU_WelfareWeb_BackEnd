@@ -18,6 +18,10 @@ import {
   CreatePlotterOrderDto,
   CreatePlotterOrderWithFilesDto,
 } from './dto/create-plotter-order.dto';
+import {
+  CreatePlotterOrderAdminDto,
+  CreatePlotterOrderAdminWithFilesDto,
+} from './dto/create-plotter-order-admin.dto';
 import { PlotterPriceCheckDto } from './dto/plotter-price-check.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../auth/get-user.decorator';
@@ -78,10 +82,42 @@ export class PlotterController {
       pdfFile,
       receiptFile,
     );
-  }
+    }
 
-  @Get('orders')
-  @ApiOperation({ summary: '플로터 주문 목록 조회' })
+    @Post('orders/admin')
+    @Roles(Role.ADMIN)
+    @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'pdfFile', maxCount: 1 },
+      { name: 'paymentReceiptImage', maxCount: 1 },
+    ]),
+    )
+    @ApiConsumes('multipart/form-data')
+    @ApiOperation({ summary: '플로터 주문 대리 신청 (관리자)' })
+    @ApiBody({ type: CreatePlotterOrderAdminWithFilesDto })
+    adminCreate(
+    @GetUser() user: any,
+    @Body() createOrderDto: CreatePlotterOrderAdminDto,
+    @UploadedFiles()
+    files: {
+      pdfFile?: Express.Multer.File[];
+      paymentReceiptImage?: Express.Multer.File[];
+    },
+    ) {
+    const pdfFile = files.pdfFile ? files.pdfFile[0] : undefined;
+    const receiptFile = files.paymentReceiptImage
+      ? files.paymentReceiptImage[0]
+      : undefined;
+    return this.plotterService.create(
+      createOrderDto.targetUserId,
+      createOrderDto,
+      pdfFile,
+      receiptFile,
+      user.userId,
+    );
+    }
+
+    @Get('orders')  @ApiOperation({ summary: '플로터 주문 목록 조회' })
   @ApiQuery({ name: 'page', required: false, example: '1' })
   @ApiQuery({ name: 'pageSize', required: false, example: '10' })
   @ApiQuery({

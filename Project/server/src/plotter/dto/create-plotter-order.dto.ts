@@ -33,11 +33,17 @@ export class CreatePlotterOrderDto {
   @IsNotEmpty()
   paperSize: string;
 
-  @ApiProperty({ example: 1, description: '인쇄 페이지 수' })
+  @ApiProperty({ example: 1, description: 'PDF 파일 내 페이지 수' })
   @Transform(({ value }) => parseInt(value))
   @IsInt()
   @IsNotEmpty()
   pageCount: number;
+
+  @ApiProperty({ example: 1, description: '출력 부수 (장수)', default: 1 })
+  @Transform(({ value }) => parseInt(value))
+  @IsInt()
+  @IsNotEmpty()
+  orderQuantity: number;
 
   @ApiProperty({
     example: '2026-03-15',

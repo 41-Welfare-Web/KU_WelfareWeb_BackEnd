@@ -204,6 +204,7 @@ model PlotterOrder {
   purpose           String        @db.VarChar(100)
   paperSize         String        @map("paper_size") @db.VarChar(10)
   pageCount         Int           @map("page_count")
+  orderQuantity     Int           @default(1) @map("order_quantity")
   isPaidService     Boolean       @map("is_paid_service")
   price             Int           @default(0)
   paymentReceiptUrl String?       @map("payment_receipt_url") @db.Text

@@ -11,6 +11,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
+import { getNowKst, getStartOfDayKst } from '../common/utils/date.util';
 
 @Injectable()
 export class UsersService {
@@ -106,14 +107,27 @@ export class UsersService {
     const { password } = deleteUserDto;
     const user = await this.prisma.user.findFirst({
       where: { id: userId, deletedAt: null },
+      include: {
+        _count: {
+          select: {
+            rentals: {
+              where: { status: { in: ['RENTED', 'OVERDUE'] }, deletedAt: null }
+            }
+          }
+        }
+      }
     });
 
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
     if (user.role === Role.ADMIN) {
       throw new ForbiddenException(
-        '관리자 계정은 보안 및 시스템 관리상의 이유로 직접 탈퇴할 수 없습니다. 관리자 권한 해제 후 다시 시도하거나 다른 관리자에게 문의하세요.',
+        '관리자 계정은 직접 탈퇴할 수 없습니다.',
       );
+    }
+
+    if (user._count.rentals > 0) {
+      throw new BadRequestException('현재 대여 중인 물품이 있어 탈퇴할 수 없습니다.');
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -121,19 +135,35 @@ export class UsersService {
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
     }
 
-    const timestamp = Date.now().toString().slice(-10); // 타임스탬프 뒷 10자리
-    const suffix = `_d${timestamp}`; // 총 12자 (_d + 10자리)
+    const now = getNowKst();
+    const timestamp = Date.now().toString().slice(-10);
+    const suffix = `_d${timestamp}`;
 
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        deletedAt: new Date(),
-        // 20자 제한을 넘지 않도록 기존 값을 8자로 자르고 접미사(12자) 추가
-        username: `${user.username.slice(0, 8)}${suffix}`,
-        studentId: `${user.studentId.slice(0, 8)}${suffix}`,
-        phoneNumber: `${user.phoneNumber.slice(0, 8)}${suffix}`,
-      },
-    });
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          deletedAt: now,
+          username: `${user.username.slice(0, 8)}${suffix}`,
+          studentId: `${user.studentId.slice(0, 8)}${suffix}`,
+          phoneNumber: `${user.phoneNumber.slice(0, 8)}${suffix}`,
+        },
+      }),
+      this.prisma.cartItem.deleteMany({ where: { userId } }),
+      this.prisma.plotterOrder.updateMany({
+        where: { userId, status: 'PENDING', deletedAt: null },
+        data: { deletedAt: now }
+      }),
+      this.prisma.auditLog.create({
+        data: {
+          userId,
+          action: 'USER_WITHDRAWAL',
+          targetType: 'USER',
+          targetId: userId,
+          details: { username: user.username }
+        }
+      })
+    ]);
 
     return { message: '회원 탈퇴가 성공적으로 처리되었습니다.' };
   }
@@ -204,7 +234,7 @@ export class UsersService {
   }
 
   // 5. 관리자: 사용자 역할 변경
-  async updateRole(userId: string, role: Role) {
+  async updateRole(userId: string, role: Role, actorId?: string) {
     if (!Object.values(Role).includes(role)) {
       throw new BadRequestException('유효하지 않은 역할입니다.');
     }
@@ -230,13 +260,24 @@ export class UsersService {
       },
     });
 
+    if (actorId) {
+      await this.prisma.auditLog.create({
+        data: {
+          userId: actorId,
+          action: 'UPDATE_USER_ROLE',
+          targetType: 'USER',
+          targetId: userId,
+          details: { oldRole: user.role, newRole: role }
+        }
+      });
+    }
+
     return updated;
   }
 
   // 6. 내 대시보드 요약 정보 조회
   async getDashboardSummary(userId: string) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = getStartOfDayKst();
 
     const activeRentalsCount = await this.prisma.rental.count({
       where: {

@@ -11,6 +11,7 @@ import { CreateItemInstanceDto } from './dto/create-item-instance.dto';
 import { UpdateItemInstanceDto } from './dto/update-item-instance.dto';
 import { AddItemComponentDto } from './dto/add-item-component.dto';
 import { FilesService } from '../common/files.service';
+import { getNowKst, getStartOfDayKst } from '../common/utils/date.util';
 
 @Injectable()
 export class ItemsService {
@@ -19,7 +20,7 @@ export class ItemsService {
     private filesService: FilesService,
   ) {}
 
-  async create(createItemDto: CreateItemDto, image?: Express.Multer.File) {
+  async create(createItemDto: CreateItemDto, image?: Express.Multer.File, actorId?: string) {
     const {
       categoryId,
       itemCode,
@@ -37,8 +38,6 @@ export class ItemsService {
     });
     if (!category) throw new NotFoundException('존재하지 않는 카테고리입니다.');
 
-    // itemCode 자동 생성: 카테고리번호(1자리) + 고유번호(2자리) = 총 3자리
-    // 예) 카테고리1 → 101, 102 ... / 카테고리2 → 201, 202 ...
     const existingItems = await this.prisma.item.findMany({
       where: { categoryId: Number(categoryId) },
       select: { itemCode: true },
@@ -56,7 +55,7 @@ export class ItemsService {
       imageUrl = await this.filesService.uploadFile(image, 'items');
     }
 
-    return this.prisma.item.create({
+    const newItem = await this.prisma.item.create({
       data: {
         name,
         itemCode: finalItemCode,
@@ -79,6 +78,20 @@ export class ItemsService {
       },
       include: { category: true, itemImages: true },
     });
+
+    if (actorId) {
+      await this.prisma.auditLog.create({
+        data: {
+          userId: actorId,
+          action: 'CREATE_ITEM',
+          targetType: 'ITEM',
+          targetId: String(newItem.id),
+          details: { name: newItem.name, itemCode: newItem.itemCode },
+        },
+      });
+    }
+
+    return newItem;
   }
 
   async findAll(
@@ -103,25 +116,9 @@ export class ItemsService {
     else if (sortBy === 'createdAt') orderBy = { createdAt: sortOrder };
     else orderBy = { rentalCount: sortOrder };
 
-    const now = new Date();
-    const todayStart = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      0,
-      0,
-      0,
-      0,
-    );
-    const todayEnd = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      23,
-      59,
-      59,
-      999,
-    );
+    const todayStart = getStartOfDayKst();
+    const todayEnd = new Date(todayStart);
+    todayEnd.setHours(23, 59, 59, 999);
 
     const items = await this.prisma.item.findMany({
       where,
@@ -129,12 +126,14 @@ export class ItemsService {
       include: {
         category: true,
         itemImages: {
+          where: { deletedAt: null },
           orderBy: { order: 'asc' },
         },
         rentalItems: {
           where: {
             rental: {
               status: { in: ['RESERVED', 'RENTED'] },
+              deletedAt: null,
               startDate: { lte: todayEnd },
               endDate: { gte: todayStart },
             },
@@ -163,6 +162,7 @@ export class ItemsService {
       include: {
         category: true,
         itemImages: {
+          where: { deletedAt: null },
           orderBy: { order: 'asc' },
         },
         components: { include: { component: true } },
@@ -178,6 +178,7 @@ export class ItemsService {
     id: number,
     updateItemDto: UpdateItemDto,
     image?: Express.Multer.File,
+    actorId?: string,
   ) {
     const item = await this.prisma.item.findFirst({
       where: { id, deletedAt: null },
@@ -200,7 +201,6 @@ export class ItemsService {
       updateData.imageUrl = await this.filesService.uploadFile(image, 'items');
     }
 
-    // 데이터 타입 보정 (multipart form-data 대응)
     if (updateData.totalQuantity !== undefined) {
       updateData.totalQuantity = Number(updateData.totalQuantity);
     }
@@ -208,10 +208,12 @@ export class ItemsService {
       updateData.categoryId = Number(updateData.categoryId);
     }
 
-    // 이미지 배열 처리 (전체 교체 방식)
     if (imageUrls) {
       updateData.itemImages = {
-        deleteMany: {}, // 기존 이미지 모두 삭제
+        updateMany: {
+          where: { itemId: id, deletedAt: null },
+          data: { deletedAt: getNowKst() },
+        },
         create: imageUrls.map((url, index) => ({
           imageUrl: url,
           order: index,
@@ -219,35 +221,81 @@ export class ItemsService {
       };
     }
 
-    return this.prisma.item.update({
+    const updatedItem = await this.prisma.item.update({
       where: { id },
       data: updateData,
       include: { category: true, itemImages: true },
     });
+
+    if (actorId) {
+      await this.prisma.auditLog.create({
+        data: {
+          userId: actorId,
+          action: 'UPDATE_ITEM',
+          targetType: 'ITEM',
+          targetId: String(id),
+          details: { updatedFields: Object.keys(dtoData) },
+        },
+      });
+    }
+
+    return updatedItem;
   }
 
-  async remove(id: number) {
+  async remove(id: number, actorId?: string) {
     const item = await this.prisma.item.findFirst({
       where: { id, deletedAt: null },
-      include: { _count: { select: { rentalItems: true } } },
+      include: { 
+        _count: { 
+          select: { 
+            rentalItems: {
+              where: { rental: { status: { in: ['RESERVED', 'RENTED', 'OVERDUE'] }, deletedAt: null } }
+            } 
+          } 
+        } 
+      },
     });
 
     if (!item) throw new NotFoundException('물품을 찾을 수 없습니다.');
 
     if (item._count.rentalItems > 0) {
       throw new ConflictException(
-        '대여 기록이 있는 물품은 삭제할 수 없습니다.',
+        '활성 대여 예약이 있는 물품은 삭제할 수 없습니다. (반납 완료 후 시도하세요)',
       );
     }
 
-    await this.prisma.item.update({
-      where: { id },
-      data: { deletedAt: new Date() },
-    });
-    return { message: '물품이 삭제되었습니다.' };
+    const now = getNowKst();
+
+    await this.prisma.$transaction([
+      this.prisma.item.update({
+        where: { id },
+        data: { deletedAt: now },
+      }),
+      this.prisma.itemInstance.updateMany({
+        where: { itemId: id, deletedAt: null },
+        data: { deletedAt: now },
+      }),
+      this.prisma.itemImage.updateMany({
+        where: { itemId: id, deletedAt: null },
+        data: { deletedAt: now },
+      }),
+    ]);
+
+    if (actorId) {
+      await this.prisma.auditLog.create({
+        data: {
+          userId: actorId,
+          action: 'DELETE_ITEM',
+          targetType: 'ITEM',
+          targetId: String(id),
+          details: { name: item.name },
+        },
+      });
+    }
+
+    return { message: '물품과 관련 실물 데이터가 삭제되었습니다.' };
   }
 
-  // 6. 물품 미래 재고 조회 (캘린더용)
   async getAvailability(itemId: number, startDate: Date, endDate: Date) {
     const item = await this.prisma.item.findFirst({
       where: { id: itemId, deletedAt: null },
@@ -267,18 +315,14 @@ export class ItemsService {
     const current = new Date(startDate);
     const end = new Date(endDate);
 
-    const searchStart = new Date(startDate);
-    searchStart.setDate(searchStart.getDate() - 1);
-    const searchEnd = new Date(endDate);
-    searchEnd.setDate(searchEnd.getDate() + 1);
-
     const rentals = await this.prisma.rentalItem.findMany({
       where: {
         itemId,
         rental: {
           status: { in: ['RESERVED', 'RENTED'] },
-          startDate: { lte: searchEnd },
-          endDate: { gte: searchStart },
+          deletedAt: null,
+          startDate: { lte: endDate },
+          endDate: { gte: startDate },
         },
       },
       include: {
@@ -311,7 +355,6 @@ export class ItemsService {
     return availability;
   }
 
-  // 7. 개별 실물 목록 조회
   async findInstances(itemId: number) {
     return this.prisma.itemInstance.findMany({
       where: { itemId, deletedAt: null },
@@ -319,8 +362,7 @@ export class ItemsService {
     });
   }
 
-  // 8. 개별 실물 등록
-  async createInstance(itemId: number, dto: CreateItemInstanceDto) {
+  async createInstance(itemId: number, dto: CreateItemInstanceDto, actorId?: string) {
     const item = await this.prisma.item.findFirst({
       where: { id: itemId, deletedAt: null },
     });
@@ -332,16 +374,29 @@ export class ItemsService {
     if (existing && !existing.deletedAt)
       throw new ConflictException('이미 존재하는 시리얼 번호입니다.');
 
-    return this.prisma.itemInstance.create({
+    const instance = await this.prisma.itemInstance.create({
       data: {
         itemId,
         ...dto,
       },
     });
+
+    if (actorId) {
+      await this.prisma.auditLog.create({
+        data: {
+          userId: actorId,
+          action: 'CREATE_INSTANCE',
+          targetType: 'ITEM_INSTANCE',
+          targetId: String(instance.id),
+          details: { serialNumber: instance.serialNumber },
+        },
+      });
+    }
+
+    return instance;
   }
 
-  // 9. 개별 실물 수정
-  async updateInstance(instanceId: number, dto: UpdateItemInstanceDto) {
+  async updateInstance(instanceId: number, dto: UpdateItemInstanceDto, actorId?: string) {
     const instance = await this.prisma.itemInstance.findFirst({
       where: { id: instanceId, deletedAt: null },
     });
@@ -355,34 +410,67 @@ export class ItemsService {
         throw new ConflictException('이미 존재하는 시리얼 번호입니다.');
     }
 
-    return this.prisma.itemInstance.update({
+    const updated = await this.prisma.itemInstance.update({
       where: { id: instanceId },
       data: dto,
     });
+
+    if (actorId) {
+      await this.prisma.auditLog.create({
+        data: {
+          userId: actorId,
+          action: 'UPDATE_INSTANCE',
+          targetType: 'ITEM_INSTANCE',
+          targetId: String(instanceId),
+          details: dto,
+        },
+      });
+    }
+
+    return updated;
   }
 
-  // 10. 개별 실물 삭제
-  async removeInstance(instanceId: number) {
+  async removeInstance(instanceId: number, actorId?: string) {
     const instance = await this.prisma.itemInstance.findFirst({
       where: { id: instanceId, deletedAt: null },
-      include: { _count: { select: { rentalItems: true } } },
+      include: { 
+        _count: { 
+          select: { 
+            rentalItems: {
+              where: { rental: { status: { in: ['RENTED', 'OVERDUE'] }, deletedAt: null } }
+            } 
+          } 
+        } 
+      },
     });
     if (!instance) throw new NotFoundException('실물을 찾을 수 없습니다.');
 
     if (instance._count.rentalItems > 0) {
       throw new BadRequestException(
-        '대여 기록이 있는 실물은 삭제할 수 없습니다. 상태를 BROKEN으로 변경하세요.',
+        '현재 대여 중인 실물은 삭제할 수 없습니다. 반납 후 시도하거나 상태를 BROKEN으로 변경하세요.',
       );
     }
 
     await this.prisma.itemInstance.update({
       where: { id: instanceId },
-      data: { deletedAt: new Date() },
+      data: { deletedAt: getNowKst() },
     });
+
+    if (actorId) {
+      await this.prisma.auditLog.create({
+        data: {
+          userId: actorId,
+          action: 'DELETE_INSTANCE',
+          targetType: 'ITEM_INSTANCE',
+          targetId: String(instanceId),
+          details: { serialNumber: instance.serialNumber },
+        },
+      });
+    }
+
     return { message: '실물이 삭제되었습니다.' };
   }
 
-  // 11. 세트 구성품 추가
   async addComponent(parentId: number, dto: AddItemComponentDto) {
     if (parentId === dto.componentId) {
       throw new BadRequestException(
@@ -417,7 +505,6 @@ export class ItemsService {
     });
   }
 
-  // 12. 세트 구성품 삭제
   async removeComponent(parentId: number, componentId: number) {
     const existing = await this.prisma.itemComponent.findUnique({
       where: {

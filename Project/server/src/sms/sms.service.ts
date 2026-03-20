@@ -124,16 +124,16 @@ export class SmsService {
   ): Promise<boolean> {
     let statusText = status;
     if (status === 'PENDING') statusText = '주문 대기';
-    if (status === 'APPROVED') statusText = '주문 확정';
-    if (status === 'COMPLETED') statusText = '인쇄 완료';
+    if (status === 'CONFIRMED') statusText = '주문 확정(승인)';
+    if (status === 'PRINTED') statusText = '인쇄 완료';
     if (status === 'REJECTED') statusText = '주문 반려';
-    if (status === 'PICKED_UP') statusText = '수령 완료';
+    if (status === 'COMPLETED') statusText = '수령 완료';
 
     let message = `[RentalWeb] ${name}님, 플로터 주문 상태가 [${statusText}]로 변경되었습니다.`;
 
     if (status === 'REJECTED') {
       message = `[RentalWeb] ${name}님, 플로터 주문이 반려되었습니다.\n사유: ${rejectionReason || '규정 미준수 등'}`;
-    } else if (status === 'COMPLETED') {
+    } else if (status === 'PRINTED') {
       message = `[RentalWeb] ${name}님, 플로터 인쇄가 완료되었습니다. 학생회실에서 수령해 주세요!`;
     }
 
