@@ -64,6 +64,7 @@ export class CommonController {
       departments: plotterMetadata.departments,
       purposes: plotterMetadata.purposes,
       freePurposes: plotterMetadata.freePurposes,
+      freeDepartments: plotterMetadata.freeDepartments,
       prices: plotterMetadata.prices,
     };
   }

@@ -24,12 +24,14 @@ export class PlotterService {
     private smsService: SmsService,
   ) {}
 
-  private async getMetadata() {
-    const [pricesA0, pricesA1, freeDepts, freePurposes] = await Promise.all([
+  public async getMetadata() {
+    const [pricesA0, pricesA1, freeDepts, freePurposes, deptsList, purposesList] = await Promise.all([
       this.configService.getValue('plotter_price_a0', '2000'),
       this.configService.getValue('plotter_price_a1', '1500'),
       this.configService.getValue('plotter_free_departments', ''),
       this.configService.getValue('plotter_free_purposes', ''),
+      this.configService.getValue('plotter_departments_list', ''),
+      this.configService.getValue('plotter_purposes', ''),
     ]);
 
     return {
@@ -37,8 +39,10 @@ export class PlotterService {
         a0: parseInt(pricesA0, 10),
         a1: parseInt(pricesA1, 10),
       },
-      freeDepartments: freeDepts.split(',').filter(Boolean),
-      freePurposes: freePurposes.split(',').filter(Boolean),
+      departments: deptsList ? deptsList.split(',').map((d) => d.trim()) : [],
+      purposes: purposesList ? purposesList.split(',').map((p) => p.trim()) : [],
+      freeDepartments: freeDepts.split(',').filter(Boolean).map((d) => d.trim()),
+      freePurposes: freePurposes.split(',').filter(Boolean).map((p) => p.trim()),
     };
   }
 

@@ -114,6 +114,7 @@ describe('Production-Ready Full E2E Flow', () => {
           purpose: '회칙 명시 사항 인쇄(예산안 등)',
           paperSize: 'A0',
           pageCount: 1,
+          orderQuantity: 1,
           departmentType: '중앙동아리'
         });
 
@@ -124,7 +125,7 @@ describe('Production-Ready Full E2E Flow', () => {
 
     it('should create plotter order with real PDF buffer', async () => {
       const pdfBuffer = Buffer.from('%PDF-1.4\n%E2E Test File Content');
-      const pickupDateStr = '2026-03-19';
+      const pickupDateStr = '2026-03-24';
 
       const response = await request(app.getHttpServer())
         .post('/api/plotter/orders')
@@ -132,6 +133,7 @@ describe('Production-Ready Full E2E Flow', () => {
         .field('purpose', '회칙 명시 사항 인쇄(예산안 등)')
         .field('paperSize', 'A0')
         .field('pageCount', '1')
+        .field('orderQuantity', '1')
         .field('departmentType', '중앙동아리')
         .field('departmentName', '테스트동아리')
         .field('pickupDate', pickupDateStr)
@@ -190,8 +192,8 @@ describe('Production-Ready Full E2E Flow', () => {
     });
 
     it('should create rental from cart', async () => {
-      const startDateStr = '2026-03-19';
-      const endDateStr = '2026-03-20';
+      const startDateStr = '2026-03-24';
+      const endDateStr = '2026-03-25';
 
       const response = await request(app.getHttpServer())
         .post('/api/rentals')

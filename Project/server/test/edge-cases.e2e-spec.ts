@@ -128,6 +128,7 @@ describe('Edge Cases & Security Stress Test', () => {
           purpose: '개인 소장용 포스터', // 유료 목적
           paperSize: 'A0',
           pageCount: 1,
+          orderQuantity: 1,
           departmentType: '기타'
         });
 
@@ -141,8 +142,9 @@ describe('Edge Cases & Security Stress Test', () => {
         .field('purpose', '개인 소장용 포스터')
         .field('paperSize', 'A0')
         .field('pageCount', '1')
+        .field('orderQuantity', '1')
         .field('departmentType', '기타')
-        .field('pickupDate', '2026-12-25')
+        .field('pickupDate', '2026-12-24') // 목요일 (평일)
         .attach('pdfFile', Buffer.from('%PDF-1.4'), 'test.pdf');
 
       expect(orderRes.status).toBe(400);
@@ -158,8 +160,9 @@ describe('Edge Cases & Security Stress Test', () => {
         .field('purpose', '회칙 인쇄')
         .field('paperSize', 'A0')
         .field('pageCount', '1')
+        .field('orderQuantity', '1')
         .field('departmentType', '중앙자치기구')
-        .field('pickupDate', '2026-12-25')
+        .field('pickupDate', '2026-12-24')
         .attach('pdfFile', fakePdf, 'fake.pdf');
 
       expect(response.status).toBe(400);

@@ -126,7 +126,6 @@ export class ItemsService {
       include: {
         category: true,
         itemImages: {
-          where: { deletedAt: null },
           orderBy: { order: 'asc' },
         },
         rentalItems: {
@@ -162,7 +161,6 @@ export class ItemsService {
       include: {
         category: true,
         itemImages: {
-          where: { deletedAt: null },
           orderBy: { order: 'asc' },
         },
         components: { include: { component: true } },
@@ -210,9 +208,8 @@ export class ItemsService {
 
     if (imageUrls) {
       updateData.itemImages = {
-        updateMany: {
-          where: { itemId: id, deletedAt: null },
-          data: { deletedAt: getNowKst() },
+        deleteMany: {
+          itemId: id,
         },
         create: imageUrls.map((url, index) => ({
           imageUrl: url,
@@ -275,23 +272,22 @@ export class ItemsService {
         where: { itemId: id, deletedAt: null },
         data: { deletedAt: now },
       }),
-      this.prisma.itemImage.updateMany({
-        where: { itemId: id, deletedAt: null },
-        data: { deletedAt: now },
+      this.prisma.itemImage.deleteMany({
+        where: { itemId: id },
       }),
-    ]);
+      ]);
 
-    if (actorId) {
+      if (actorId) {
       await this.prisma.auditLog.create({
         data: {
           userId: actorId,
-          action: 'DELETE_ITEM',
+          action: 'REMOVE_ITEM',
           targetType: 'ITEM',
           targetId: String(id),
-          details: { name: item.name },
+          details: item as any,
         },
       });
-    }
+      }
 
     return { message: '물품과 관련 실물 데이터가 삭제되었습니다.' };
   }
@@ -422,7 +418,7 @@ export class ItemsService {
           action: 'UPDATE_INSTANCE',
           targetType: 'ITEM_INSTANCE',
           targetId: String(instanceId),
-          details: dto,
+          details: dto as any,
         },
       });
     }
