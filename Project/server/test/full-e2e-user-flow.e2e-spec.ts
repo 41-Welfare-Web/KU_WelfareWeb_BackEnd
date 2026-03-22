@@ -312,7 +312,42 @@ describe('Production-Ready Full E2E Flow', () => {
     });
   });
 
-  describe('5. Safety & Security Rules', () => {
+  describe('5. Admin Rental Update (PUT /api/rentals/admin/:id)', () => {
+    it('should allow admin to update rental regardless of status (non-RESERVED)', async () => {
+      // createdRentalId는 섹션 4에서 OVERDUE 상태로 변경됨
+      const newStart = getFutureWeekday(5);
+      const newEnd = new Date(newStart);
+      newEnd.setDate(newEnd.getDate() + 1);
+      while (newEnd.getDay() === 0 || newEnd.getDay() === 6) {
+        newEnd.setDate(newEnd.getDate() + 1);
+      }
+
+      const response = await request(app.getHttpServer())
+        .put(`/api/rentals/admin/${createdRentalId}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .send({
+          departmentType: '중앙동아리',
+          departmentName: '수정테스트동아리',
+          items: [{ itemId: testItemId, quantity: 1, startDate: toDateStr(newStart), endDate: toDateStr(newEnd) }],
+        });
+
+      expect(response.status).toBe(200);
+    });
+
+    it('should block regular user from using admin rental update endpoint', async () => {
+      const response = await request(app.getHttpServer())
+        .put(`/api/rentals/admin/${createdRentalId}`)
+        .set('Authorization', `Bearer ${userAccessToken}`)
+        .send({
+          departmentType: '기타',
+          items: [{ itemId: testItemId, quantity: 1, startDate: toDateStr(getFutureWeekday(5)), endDate: toDateStr(getFutureWeekday(6)) }],
+        });
+
+      expect(response.status).toBe(403);
+    });
+  });
+
+  describe('6. Safety & Security Rules', () => {
     it('should block admin from self-withdrawal', async () => {
       const response = await request(app.getHttpServer())
         .delete('/api/users/me')

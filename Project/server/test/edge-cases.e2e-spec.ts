@@ -88,10 +88,9 @@ describe('Edge Cases & Security Stress Test', () => {
 
   describe('1. Rental Duration Boundary (Max 15 Days)', () => {
     it('should ALLOW rental of EXACTLY 15 days', async () => {
-      const start = new Date();
-      start.setDate(start.getDate() + 1); // 내일
+      const start = getFutureWeekday(1); // 내일 이후 첫 평일
       const end = new Date(start);
-      end.setDate(start.getDate() + 14); // 시작일 포함 총 15일
+      end.setDate(start.getDate() + 14); // 시작일 포함 총 15일 (평일+14는 항상 평일)
 
       const response = await request(app.getHttpServer())
         .post('/api/rentals')
@@ -110,10 +109,12 @@ describe('Edge Cases & Security Stress Test', () => {
     });
 
     it('should BLOCK rental of 16 days', async () => {
-      const start = new Date();
-      start.setDate(start.getDate() + 20); 
+      const start = getFutureWeekday(20);
       const end = new Date(start);
       end.setDate(start.getDate() + 15); // 시작일 포함 총 16일
+      while (end.getDay() === 0 || end.getDay() === 6) {
+        end.setDate(end.getDate() + 1); // 주말이면 다음 평일로 (여전히 >15일)
+      }
 
       const response = await request(app.getHttpServer())
         .post('/api/rentals')

@@ -20,6 +20,7 @@ describe('PlotterService', () => {
           provide: PrismaService,
           useValue: {
             plotterOrder: { create: jest.fn().mockResolvedValue({ id: 1 }) },
+            auditLog: { create: jest.fn().mockResolvedValue({}) },
             user: {
               findFirst: jest.fn().mockResolvedValue({
                 id: 'user-id',
