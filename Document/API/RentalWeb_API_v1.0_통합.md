@@ -1711,6 +1711,44 @@
 | (이 외 Create Rental, Get Rental Details의 Error 참조) | | |
 
 ---
+# 대여 정보 수정 (Update Rental By Admin)
+
+관리자가 특정 사용자의 대여 건을 대신 수정합니다.
+
+## **ENDPOINT:** `PUT /api/rentals/admin/{rentalId}`
+**Description:** 관리자가 대여 기간 또는 품목 수량을 대신 수정합니다. 이력에 "관리자 대리 예약 수정"으로 기록됩니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Path Parameters**
+
+| 파라미터 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `rentalId` | `integer` | 수정할 대여의 고유 ID |
+
+---
+
+#### **Request Body**
+*   `PUT /api/rentals/{rentalId}`의 Request Body와 동일합니다.
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+    *   수정된 대여 상세 정보를 반환합니다.
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
+| `403 Forbidden` | `NOT_MODIFIABLE` | '예약' 상태가 아니어서 수정할 수 없을 때 |
+| (이 외 Update Rental, Get Rental Details의 Error 참조) | | |
+
+---
 # 대여 예약 취소 (Cancel Rental)
 
 `FR-17` 요구사항에 따라, '예약' 상태인 대여 건을 사용자가 취소합니다.

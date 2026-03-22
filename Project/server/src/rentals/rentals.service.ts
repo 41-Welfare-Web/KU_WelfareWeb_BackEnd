@@ -545,7 +545,7 @@ export class RentalsService {
   }
 
   // 6. 예약 내용 수정 (날짜, 수량 변경) — 단일 rental 수정, items 각각 동일 날짜여야 함
-  async update(id: number, userId: string, updateDto: UpdateRentalDto) {
+  async update(id: number, userId: string, updateDto: UpdateRentalDto, actorId?: string) {
     const { items, departmentType, departmentName } = updateDto;
 
     const rental = await this.prisma.rental.findFirst({
@@ -554,7 +554,7 @@ export class RentalsService {
     });
 
     if (!rental) throw new NotFoundException('대여 건을 찾을 수 없습니다.');
-    if (rental.userId !== userId)
+    if (!actorId && rental.userId !== userId)
       throw new ForbiddenException('수정 권한이 없습니다.');
     if (rental.status !== RentalStatus.RESERVED) {
       throw new BadRequestException('예약 상태일 때만 수정할 수 있습니다.');
@@ -693,10 +693,10 @@ export class RentalsService {
             },
             rentalHistories: {
               create: {
-                changedBy: userId,
+                changedBy: actorId || userId,
                 oldStatus: RentalStatus.RESERVED,
                 newStatus: RentalStatus.RESERVED,
-                memo: '예약 내용(날짜/수량) 수정',
+                memo: actorId ? '관리자 대리 예약 수정' : '예약 내용(날짜/수량) 수정',
               },
             },
           },
@@ -714,10 +714,10 @@ export class RentalsService {
                 : departmentName || rental.departmentName,
             rentalHistories: {
               create: {
-                changedBy: userId,
+                changedBy: actorId || userId,
                 oldStatus: RentalStatus.RESERVED,
                 newStatus: RentalStatus.RESERVED,
-                memo: '예약 기간 수정',
+                memo: actorId ? '관리자 대리 예약 수정' : '예약 기간 수정',
               },
             },
           },

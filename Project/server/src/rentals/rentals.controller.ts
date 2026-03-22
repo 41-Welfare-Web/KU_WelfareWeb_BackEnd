@@ -101,6 +101,17 @@ export class RentalsController {
     return this.rentalsService.findOne(id, user.userId, user.role);
   }
 
+  @Put('admin/:id')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: '예약 정보 수정 (관리자 대리)' })
+  updateByAdmin(
+    @GetUser() admin: any,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDto: UpdateRentalDto,
+  ) {
+    return this.rentalsService.update(id, '', updateDto, admin.userId);
+  }
+
   @Put(':id')
   @ApiOperation({ summary: '예약 정보 수정 (사용자)' })
   update(

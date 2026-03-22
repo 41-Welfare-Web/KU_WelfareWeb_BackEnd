@@ -44,6 +44,7 @@
 *   `GET /api/rentals` (대여 목록 조회 - 내역 또는 전체-**Admin**)
 *   `GET /api/rentals/{rentalId}` (대여 상세 조회)
 *   `PUT /api/rentals/{rentalId}` (대여 정보 수정 - 날짜/수량)
+*   `PUT /api/rentals/admin/{rentalId}` (대여 정보 수정 대리 - **Admin**)
 *   `DELETE /api/rentals/{rentalId}` (대여 예약 취소)
 *   `PUT /api/rentals/{rentalId}/status` (대여 상태 변경 - **Admin**)
 
