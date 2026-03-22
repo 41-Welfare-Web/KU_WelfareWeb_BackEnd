@@ -1787,6 +1787,73 @@
 
 
 ---
+---
+### **6. 공통 (Common)**
+
+# 공통 메타데이터 조회 (Get Common Metadata)
+
+시스템 전반에서 공통으로 사용하는 데이터를 조회합니다. (부서 목록, 플로터 인쇄 목적, 가격 정보 등)
+
+## **ENDPOINT:** `GET /api/common/metadata`
+**Description:** 프론트엔드 초기화 시 소속 선택 드롭다운, 인쇄 목적 목록 등을 한 번에 가져오는 데 사용합니다.
+**Required Permissions:** All Users
+
+---
+
+##### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "departments": [
+    { "category": "중앙자치기구", "requiresInput": false, "options": ["총학생회", "건국문화예술학생연합", "..."] },
+    { "category": "단과대 학생회", "requiresInput": false, "options": ["문과대학 학생회", "공과대학 학생회", "..."] },
+    { "category": "학과 학생회", "requiresInput": false, "options": ["국어국문학과 학생회", "..."] },
+    { "category": "중앙동아리", "requiresInput": true, "placeholder": "동아리 이름을 입력하세요" },
+    { "category": "단과대동아리", "requiresInput": true, "placeholder": "동아리 이름을 입력하세요" },
+    { "category": "학과동아리", "requiresInput": true, "placeholder": "동아리 이름을 입력하세요" },
+    { "category": "기타", "requiresInput": true, "placeholder": "소속명을 직접 입력하세요" }
+  ],
+  "purposes": ["회칙 명시 사항 인쇄(예산안 등)", "학과 행사 목적", "동아리 홍보물", "기타"],
+  "freePurposes": ["회칙 명시 사항 인쇄(예산안 등)", "학과 행사 목적"],
+  "prices": {
+    "a0": 2000,
+    "a1": 1500
+  }
+}
+```
+
+---
+# 이미지 업로드 (Upload Image)
+
+`FR-35` 요구사항에 따라, 이미지를 서버(Supabase Storage)에 업로드하고 URL을 획득합니다.
+
+## **ENDPOINT:** `POST /api/common/upload`
+**Description:** 물품 이미지, 영수증 캡처 등을 위해 이미지 파일을 업로드합니다.
+**Required Permissions:** Authenticated Users
+
+---
+
+#### **Request Body (multipart/form-data)**
+
+| 필드명 | 타입 | 필수 여부 | 설명 |
+| :--- | :--- | :--- | :--- |
+| `file` | `file` | 필수 | 업로드할 이미지 파일 (jpg, png, webp) |
+
+---
+
+##### **Responses**
+
+*   **Success Response (`201 Created`)**
+
+```json
+{
+  "url": "https://.../common/unique-filename.jpg"
+}
+```
+
+---
 ### **5. 플로터 (Plotter)**
 
 # 플로터 가격 계산 (Calculate Plotter Price)
@@ -1794,7 +1861,7 @@
 주문 전에 인쇄 비용을 미리 계산합니다.
 
 ## **ENDPOINT:** `POST /api/plotter/calculate-price`
-**Description:** 사용자의 소속(입력된 소속 우선, 미입력 시 프로필 정보 활용), 목적, 용지 크기, 장수를 기반으로 무료/유료 여부와 예상 금액을 반환합니다.
+**Description:** 목적, 용지 크기, 장수, **인쇄 부수**를 기반으로 무료/유료 여부와 예상 금액을 반환합니다. 목적이 무료 목적(`freePurposes`)에 해당하면 소속에 관계없이 무료입니다.
 **Required Permissions:** Authenticated Users
 
 ---
@@ -1806,13 +1873,15 @@
   "purpose": "졸업 작품 포스터",
   "paperSize": "A0",
   "pageCount": 1,
+  "orderQuantity": 1,
   "departmentType": "자치기구"
 }
 ```
 * `purpose`: (string, required) 인쇄 목적.
-* `paperSize`: (string, required) 용지 크기. (예: `A0`, `A1`)
-* `pageCount`: (integer, required) 인쇄 장수.
-* `departmentType`: (string, optional) 소속 유형. (미입력 시 사용자 기본 정보 활용)
+* `paperSize`: (string, required) 용지 크기. (`A0`, `A1`)
+* `pageCount`: (integer, required) PDF 파일 내의 페이지 수.
+* `orderQuantity`: (integer, required) 출력할 부수. (예: 1페이지 PDF를 5부 인쇄 시 `pageCount=1`, `orderQuantity=5`)
+* `departmentType`: (string, optional) 소속 유형. (가격 계산에 영향 없음, 주문 저장 시에만 사용)
 
 ---
 
@@ -1822,20 +1891,14 @@
 
 ```json
 {
-  "price": 5000,
+  "price": 10000,
+  "totalSheets": 5,
   "isFree": false,
-  "message": "인쇄 비용은 총 5,000원입니다. 입금 확인증(영수증) 업로드가 필요합니다."
+  "message": "인쇄 비용은 총 10,000원입니다. (총 10,000원) 입금 확인증 업로드가 필요합니다."
 }
 ```
-* **무료인 경우:** `{ "price": 0, "isFree": true, "message": "..." }`
-* `isFree`: 무료 인쇄 대상 여부. 무료이면 `POST /api/plotter/orders` 시 `paymentReceiptImage` 불필요.
-
-*   **Error Responses**
-
-| HTTP Code | Error Code | 설명 |
-| :--- | :--- | :--- |
-| `400 Bad Request` | `INVALID_INPUT` | 필수 필드 누락 또는 유효하지 않은 값 |
-| `500 Internal Server Error` | `SERVER_ERROR` | 서버 내부 로직 처리 중 에러 발생 |
+* **가격 산출 로직:** `용지 단가 * pageCount * orderQuantity`
+* **무료 판정 로직:** `purpose`가 `freePurposes` 목록에 포함되면 소속 무관 무료 (`price: 0`)
 
 ---
 # 플로터 주문 신청 (Create Plotter Order)
@@ -1843,8 +1906,7 @@
 `FR-27`, `FR-28` 요구사항에 따라, 사용자가 플로터 인쇄를 주문 신청합니다.
 
 ## **ENDPOINT:** `POST /api/plotter/orders`
-**Description:** 인쇄 목적, 용지 크기, 인쇄 장수 등의 정보와 PDF 파일을 받아 플로터 주문을 신청합니다. 파일 업로드를 위해 `multipart/form-data` 형식을 사용합니다.
-**Security Note:** `FR-27`에 따라, 서버는 업로드된 파일의 **Magic Number(`%PDF-`)**를 직접 검사하여 실제 PDF 파일인지 확인합니다. 확장자만 위조된 파일은 업로드할 수 없습니다.
+**Description:** 인쇄 목적, 용지 크기, 인쇄 장수, **인쇄 부수** 등의 정보와 PDF 파일을 받아 플로터 주문을 신청합니다.
 **Required Permissions:** Authenticated Users
 
 ---
@@ -1857,10 +1919,26 @@
 | `departmentName` | `string` | 선택 | 신청 시 소속 단위명 |
 | `purpose` | `string` | 필수 | 인쇄 목적 |
 | `paperSize` | `string` | 필수 | 용지 크기 (예: `A0`, `A1`) |
-| `pageCount` | `integer` | 필수 | 인쇄 장수 |
+| `pageCount` | `integer` | 필수 | 인쇄할 페이지 수 |
+| `orderQuantity` | `integer` | 필수 | 인쇄 부수 |
 | `pickupDate` | `string` | 필수 | 수령 희망 일자 (YYYY-MM-DD) |
-| `paymentReceiptImage` | `file` | 유료 시 필수 | 입금 내역 캡처 이미지 파일 (유료 서비스일 경우) |
+| `paymentReceiptImage` | `file` | 유료 시 필수 | 입금 내역 캡처 이미지 파일 |
 | `pdfFile` | `file` | 필수 | 인쇄할 PDF 파일 |
+
+---
+# 관리자용 플로터 주문 대리 신청 (Create Plotter Order By Admin)
+
+관리자가 특정 사용자를 대신하여 플로터 주문을 생성합니다.
+
+## **ENDPOINT:** `POST /api/plotter/orders/admin`
+**Description:** 관리자가 사용자를 지정하여 주문을 생성합니다. 가격 계산 로직은 동일하게 적용되나, 관리자 권한으로 직접 생성됩니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Request Body (multipart/form-data)**
+
+* 일반 주문 신청 필드에 `targetUserId` (uuid, 필수) 필드가 추가됩니다.
 
 ---
 
