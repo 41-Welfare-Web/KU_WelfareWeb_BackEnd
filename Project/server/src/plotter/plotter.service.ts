@@ -94,25 +94,18 @@ export class PlotterService {
   }
 
   async calculateEstimatedPrice(dto: PlotterPriceCheckDto, userId: string) {
-    const { purpose, paperSize, pageCount, orderQuantity, departmentType: dtoDeptType } = dto;
+    const { purpose, paperSize, pageCount, orderQuantity } = dto;
 
     const user = await this.prisma.user.findFirst({
       where: { id: userId, deletedAt: null },
     });
     if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
 
-    const departmentType = dtoDeptType || user.departmentType;
     const metadata = await this.getMetadata();
     const unitPrice = paperSize.toLowerCase() === 'a0' ? metadata.prices.a0 : metadata.prices.a1;
-    
+
     const totalSheets = Number(pageCount) * Number(orderQuantity || 1);
     let totalPrice = unitPrice * totalSheets;
-
-    const normalizedDept = departmentType.replace(/\s+/g, '');
-    const isFreeDept = metadata.freeDepartments.some(freeDept => {
-      const normalizedFreeDept = freeDept.replace(/\s+/g, '');
-      return normalizedDept.includes(normalizedFreeDept) || normalizedFreeDept.includes(normalizedDept);
-    });
 
     const normalizedPurpose = purpose.replace(/\s+/g, '');
     const isFreePurpose = metadata.freePurposes.some(freePurpose => {
@@ -121,10 +114,10 @@ export class PlotterService {
     });
 
     let message = `인쇄 비용은 총 ${totalPrice.toLocaleString()}원입니다.`;
-    
-    if (isFreeDept && isFreePurpose) {
+
+    if (isFreePurpose) {
       totalPrice = 0;
-      message = `[무료 대상] '${departmentType}' 소속 및 '${purpose}' 목적은 무료 인쇄 지원 대상입니다.`;
+      message = `[무료 대상] '${purpose}' 목적은 무료 인쇄 지원 대상입니다.`;
     } else {
       message += ` (총 ${totalPrice.toLocaleString()}원) 입금 확인증 업로드가 필요합니다.`;
     }
