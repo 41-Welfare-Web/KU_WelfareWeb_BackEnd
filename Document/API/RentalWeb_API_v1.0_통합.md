@@ -1716,7 +1716,7 @@
 관리자가 특정 사용자의 대여 건을 대신 수정합니다.
 
 ## **ENDPOINT:** `PUT /api/rentals/admin/{rentalId}`
-**Description:** 관리자가 대여 기간 또는 품목 수량을 대신 수정합니다. 이력에 "관리자 대리 예약 수정"으로 기록됩니다.
+**Description:** 관리자가 대여 기간 또는 품목 수량을 대신 수정합니다. **모든 상태의 대여 건 수정 가능** (사용자는 RESERVED만 가능). 이력에 "관리자 대리 예약 수정"으로 기록됩니다.
 **Required Permissions:** Admin Only
 
 ---
@@ -1745,7 +1745,6 @@
 | :--- | :--- | :--- |
 | `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
 | `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
-| `403 Forbidden` | `NOT_MODIFIABLE` | '예약' 상태가 아니어서 수정할 수 없을 때 |
 | (이 외 Update Rental, Get Rental Details의 Error 참조) | | |
 
 ---
