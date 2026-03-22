@@ -36,6 +36,10 @@ describe('Auth - 아이디 찾기 / 비밀번호 재설정 요청', () => {
 
     // 테스트 유저 보장
     const hashedPassword = await bcrypt.hash(testUser.password, 10);
+    // 전화번호 충돌 방지: 동일 번호를 가진 다른 유저 제거
+    await prisma.user.deleteMany({
+      where: { phoneNumber: testUser.phoneNumber, NOT: { username: testUser.username } },
+    });
     await prisma.user.upsert({
       where: { username: testUser.username },
       update: { password: hashedPassword, deletedAt: null, name: testUser.name, phoneNumber: testUser.phoneNumber },

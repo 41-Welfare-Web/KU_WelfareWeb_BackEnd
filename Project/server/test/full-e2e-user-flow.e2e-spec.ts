@@ -63,10 +63,15 @@ describe('Production-Ready Full E2E Flow', () => {
 
     // 테스트용 사용자 강제 생성 또는 업데이트 (401 방지)
     const hashedPassword = await bcrypt.hash(testUser.password, 10);
+    // 전화번호 충돌 방지: 동일 번호를 가진 다른 유저 제거
+    await prisma.user.deleteMany({
+      where: { phoneNumber: testUser.phoneNumber, NOT: { username: testUser.username } },
+    });
     const user = await prisma.user.upsert({
       where: { username: testUser.username },
       update: {
         password: hashedPassword,
+        phoneNumber: testUser.phoneNumber,
         role: 'USER',
         deletedAt: null,
       },
