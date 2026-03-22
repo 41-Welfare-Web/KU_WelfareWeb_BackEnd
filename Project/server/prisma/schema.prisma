@@ -161,6 +161,7 @@ enum RentalStatus {
   RETURNED
   CANCELED
   OVERDUE
+  DEFECTIVE
 }
 
 // 6. Rental Items
