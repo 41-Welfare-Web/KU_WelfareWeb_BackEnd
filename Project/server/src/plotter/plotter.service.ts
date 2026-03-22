@@ -25,24 +25,71 @@ export class PlotterService {
   ) {}
 
   public async getMetadata() {
-    const [pricesA0, pricesA1, freeDepts, freePurposes, deptsList, purposesList] = await Promise.all([
-      this.configService.getValue('plotter_price_a0', '2000'),
-      this.configService.getValue('plotter_price_a1', '1500'),
-      this.configService.getValue('plotter_free_departments', ''),
-      this.configService.getValue('plotter_free_purposes', ''),
-      this.configService.getValue('plotter_departments_list', ''),
-      this.configService.getValue('plotter_purposes', ''),
-    ]);
+    // 1. 소속 목록 파싱 로직
+    const typeString = await this.configService.getValue('plotter_departments_list', '');
+    const types = typeString ? typeString.split(',').map((t) => t.trim()) : [];
+
+    const original2DArray = await Promise.all(
+      types.map(async (type) => {
+        if (!type) return [];
+        const namesString = await this.configService.getValue(`dept_list_${type}`, '');
+        return namesString ? namesString.split(',').map((n) => n.trim()) : [type];
+      }),
+    );
+
+    const collegeOptions: string[] = [];
+    const departmentOptions: string[] = [];
+    const centralAutonomousOptions: string[] = [];
+
+    original2DArray.forEach((arr) => {
+      if (!arr || arr.length === 0) return;
+      const mainCategory = arr[0];
+      const subCategories = arr.slice(1);
+
+      if (mainCategory === '총학생회') {
+        centralAutonomousOptions.push(mainCategory);
+      } else if (mainCategory === '중앙자치기구') {
+        centralAutonomousOptions.push(...subCategories);
+      } else if (
+        subCategories.length > 0 &&
+        (mainCategory.endsWith('대학') || mainCategory.endsWith('과학원') || mainCategory.endsWith('기술원'))
+      ) {
+        collegeOptions.push(mainCategory);
+        departmentOptions.push(...subCategories);
+      } else if (
+        subCategories.length === 0 &&
+        (mainCategory.endsWith('대학') || mainCategory.endsWith('과학원') || mainCategory.endsWith('기술원'))
+      ) {
+        collegeOptions.push(mainCategory);
+      }
+    });
+
+    const departments = [
+      { category: '중앙자치기구', requiresInput: false, options: centralAutonomousOptions },
+      { category: '단과대 학생회', requiresInput: false, options: collegeOptions.map((c) => `${c} 학생회`) },
+      { category: '학과 학생회', requiresInput: false, options: departmentOptions.map((d) => `${d} 학생회`) },
+      { category: '중앙동아리', requiresInput: true, placeholder: '동아리 이름을 입력하세요' },
+      { category: '단과대동아리', requiresInput: true, placeholder: '동아리 이름을 입력하세요' },
+      { category: '학과동아리', requiresInput: true, placeholder: '동아리 이름을 입력하세요' },
+      { category: '기타', requiresInput: true, placeholder: '소속명을 직접 입력하세요' },
+    ];
+
+    // 2. 가격 및 목적 설정 조회
+    const purposesStr = await this.configService.getValue('plotter_purposes', '');
+    const freePurposesStr = await this.configService.getValue('plotter_free_purposes', '');
+    const freeDeptsStr = await this.configService.getValue('plotter_free_departments', '');
+    const priceA0 = await this.configService.getValue('plotter_price_a0', '2000');
+    const priceA1 = await this.configService.getValue('plotter_price_a1', '1500');
 
     return {
+      departments,
+      purposes: purposesStr ? purposesStr.split(',').map((p) => p.trim()) : [],
+      freePurposes: freePurposesStr ? freePurposesStr.split(',').map((p) => p.trim()) : [],
+      freeDepartments: freeDeptsStr ? freeDeptsStr.split(',').map((d) => d.trim()) : [],
       prices: {
-        a0: parseInt(pricesA0, 10),
-        a1: parseInt(pricesA1, 10),
+        a0: parseInt(priceA0, 10),
+        a1: parseInt(priceA1, 10),
       },
-      departments: deptsList ? deptsList.split(',').map((d) => d.trim()) : [],
-      purposes: purposesList ? purposesList.split(',').map((p) => p.trim()) : [],
-      freeDepartments: freeDepts.split(',').filter(Boolean).map((d) => d.trim()),
-      freePurposes: freePurposes.split(',').filter(Boolean).map((p) => p.trim()),
     };
   }
 
