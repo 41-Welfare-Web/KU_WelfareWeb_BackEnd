@@ -90,9 +90,7 @@ describe('PlotterService', () => {
     await expect(
       service.create('user-id', dto as any, fakePdf, undefined),
     ).rejects.toThrow(
-      new BadRequestException(
-        '유효하지 않은 PDF 형식입니다. 실제 PDF 파일을 업로드해주세요.',
-      ),
+      new BadRequestException('유효하지 않은 PDF 형식입니다.'),
     );
   });
 
@@ -118,27 +116,24 @@ describe('PlotterService', () => {
   });
 
   describe('calculateEstimatedPrice', () => {
-    it('should identify as free if the provided departmentType is a free target, even if user default is not', async () => {
-      // Mocking user: default is '학과' (Paid)
-      const mockUser = { id: 'user-id', departmentType: '학과' };
+    it('should identify as free if purpose is a free target (regardless of department)', async () => {
+      // 소속이 유료 대상이어도 목적이 무료이면 무료
+      const mockUser = { id: 'user-id', departmentType: '학과 학생회' };
       const prisma = (service as any).prisma;
       prisma.user.findFirst.mockResolvedValue(mockUser);
 
-      // Mocking configurations: '자치기구' is free
       const config = (service as any).configService;
       config.getValue.mockImplementation(async (key: string) => {
-        if (key === 'plotter_free_departments') return '자치기구, 중앙동아리';
         if (key === 'plotter_free_purposes') return '예산안 출력';
         if (key === 'plotter_price_a0') return '5000';
         return '0';
       });
 
-      // Case: User selects '자치기구' (Free) and '예산안 출력' (Free)
       const dto = {
         purpose: '예산안 출력',
         paperSize: 'A0',
         pageCount: 1,
-        departmentType: '자치기구',
+        departmentType: '학과 학생회',
       };
 
       const result = await service.calculateEstimatedPrice(dto, 'user-id');
@@ -147,26 +142,25 @@ describe('PlotterService', () => {
       expect(result.message).toContain('무료 인쇄 지원 대상입니다.');
     });
 
-    it('should identify as paid if the provided departmentType is not a free target, even if user default is', async () => {
-      // Mocking user: default is '자치기구' (Free)
-      const mockUser = { id: 'user-id', departmentType: '자치기구' };
+    it('should identify as paid if purpose is not a free target (regardless of department)', async () => {
+      // 소속이 무료 대상이어도 목적이 유료이면 유료
+      const mockUser = { id: 'user-id', departmentType: '중앙동아리' };
       const prisma = (service as any).prisma;
       prisma.user.findFirst.mockResolvedValue(mockUser);
 
       const config = (service as any).configService;
       config.getValue.mockImplementation(async (key: string) => {
-        if (key === 'plotter_free_departments') return '자치기구, 중앙동아리';
         if (key === 'plotter_free_purposes') return '예산안 출력';
         if (key === 'plotter_price_a0') return '5000';
         return '0';
       });
 
-      // Case: User selects '학과' (Paid) although they are originally '자치기구'
+      // 무료 목적에 없는 purpose → 유료
       const dto = {
-        purpose: '예산안 출력',
+        purpose: '포스터 제작',
         paperSize: 'A0',
         pageCount: 1,
-        departmentType: '학과',
+        departmentType: '중앙동아리',
       };
 
       const result = await service.calculateEstimatedPrice(dto, 'user-id');

@@ -14,6 +14,20 @@ describe('Edge Cases & Security Stress Test', () => {
   // 타임아웃 30초로 연장
   jest.setTimeout(30000);
 
+  // 날짜 헬퍼: n일 뒤 평일(월~금) 반환
+  function getFutureWeekday(daysFromNow: number): Date {
+    const d = new Date();
+    d.setDate(d.getDate() + daysFromNow);
+    while (d.getDay() === 0 || d.getDay() === 6) {
+      d.setDate(d.getDate() + 1);
+    }
+    return d;
+  }
+
+  function toDateStr(d: Date): string {
+    return d.toISOString().split('T')[0];
+  }
+
   const testUser = {
     username: 'tester01090665493z',
     password: '@Jgn1517',
@@ -144,7 +158,7 @@ describe('Edge Cases & Security Stress Test', () => {
         .field('pageCount', '1')
         .field('orderQuantity', '1')
         .field('departmentType', '기타')
-        .field('pickupDate', '2026-12-24') // 목요일 (평일)
+        .field('pickupDate', toDateStr(getFutureWeekday(7)))
         .attach('pdfFile', Buffer.from('%PDF-1.4'), 'test.pdf');
 
       expect(orderRes.status).toBe(400);
@@ -162,7 +176,7 @@ describe('Edge Cases & Security Stress Test', () => {
         .field('pageCount', '1')
         .field('orderQuantity', '1')
         .field('departmentType', '중앙자치기구')
-        .field('pickupDate', '2026-12-24')
+        .field('pickupDate', toDateStr(getFutureWeekday(7)))
         .attach('pdfFile', fakePdf, 'fake.pdf');
 
       expect(response.status).toBe(400);

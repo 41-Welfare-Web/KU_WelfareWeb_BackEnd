@@ -8,6 +8,20 @@ import { CartService } from '../cart/cart.service';
 import { RentalStatus } from '@prisma/client';
 import { ConflictException } from '@nestjs/common';
 
+// 날짜 헬퍼: n일 뒤 평일(월~금) 반환
+function getFutureWeekday(daysFromNow: number): Date {
+  const d = new Date();
+  d.setDate(d.getDate() + daysFromNow);
+  while (d.getDay() === 0 || d.getDay() === 6) {
+    d.setDate(d.getDate() + 1);
+  }
+  return d;
+}
+
+function toDateStr(d: Date): string {
+  return d.toISOString().split('T')[0];
+}
+
 describe('RentalsService', () => {
   let service: RentalsService;
   let _prisma: PrismaService;
@@ -92,8 +106,8 @@ describe('RentalsService', () => {
         {
           itemId: 1,
           quantity: 1,
-          startDate: '2026-04-01',
-          endDate: '2026-04-03',
+          startDate: toDateStr(getFutureWeekday(5)),
+          endDate: toDateStr(getFutureWeekday(7)),
         },
       ],
     };
@@ -152,8 +166,8 @@ describe('RentalsService', () => {
         {
           itemId: 1,
           quantity: 1,
-          startDate: '2026-04-01',
-          endDate: '2026-04-03',
+          startDate: toDateStr(getFutureWeekday(5)),
+          endDate: toDateStr(getFutureWeekday(7)),
         },
       ],
     };
@@ -183,7 +197,7 @@ describe('RentalsService', () => {
         return Promise.resolve([
           {
             quantity: 1,
-            rental: { startDate: new Date('2026-04-01'), endDate: new Date('2026-04-03') },
+            rental: { startDate: getFutureWeekday(5), endDate: getFutureWeekday(7) },
           },
         ]);
       }

@@ -34,6 +34,20 @@ describe('Production-Ready Full E2E Flow', () => {
   let createdRentalId: number;
   let createdOrderId: number;
 
+  // 날짜 헬퍼: n일 뒤 평일(월~금) 반환
+  function getFutureWeekday(daysFromNow: number): Date {
+    const d = new Date();
+    d.setDate(d.getDate() + daysFromNow);
+    while (d.getDay() === 0 || d.getDay() === 6) {
+      d.setDate(d.getDate() + 1);
+    }
+    return d;
+  }
+
+  function toDateStr(d: Date): string {
+    return d.toISOString().split('T')[0];
+  }
+
   beforeAll(async () => {
     process.env.NODE_ENV = 'test';
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -106,7 +120,7 @@ describe('Production-Ready Full E2E Flow', () => {
   });
 
   describe('2. Plotter Free Verification & File Logic', () => {
-    it('should verify 0 price for Central Club + Free Purpose', async () => {
+    it('should verify 0 price for Free Purpose (department agnostic)', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/plotter/calculate-price')
         .set('Authorization', `Bearer ${userAccessToken}`)
@@ -125,7 +139,7 @@ describe('Production-Ready Full E2E Flow', () => {
 
     it('should create plotter order with real PDF buffer', async () => {
       const pdfBuffer = Buffer.from('%PDF-1.4\n%E2E Test File Content');
-      const pickupDateStr = '2026-03-24';
+      const pickupDateStr = toDateStr(getFutureWeekday(7));
 
       const response = await request(app.getHttpServer())
         .post('/api/plotter/orders')
@@ -192,8 +206,14 @@ describe('Production-Ready Full E2E Flow', () => {
     });
 
     it('should create rental from cart', async () => {
-      const startDateStr = '2026-03-24';
-      const endDateStr = '2026-03-25';
+      const rentalStart = getFutureWeekday(3);
+      const rentalEnd = new Date(rentalStart);
+      rentalEnd.setDate(rentalEnd.getDate() + 1);
+      while (rentalEnd.getDay() === 0 || rentalEnd.getDay() === 6) {
+        rentalEnd.setDate(rentalEnd.getDate() + 1);
+      }
+      const startDateStr = toDateStr(rentalStart);
+      const endDateStr = toDateStr(rentalEnd);
 
       const response = await request(app.getHttpServer())
         .post('/api/rentals')
@@ -255,8 +275,14 @@ describe('Production-Ready Full E2E Flow', () => {
 
     it('should allow admin to change status of a CANCELED rental', async () => {
       // 새 대여 생성 후 CANCELED → 다시 상태 변경 테스트
-      const startDateStr = '2026-04-07';
-      const endDateStr = '2026-04-08';
+      const cancelStart = getFutureWeekday(14);
+      const cancelEnd = new Date(cancelStart);
+      cancelEnd.setDate(cancelEnd.getDate() + 1);
+      while (cancelEnd.getDay() === 0 || cancelEnd.getDay() === 6) {
+        cancelEnd.setDate(cancelEnd.getDate() + 1);
+      }
+      const startDateStr = toDateStr(cancelStart);
+      const endDateStr = toDateStr(cancelEnd);
 
       const rentalRes = await request(app.getHttpServer())
         .post('/api/rentals')
@@ -299,9 +325,15 @@ describe('Production-Ready Full E2E Flow', () => {
     });
 
     it('should block rental longer than 15 days', async () => {
-      // 안전한 미래 평일: 2026-04-20(월) ~ 2026-05-07(목) (총 18일)
-      const longStartDate = '2026-04-20';
-      const longEndDate = '2026-05-07';
+      // 오늘로부터 30일 이상 뒤 평일 시작, 17일 뒤 평일 종료 (총 18일 이상)
+      const longStart = getFutureWeekday(30);
+      const longEnd = new Date(longStart);
+      longEnd.setDate(longEnd.getDate() + 17);
+      while (longEnd.getDay() === 0 || longEnd.getDay() === 6) {
+        longEnd.setDate(longEnd.getDate() + 1);
+      }
+      const longStartDate = toDateStr(longStart);
+      const longEndDate = toDateStr(longEnd);
 
       const response = await request(app.getHttpServer())
         .post('/api/rentals')
