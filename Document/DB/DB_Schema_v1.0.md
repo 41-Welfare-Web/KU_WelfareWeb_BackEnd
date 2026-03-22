@@ -127,6 +127,7 @@
 | `purpose` | `varchar(100)` | 인쇄 목적 | Not Null |
 | `paper_size` | `varchar(10)` | 용지 크기 (`A0`, `A1`) | Not Null |
 | `page_count` | `integer` | 출력 페이지 수 | Not Null |
+| `order_quantity` | `integer` | 인쇄 부수 | Default: 1 |
 | `is_paid_service` | `boolean` | 유료 여부 | Not Null |
 | `price` | `integer` | 청구 금액 (원) | Default: 0 |
 | `payment_receipt_url` | `text` | 입금 영수증 이미지 URL | |

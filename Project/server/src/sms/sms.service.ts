@@ -77,7 +77,7 @@ export class SmsService {
   }
 
   /**
-   * 대여 상태 변경 알림
+   * 대여 상태 변경 알림 (비활성화)
    */
   async sendRentalStatusNotice(
     receiver: string,
@@ -86,22 +86,12 @@ export class SmsService {
     status: string,
     memo?: string,
   ): Promise<boolean> {
-    let statusText = status;
-    if (status === 'RESERVED') statusText = '예약 완료';
-    if (status === 'RENTED') statusText = '대여 중(수령 완료)';
-    if (status === 'RETURNED') statusText = '반납 완료';
-    if (status === 'CANCELED') statusText = '취소됨';
-
-    let message = `[RentalWeb] ${name}님, 대여 신청하신 [${itemSummary}]의 상태가 [${statusText}]로 변경되었습니다.`;
-    if (memo) {
-      message += `\n사유/메모: ${memo}`;
-    }
-
-    return this.sendSMS(receiver, message);
+    console.log(`[SmsService] Rental status notice DISABLED. Skipping message to ${receiver} for status ${status}`);
+    return true;
   }
 
   /**
-   * 반납 예정일 안내 (D-1)
+   * 반납 예정일 안내 (비활성화)
    */
   async sendReturnReminder(
     receiver: string,
@@ -109,12 +99,12 @@ export class SmsService {
     itemSummary: string,
     dueDate: string,
   ): Promise<boolean> {
-    const message = `[RentalWeb] ${name}님, 대여 중인 [${itemSummary}]의 반납 예정일은 내일(${dueDate})입니다. 늦지 않게 반납 부탁드립니다.`;
-    return this.sendSMS(receiver, message);
+    console.log(`[SmsService] Return reminder DISABLED. Skipping message to ${receiver}`);
+    return true;
   }
 
   /**
-   * 플로터 주문 상태 알림 (반려, 완료 등)
+   * 플로터 주문 상태 알림 (CONFIRMED, REJECTED만 발송)
    */
   async sendPlotterStatusNotice(
     receiver: string,
@@ -122,22 +112,24 @@ export class SmsService {
     status: string,
     rejectionReason?: string,
   ): Promise<boolean> {
+    // 요청하신 대로 CONFIRMED와 REJECTED 상태만 발송 허용
+    if (status !== 'CONFIRMED' && status !== 'REJECTED') {
+      console.log(`[SmsService] Plotter status notice for ${status} is DISABLED. Skipping message to ${receiver}`);
+      return true;
+    }
+
     let statusText = status;
-    if (status === 'PENDING') statusText = '주문 대기';
-    if (status === 'CONFIRMED') statusText = '주문 확정(승인)';
-    if (status === 'PRINTED') statusText = '인쇄 완료';
+    if (status === 'CONFIRMED') statusText = '주문 확정(입금 확인)';
     if (status === 'REJECTED') statusText = '주문 반려';
-    if (status === 'COMPLETED') statusText = '수령 완료';
 
     let message = `[RentalWeb] ${name}님, 플로터 주문 상태가 [${statusText}]로 변경되었습니다.`;
 
     if (status === 'REJECTED') {
       message = `[RentalWeb] ${name}님, 플로터 주문이 반려되었습니다.\n사유: ${rejectionReason || '규정 미준수 등'}`;
-    } else if (status === 'PRINTED') {
-      message = `[RentalWeb] ${name}님, 플로터 인쇄가 완료되었습니다. 학생회실에서 수령해 주세요!`;
     }
 
-    return this.sendSMS(receiver, message);
+    // 플로터 알림은 중요하므로 ignoreConfig=true를 사용하여 설정값에 상관없이 발송 (또는 필요시 false 유지)
+    return this.sendSMS(receiver, message, true);
   }
 
   /**
