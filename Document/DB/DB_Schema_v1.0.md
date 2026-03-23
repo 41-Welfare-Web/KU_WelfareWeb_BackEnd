@@ -1,6 +1,6 @@
-### **RentalWeb 데이터베이스 스키마 (v1.0.1)**
+### **RentalWeb 데이터베이스 스키마 (v1.0.2)**
 
-최종 수정일: 2026-03-11 (Actual Code 기준 동기화 완료)
+최종 수정일: 2026-03-23 (DEFECTIVE 상태 추가 반영)
 
 ---
 
@@ -11,7 +11,7 @@
 | `Role` | `USER`, `ADMIN` | 사용자 권한 |
 | `ManagementType` | `INDIVIDUAL`, `BULK` | 물품 관리 방식 (개별 시리얼 vs 단순 수량) |
 | `InstanceStatus` | `AVAILABLE`, `RENTED`, `BROKEN` | 개별 품목 실물 상태 |
-| `RentalStatus` | `RESERVED`, `RENTED`, `RETURNED`, `CANCELED`, `OVERDUE` | 대여 예약 상태 |
+| `RentalStatus` | `RESERVED`, `RENTED`, `RETURNED`, `CANCELED`, `OVERDUE`, `DEFECTIVE` | 대여 예약 상태 |
 | `PlotterStatus` | `PENDING`, `CONFIRMED`, `PRINTED`, `REJECTED`, `COMPLETED` | 플로터 주문 상태 |
 
 ---

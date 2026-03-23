@@ -1609,7 +1609,7 @@
 | 파라미터 | 타입 | 필수 여부 | 설명 |
 | :--- | :--- | :--- | :--- |
 | `userId` | `uuid` | 선택 (Admin) | 특정 사용자의 대여 내역을 조회합니다. (관리자 전용) |
-| `status` | `string` | 선택 | 특정 상태의 대여 건만 필터링합니다. (예: `RESERVED`, `RENTED`, `OVERDUE`) |
+| `status` | `string` | 선택 | 특정 상태의 대여 건만 필터링합니다. (예: `RESERVED`, `RENTED`, `RETURNED`, `CANCELED`, `OVERDUE`, `DEFECTIVE`) |
 | `page` | `integer` | 선택 | 페이지 번호 (기본값: 1) |
 | `pageSize` | `integer` | 선택 | 페이지 당 항목 수 (기본값: 10) |
 
@@ -1804,7 +1804,7 @@
   "memo": "사용자에게 정상 지급 완료"
 }
 ```
-* `status`: (string, required) 변경할 상태. (`RENTED`, `RETURNED`, `CANCELED` 등)
+* `status`: (string, required) 변경할 상태. (`RENTED`, `RETURNED`, `CANCELED`, `DEFECTIVE`, `OVERDUE` 중 하나. `DEFECTIVE`는 불량 반납 시 사용)
 * `memo`: (string, optional) 상태 변경에 대한 비고. (예: 불량 반납 시 내용, 관리자 취소 사유)
 
 ---
