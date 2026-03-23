@@ -1,0 +1,1292 @@
+[
+  {
+    "id": 37,
+    "rentalId": 8,
+    "rentalItemId": null,
+    "changedBy": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-22T05:02:22.633Z"
+  },
+  {
+    "id": 38,
+    "rentalId": 8,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RENTED",
+    "memo": "상태 변경: RENTED",
+    "changedAt": "2026-03-22T05:02:25.078Z"
+  },
+  {
+    "id": 39,
+    "rentalId": 8,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RENTED",
+    "newStatus": "RETURNED",
+    "memo": "상태 변경: RETURNED",
+    "changedAt": "2026-03-22T05:02:27.520Z"
+  },
+  {
+    "id": 40,
+    "rentalId": 8,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "OVERDUE",
+    "memo": "테스트 목적 재변경",
+    "changedAt": "2026-03-22T05:02:30.041Z"
+  },
+  {
+    "id": 41,
+    "rentalId": 8,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "OVERDUE",
+    "newStatus": "OVERDUE",
+    "memo": "메모만 변경 테스트",
+    "changedAt": "2026-03-22T05:02:33.907Z"
+  },
+  {
+    "id": 42,
+    "rentalId": 9,
+    "rentalItemId": null,
+    "changedBy": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-22T05:02:37.633Z"
+  },
+  {
+    "id": 43,
+    "rentalId": 9,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "CANCELED",
+    "memo": "상태 변경: CANCELED",
+    "changedAt": "2026-03-22T05:02:40.077Z"
+  },
+  {
+    "id": 44,
+    "rentalId": 9,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CANCELED",
+    "newStatus": "RESERVED",
+    "memo": "취소 후 재활성화",
+    "changedAt": "2026-03-22T05:02:42.518Z"
+  },
+  {
+    "id": 45,
+    "rentalId": 8,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-22T05:02:46.390Z"
+  },
+  {
+    "id": 46,
+    "rentalId": 10,
+    "rentalItemId": null,
+    "changedBy": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-22T05:03:02.375Z"
+  },
+  {
+    "id": 47,
+    "rentalId": 9,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-22T05:13:25.922Z"
+  },
+  {
+    "id": 48,
+    "rentalId": 10,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-22T05:15:14.265Z"
+  },
+  {
+    "id": 49,
+    "rentalId": 10,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-22T05:18:33.890Z"
+  },
+  {
+    "id": 50,
+    "rentalId": 9,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-22T05:42:27.083Z"
+  },
+  {
+    "id": 51,
+    "rentalId": 11,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-22T07:37:02.662Z"
+  },
+  {
+    "id": 52,
+    "rentalId": 12,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-22T07:37:02.757Z"
+  },
+  {
+    "id": 53,
+    "rentalId": 13,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-22T07:37:03.025Z"
+  },
+  {
+    "id": 54,
+    "rentalId": 14,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-22T07:48:18.488Z"
+  },
+  {
+    "id": 55,
+    "rentalId": 15,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-22T07:48:18.553Z"
+  },
+  {
+    "id": 56,
+    "rentalId": 16,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-22T07:48:44.539Z"
+  },
+  {
+    "id": 57,
+    "rentalId": 17,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-22T08:32:19.479Z"
+  },
+  {
+    "id": 58,
+    "rentalId": 18,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-22T08:32:19.567Z"
+  },
+  {
+    "id": 59,
+    "rentalId": 19,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-22T08:32:19.625Z"
+  },
+  {
+    "id": 60,
+    "rentalId": 20,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-22T08:32:19.686Z"
+  },
+  {
+    "id": 61,
+    "rentalId": 21,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-22T08:32:56.115Z"
+  },
+  {
+    "id": 62,
+    "rentalId": 22,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-22T08:32:56.194Z"
+  },
+  {
+    "id": 63,
+    "rentalId": 23,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-22T08:32:56.254Z"
+  },
+  {
+    "id": 64,
+    "rentalId": 24,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-22T08:36:55.959Z"
+  },
+  {
+    "id": 65,
+    "rentalId": 25,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-22T08:36:56.052Z"
+  },
+  {
+    "id": 66,
+    "rentalId": 26,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-22T08:38:05.465Z"
+  },
+  {
+    "id": 67,
+    "rentalId": 27,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-22T09:45:23.440Z"
+  },
+  {
+    "id": 68,
+    "rentalId": 27,
+    "rentalItemId": null,
+    "changedBy": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+    "oldStatus": "RESERVED",
+    "newStatus": "CANCELED",
+    "memo": "사용자 예약 취소",
+    "changedAt": "2026-03-22T09:45:42.173Z"
+  },
+  {
+    "id": 69,
+    "rentalId": 27,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-22T09:48:08.439Z"
+  },
+  {
+    "id": 70,
+    "rentalId": 28,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-22T09:50:29.173Z"
+  },
+  {
+    "id": 71,
+    "rentalId": 29,
+    "rentalItemId": null,
+    "changedBy": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-22T09:51:43.725Z"
+  },
+  {
+    "id": 72,
+    "rentalId": 30,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-22T10:02:49.954Z"
+  },
+  {
+    "id": 73,
+    "rentalId": 30,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RENTED",
+    "memo": "상태 변경: RENTED",
+    "changedAt": "2026-03-22T10:25:25.095Z"
+  },
+  {
+    "id": 74,
+    "rentalId": 28,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RETURNED",
+    "memo": "상태 변경: RETURNED",
+    "changedAt": "2026-03-22T10:25:43.733Z"
+  },
+  {
+    "id": 75,
+    "rentalId": 28,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RETURNED",
+    "memo": "상태 변경: RETURNED",
+    "changedAt": "2026-03-22T10:25:53.909Z"
+  },
+  {
+    "id": 76,
+    "rentalId": 28,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RETURNED",
+    "memo": "상태 변경: RETURNED",
+    "changedAt": "2026-03-22T10:26:04.694Z"
+  },
+  {
+    "id": 77,
+    "rentalId": 30,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RENTED",
+    "newStatus": "DEFECTIVE",
+    "memo": "상태 변경: DEFECTIVE",
+    "changedAt": "2026-03-22T12:53:52.695Z"
+  },
+  {
+    "id": 78,
+    "rentalId": 31,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-22T15:37:00.096Z"
+  },
+  {
+    "id": 79,
+    "rentalId": 31,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-22T15:42:14.671Z"
+  },
+  {
+    "id": 80,
+    "rentalId": 31,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RETURNED",
+    "memo": "고장",
+    "changedAt": "2026-03-22T15:42:38.700Z"
+  },
+  {
+    "id": 81,
+    "rentalId": 31,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "DEFECTIVE",
+    "memo": "상태 변경: DEFECTIVE",
+    "changedAt": "2026-03-22T15:42:39.019Z"
+  },
+  {
+    "id": 82,
+    "rentalId": 31,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RESERVED",
+    "memo": "고장",
+    "changedAt": "2026-03-22T15:42:39.061Z"
+  },
+  {
+    "id": 83,
+    "rentalId": 31,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RETURNED",
+    "memo": "고장",
+    "changedAt": "2026-03-22T15:42:54.862Z"
+  },
+  {
+    "id": 84,
+    "rentalId": 31,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "DEFECTIVE",
+    "memo": "상태 변경: DEFECTIVE",
+    "changedAt": "2026-03-22T15:42:55.118Z"
+  },
+  {
+    "id": 85,
+    "rentalId": 29,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RETURNED",
+    "memo": "ㅇ",
+    "changedAt": "2026-03-22T15:43:14.902Z"
+  },
+  {
+    "id": 86,
+    "rentalId": 29,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RETURNED",
+    "memo": "상태 변경: RETURNED",
+    "changedAt": "2026-03-22T15:43:15.145Z"
+  },
+  {
+    "id": 87,
+    "rentalId": 29,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RESERVED",
+    "memo": "ㅇ",
+    "changedAt": "2026-03-22T15:43:15.187Z"
+  },
+  {
+    "id": 88,
+    "rentalId": 29,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RETURNED",
+    "memo": "ㅇ",
+    "changedAt": "2026-03-22T15:43:26.466Z"
+  },
+  {
+    "id": 89,
+    "rentalId": 29,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "DEFECTIVE",
+    "memo": "상태 변경: DEFECTIVE",
+    "changedAt": "2026-03-22T15:43:26.755Z"
+  },
+  {
+    "id": 90,
+    "rentalId": 31,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "DEFECTIVE",
+    "newStatus": "RENTED",
+    "memo": "상태 변경: RENTED",
+    "changedAt": "2026-03-22T15:43:37.621Z"
+  },
+  {
+    "id": 91,
+    "rentalId": 31,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RENTED",
+    "newStatus": "RETURNED",
+    "memo": "고장아닌뎅",
+    "changedAt": "2026-03-23T01:44:28.397Z"
+  },
+  {
+    "id": 92,
+    "rentalId": 31,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RETURNED",
+    "memo": "상태 변경: RETURNED",
+    "changedAt": "2026-03-23T01:44:28.728Z"
+  },
+  {
+    "id": 93,
+    "rentalId": 31,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RENTED",
+    "memo": "고장아닌뎅",
+    "changedAt": "2026-03-23T01:44:28.757Z"
+  },
+  {
+    "id": 94,
+    "rentalId": 31,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RENTED",
+    "newStatus": "RETURNED",
+    "memo": "고장아닌뎅",
+    "changedAt": "2026-03-23T01:45:03.233Z"
+  },
+  {
+    "id": 95,
+    "rentalId": 31,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "DEFECTIVE",
+    "memo": "상태 변경: DEFECTIVE",
+    "changedAt": "2026-03-23T01:45:03.471Z"
+  },
+  {
+    "id": 96,
+    "rentalId": 31,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-23T01:52:08.728Z"
+  },
+  {
+    "id": 97,
+    "rentalId": 16,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-23T01:53:40.760Z"
+  },
+  {
+    "id": 98,
+    "rentalId": 28,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-23T01:59:15.682Z"
+  },
+  {
+    "id": 99,
+    "rentalId": 32,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-23T01:59:55.201Z"
+  },
+  {
+    "id": 100,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-23T02:06:30.231Z"
+  },
+  {
+    "id": 101,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-23T02:18:51.786Z"
+  },
+  {
+    "id": 102,
+    "rentalId": 34,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-23T02:19:35.000Z"
+  },
+  {
+    "id": 103,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RETURNED",
+    "memo": "상태 변경: RETURNED",
+    "changedAt": "2026-03-23T02:23:16.121Z"
+  },
+  {
+    "id": 104,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RETURNED",
+    "memo": "상태 변경: RETURNED",
+    "changedAt": "2026-03-23T02:23:16.351Z"
+  },
+  {
+    "id": 105,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RENTED",
+    "memo": "강강",
+    "changedAt": "2026-03-23T02:23:28.927Z"
+  },
+  {
+    "id": 106,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RENTED",
+    "newStatus": "RENTED",
+    "memo": "상태 변경: RENTED",
+    "changedAt": "2026-03-23T02:23:29.160Z"
+  },
+  {
+    "id": 107,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RENTED",
+    "newStatus": "RETURNED",
+    "memo": "강강",
+    "changedAt": "2026-03-23T02:23:29.189Z"
+  },
+  {
+    "id": 108,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RETURNED",
+    "memo": "강강ㄹㄹ",
+    "changedAt": "2026-03-23T02:26:28.686Z"
+  },
+  {
+    "id": 109,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RETURNED",
+    "memo": "강강ㄹㄹ",
+    "changedAt": "2026-03-23T02:26:28.926Z"
+  },
+  {
+    "id": 110,
+    "rentalId": 34,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RENTED",
+    "memo": "상태 변경: RENTED",
+    "changedAt": "2026-03-23T02:26:35.809Z"
+  },
+  {
+    "id": 111,
+    "rentalId": 34,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RENTED",
+    "newStatus": "RENTED",
+    "memo": "상태 변경: RENTED",
+    "changedAt": "2026-03-23T02:26:36.054Z"
+  },
+  {
+    "id": 112,
+    "rentalId": 34,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RENTED",
+    "newStatus": "RENTED",
+    "memo": "ㅁㅁㅁ",
+    "changedAt": "2026-03-23T02:26:42.773Z"
+  },
+  {
+    "id": 113,
+    "rentalId": 34,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RENTED",
+    "newStatus": "RENTED",
+    "memo": "ㅁㅁㅁ",
+    "changedAt": "2026-03-23T02:26:43.017Z"
+  },
+  {
+    "id": 114,
+    "rentalId": 34,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RENTED",
+    "newStatus": "RETURNED",
+    "memo": "ㅁㅁㅁㄹㄹ",
+    "changedAt": "2026-03-23T02:31:02.457Z"
+  },
+  {
+    "id": 115,
+    "rentalId": 34,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RETURNED",
+    "memo": "ㅁㅁㅁㄹㄹ",
+    "changedAt": "2026-03-23T02:31:02.692Z"
+  },
+  {
+    "id": 116,
+    "rentalId": 32,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RENTED",
+    "memo": "상태 변경: RENTED",
+    "changedAt": "2026-03-23T02:31:22.955Z"
+  },
+  {
+    "id": 117,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RETURNED",
+    "memo": "강강ㄹㄹ",
+    "changedAt": "2026-03-23T02:31:35.379Z"
+  },
+  {
+    "id": 118,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "DEFECTIVE",
+    "memo": "강강ㄹㄹ",
+    "changedAt": "2026-03-23T02:31:35.600Z"
+  },
+  {
+    "id": 119,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "DEFECTIVE",
+    "newStatus": "CANCELED",
+    "memo": "강강ㄹㄹㅂㅂㅂㅂ",
+    "changedAt": "2026-03-23T02:31:48.427Z"
+  },
+  {
+    "id": 120,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CANCELED",
+    "newStatus": "CANCELED",
+    "memo": "강강ㄹㄹㅂㅂㅂㅂ",
+    "changedAt": "2026-03-23T02:31:48.660Z"
+  },
+  {
+    "id": 121,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CANCELED",
+    "newStatus": "CANCELED",
+    "memo": "강강ㄹㄹㅂㅂㅂㅂ",
+    "changedAt": "2026-03-23T02:34:14.438Z"
+  },
+  {
+    "id": 122,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CANCELED",
+    "newStatus": "CANCELED",
+    "memo": "강강ㄹㄹㅂㅂㅂㅂ",
+    "changedAt": "2026-03-23T02:34:14.767Z"
+  },
+  {
+    "id": 123,
+    "rentalId": 35,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-23T02:42:50.690Z"
+  },
+  {
+    "id": 124,
+    "rentalId": 35,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-23T02:43:10.067Z"
+  },
+  {
+    "id": 125,
+    "rentalId": 35,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RENTED",
+    "memo": "테스트",
+    "changedAt": "2026-03-23T02:43:41.990Z"
+  },
+  {
+    "id": 126,
+    "rentalId": 35,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RENTED",
+    "newStatus": "RENTED",
+    "memo": "테스트",
+    "changedAt": "2026-03-23T02:43:42.288Z"
+  },
+  {
+    "id": 127,
+    "rentalId": 35,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-23T04:54:35.250Z"
+  },
+  {
+    "id": 128,
+    "rentalId": 33,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-23T05:03:00.331Z"
+  },
+  {
+    "id": 129,
+    "rentalId": 32,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-23T05:10:58.411Z"
+  },
+  {
+    "id": 130,
+    "rentalId": 36,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-23T05:11:52.185Z"
+  },
+  {
+    "id": 131,
+    "rentalId": 37,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-23T05:15:21.578Z"
+  },
+  {
+    "id": 132,
+    "rentalId": 38,
+    "rentalItemId": null,
+    "changedBy": "6434ae3f-75d9-4534-9fa4-3efc80b39eb9",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-23T05:20:15.620Z"
+  },
+  {
+    "id": 133,
+    "rentalId": 38,
+    "rentalItemId": null,
+    "changedBy": "6434ae3f-75d9-4534-9fa4-3efc80b39eb9",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "예약 내용(날짜/수량) 수정",
+    "changedAt": "2026-03-23T05:20:49.728Z"
+  },
+  {
+    "id": 134,
+    "rentalId": 39,
+    "rentalItemId": null,
+    "changedBy": "6434ae3f-75d9-4534-9fa4-3efc80b39eb9",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-23T05:21:24.823Z"
+  },
+  {
+    "id": 135,
+    "rentalId": 38,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 수정",
+    "changedAt": "2026-03-23T05:21:44.610Z"
+  },
+  {
+    "id": 136,
+    "rentalId": 39,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "상태 변경: RESERVED",
+    "changedAt": "2026-03-23T05:21:53.292Z"
+  },
+  {
+    "id": 137,
+    "rentalId": 39,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "CANCELED",
+    "memo": "상태 변경: CANCELED",
+    "changedAt": "2026-03-23T05:21:59.169Z"
+  },
+  {
+    "id": 138,
+    "rentalId": 39,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CANCELED",
+    "newStatus": "DEFECTIVE",
+    "memo": "상태 변경: DEFECTIVE",
+    "changedAt": "2026-03-23T05:22:08.048Z"
+  },
+  {
+    "id": 139,
+    "rentalId": 39,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "DEFECTIVE",
+    "newStatus": "CANCELED",
+    "memo": "상태 변경: CANCELED",
+    "changedAt": "2026-03-23T05:22:11.241Z"
+  },
+  {
+    "id": 140,
+    "rentalId": 39,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CANCELED",
+    "newStatus": "CANCELED",
+    "memo": "상태 변경: CANCELED",
+    "changedAt": "2026-03-23T05:23:21.437Z"
+  },
+  {
+    "id": 141,
+    "rentalId": 39,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CANCELED",
+    "newStatus": "RESERVED",
+    "memo": "상태 변경: RESERVED",
+    "changedAt": "2026-03-23T05:23:24.967Z"
+  },
+  {
+    "id": 142,
+    "rentalId": 39,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "CANCELED",
+    "memo": "상태 변경: CANCELED",
+    "changedAt": "2026-03-23T05:23:31.683Z"
+  },
+  {
+    "id": 143,
+    "rentalId": 39,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CANCELED",
+    "newStatus": "DEFECTIVE",
+    "memo": "상태 변경: DEFECTIVE",
+    "changedAt": "2026-03-23T05:36:44.704Z"
+  },
+  {
+    "id": 144,
+    "rentalId": 39,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "DEFECTIVE",
+    "newStatus": "DEFECTIVE",
+    "memo": "상태 변경: DEFECTIVE",
+    "changedAt": "2026-03-23T05:37:03.651Z"
+  },
+  {
+    "id": 145,
+    "rentalId": 39,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "DEFECTIVE",
+    "newStatus": "RETURNED",
+    "memo": "김준호 빵꾸똥꾸\n",
+    "changedAt": "2026-03-23T05:37:19.328Z"
+  },
+  {
+    "id": 146,
+    "rentalId": 39,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "DEFECTIVE",
+    "memo": "김준호 빵꾸똥꾸\n",
+    "changedAt": "2026-03-23T05:37:19.561Z"
+  },
+  {
+    "id": 147,
+    "rentalId": 39,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "DEFECTIVE",
+    "newStatus": "RETURNED",
+    "memo": "김준호 빵꾸똥꾸\n",
+    "changedAt": "2026-03-23T05:38:01.663Z"
+  },
+  {
+    "id": 148,
+    "rentalId": 39,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "DEFECTIVE",
+    "memo": "김준호 빵꾸똥꾸\n",
+    "changedAt": "2026-03-23T05:38:01.902Z"
+  },
+  {
+    "id": 149,
+    "rentalId": 40,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "관리자 대리 예약 생성",
+    "changedAt": "2026-03-23T05:45:38.755Z"
+  },
+  {
+    "id": 150,
+    "rentalId": 40,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "상태 변경: RESERVED",
+    "changedAt": "2026-03-23T05:46:04.850Z"
+  },
+  {
+    "id": 151,
+    "rentalId": 40,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RESERVED",
+    "memo": "상태 변경: RESERVED",
+    "changedAt": "2026-03-23T05:46:05.077Z"
+  },
+  {
+    "id": 152,
+    "rentalId": 40,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RETURNED",
+    "memo": "상태 변경: RETURNED",
+    "changedAt": "2026-03-23T05:53:29.433Z"
+  },
+  {
+    "id": 153,
+    "rentalId": 40,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RENTED",
+    "memo": "상태 변경: RENTED",
+    "changedAt": "2026-03-23T05:53:32.125Z"
+  },
+  {
+    "id": 154,
+    "rentalId": 40,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RENTED",
+    "newStatus": "RESERVED",
+    "memo": "상태 변경: RESERVED",
+    "changedAt": "2026-03-23T05:53:35.055Z"
+  },
+  {
+    "id": 155,
+    "rentalId": 40,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "DEFECTIVE",
+    "memo": "상태 변경: DEFECTIVE",
+    "changedAt": "2026-03-23T05:53:37.437Z"
+  },
+  {
+    "id": 156,
+    "rentalId": 41,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-23T05:53:53.808Z"
+  },
+  {
+    "id": 157,
+    "rentalId": 42,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-23T05:54:14.273Z"
+  },
+  {
+    "id": 158,
+    "rentalId": 43,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-23T05:54:55.945Z"
+  },
+  {
+    "id": 159,
+    "rentalId": 44,
+    "rentalItemId": null,
+    "changedBy": "972932cf-25ab-4745-9c20-9a5bfa0252fb",
+    "oldStatus": null,
+    "newStatus": "RESERVED",
+    "memo": "대여 예약 생성",
+    "changedAt": "2026-03-23T06:12:28.558Z"
+  },
+  {
+    "id": 160,
+    "rentalId": 44,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RESERVED",
+    "newStatus": "RENTED",
+    "memo": "상태 변경: RENTED",
+    "changedAt": "2026-03-23T06:29:03.612Z"
+  },
+  {
+    "id": 161,
+    "rentalId": 44,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RENTED",
+    "newStatus": "CANCELED",
+    "memo": "상태 변경: CANCELED",
+    "changedAt": "2026-03-23T06:29:08.355Z"
+  },
+  {
+    "id": 162,
+    "rentalId": 44,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CANCELED",
+    "newStatus": "DEFECTIVE",
+    "memo": "상태 변경: DEFECTIVE",
+    "changedAt": "2026-03-23T06:29:16.577Z"
+  },
+  {
+    "id": 163,
+    "rentalId": 44,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "DEFECTIVE",
+    "newStatus": "RETURNED",
+    "memo": "상태 변경: RETURNED",
+    "changedAt": "2026-03-23T06:29:20.437Z"
+  },
+  {
+    "id": 164,
+    "rentalId": 44,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RETURNED",
+    "newStatus": "RENTED",
+    "memo": "상태 변경: RENTED",
+    "changedAt": "2026-03-23T06:29:24.022Z"
+  },
+  {
+    "id": 165,
+    "rentalId": 44,
+    "rentalItemId": null,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "RENTED",
+    "newStatus": "RETURNED",
+    "memo": "상태 변경: RETURNED",
+    "changedAt": "2026-03-23T06:41:47.674Z"
+  }
+]

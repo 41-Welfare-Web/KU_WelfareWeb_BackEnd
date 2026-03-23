@@ -1,0 +1,289 @@
+[
+  {
+    "id": 11,
+    "rentalId": 8,
+    "itemId": 2,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 15,
+    "rentalId": 10,
+    "itemId": 2,
+    "quantity": 7,
+    "instanceId": null
+  },
+  {
+    "id": 16,
+    "rentalId": 9,
+    "itemId": 2,
+    "quantity": 5,
+    "instanceId": null
+  },
+  {
+    "id": 17,
+    "rentalId": 11,
+    "itemId": 37,
+    "quantity": 2,
+    "instanceId": null
+  },
+  {
+    "id": 18,
+    "rentalId": 12,
+    "itemId": 43,
+    "quantity": 2,
+    "instanceId": null
+  },
+  {
+    "id": 19,
+    "rentalId": 13,
+    "itemId": 50,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 20,
+    "rentalId": 14,
+    "itemId": 37,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 21,
+    "rentalId": 15,
+    "itemId": 38,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 23,
+    "rentalId": 17,
+    "itemId": 7,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 24,
+    "rentalId": 18,
+    "itemId": 38,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 25,
+    "rentalId": 19,
+    "itemId": 1,
+    "quantity": 4,
+    "instanceId": null
+  },
+  {
+    "id": 26,
+    "rentalId": 20,
+    "itemId": 50,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 27,
+    "rentalId": 21,
+    "itemId": 7,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 28,
+    "rentalId": 22,
+    "itemId": 38,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 29,
+    "rentalId": 23,
+    "itemId": 1,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 30,
+    "rentalId": 24,
+    "itemId": 45,
+    "quantity": 2,
+    "instanceId": null
+  },
+  {
+    "id": 31,
+    "rentalId": 25,
+    "itemId": 50,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 32,
+    "rentalId": 26,
+    "itemId": 1,
+    "quantity": 3,
+    "instanceId": null
+  },
+  {
+    "id": 34,
+    "rentalId": 27,
+    "itemId": 12,
+    "quantity": 4,
+    "instanceId": null
+  },
+  {
+    "id": 37,
+    "rentalId": 29,
+    "itemId": 38,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 38,
+    "rentalId": 30,
+    "itemId": 12,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 39,
+    "rentalId": 30,
+    "itemId": 13,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 42,
+    "rentalId": 31,
+    "itemId": 38,
+    "quantity": 2,
+    "instanceId": null
+  },
+  {
+    "id": 43,
+    "rentalId": 16,
+    "itemId": 50,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 44,
+    "rentalId": 28,
+    "itemId": 38,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 45,
+    "rentalId": 28,
+    "itemId": 37,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 51,
+    "rentalId": 34,
+    "itemId": 43,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 54,
+    "rentalId": 35,
+    "itemId": 13,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 55,
+    "rentalId": 33,
+    "itemId": 43,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 56,
+    "rentalId": 33,
+    "itemId": 1,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 57,
+    "rentalId": 32,
+    "itemId": 8,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 58,
+    "rentalId": 36,
+    "itemId": 12,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 59,
+    "rentalId": 37,
+    "itemId": 12,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 60,
+    "rentalId": 37,
+    "itemId": 39,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 63,
+    "rentalId": 39,
+    "itemId": 44,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 64,
+    "rentalId": 38,
+    "itemId": 37,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 65,
+    "rentalId": 40,
+    "itemId": 8,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 66,
+    "rentalId": 41,
+    "itemId": 37,
+    "quantity": 3,
+    "instanceId": null
+  },
+  {
+    "id": 67,
+    "rentalId": 42,
+    "itemId": 37,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 68,
+    "rentalId": 43,
+    "itemId": 37,
+    "quantity": 1,
+    "instanceId": null
+  },
+  {
+    "id": 69,
+    "rentalId": 44,
+    "itemId": 5,
+    "quantity": 10,
+    "instanceId": null
+  }
+]

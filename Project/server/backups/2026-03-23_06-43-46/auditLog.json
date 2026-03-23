@@ -1,0 +1,6466 @@
+[
+  {
+    "id": "37",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "@Jgn1517",
+      "username": "tester01090665493z"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:20:52.396Z"
+  },
+  {
+    "id": "38",
+    "userId": null,
+    "action": "POST /api/auth/find-username",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "name": "홍길동",
+      "phoneNumber": "01090665493"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:20:52.703Z"
+  },
+  {
+    "id": "39",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "@Jgn1517",
+      "username": "tester01090665493z"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:20:54.210Z"
+  },
+  {
+    "id": "40",
+    "userId": null,
+    "action": "POST /api/auth/password-reset/request",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "username": "tester01090665493z",
+      "phoneNumber": "01090665493"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:20:54.684Z"
+  },
+  {
+    "id": "41",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:20:54.951Z"
+  },
+  {
+    "id": "42",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/plotter/calculate-price",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "purpose": "회칙 명시 사항 인쇄(예산안 등)",
+      "pageCount": 1,
+      "paperSize": "A0",
+      "orderQuantity": 1,
+      "departmentType": "중앙동아리"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:20:56.004Z"
+  },
+  {
+    "id": "43",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/plotter/calculate-price",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "purpose": "개인 소장용 포스터",
+      "pageCount": 1,
+      "paperSize": "A0",
+      "orderQuantity": 1,
+      "departmentType": "기타"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:20:57.314Z"
+  },
+  {
+    "id": "44",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "CREATE_PLOTTER_ORDER",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "2",
+    "details": {
+      "price": 0,
+      "isPaidService": false
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-20T08:21:00.788Z"
+  },
+  {
+    "id": "45",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/plotter/orders",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:21:01.133Z"
+  },
+  {
+    "id": "46",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "2",
+    "details": {
+      "newStatus": "CONFIRMED",
+      "oldStatus": "PENDING"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-20T08:21:02.588Z"
+  },
+  {
+    "id": "47",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/2/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "CONFIRMED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:21:03.099Z"
+  },
+  {
+    "id": "48",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "2",
+    "details": {
+      "newStatus": "PRINTED",
+      "oldStatus": "CONFIRMED"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-20T08:21:04.550Z"
+  },
+  {
+    "id": "49",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/2/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "memo": "특수 용지 사용 완료",
+      "status": "PRINTED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:21:04.893Z"
+  },
+  {
+    "id": "50",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 2,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:21:08.367Z"
+  },
+  {
+    "id": "51",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 2,
+          "endDate": "2026-03-25",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        }
+      ],
+      "departmentName": "테스트동아리",
+      "departmentType": "중앙동아리"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:21:12.515Z"
+  },
+  {
+    "id": "52",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/3/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:21:14.996Z"
+  },
+  {
+    "id": "53",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/3/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:21:17.477Z"
+  },
+  {
+    "id": "54",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/3/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "테스트 목적 재변경",
+      "status": "OVERDUE"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:21:19.961Z"
+  },
+  {
+    "id": "55",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/3/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "메모만 변경 테스트"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:21:23.539Z"
+  },
+  {
+    "id": "56",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 2,
+          "endDate": "2026-04-08",
+          "quantity": 1,
+          "startDate": "2026-04-07"
+        }
+      ],
+      "departmentName": "테스트동아리",
+      "departmentType": "중앙동아리"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:21:27.794Z"
+  },
+  {
+    "id": "57",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/4/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "CANCELED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:21:30.398Z"
+  },
+  {
+    "id": "58",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/4/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "취소 후 재활성화",
+      "status": "RESERVED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-20T08:21:32.897Z"
+  },
+  {
+    "id": "59",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzczOTkzMzgxLCJleHAiOjE3NzUyMDI5ODF9._ev1txtWfIzZ1qNzu0uNHlIB4axqs4RIXo_vcEMRqb0"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-20T08:26:50.760Z"
+  },
+  {
+    "id": "60",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/admin/upload-image",
+    "targetType": "admin",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-20T08:27:07.610Z"
+  },
+  {
+    "id": "61",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/admin/upload-image",
+    "targetType": "admin",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-20T08:27:07.622Z"
+  },
+  {
+    "id": "62",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/items",
+    "targetType": "items",
+    "targetId": null,
+    "details": {
+      "name": "test",
+      "imageUrl": "https://npiebcgvqiatwodyjiet.supabase.co/storage/v1/object/public/rental-web/items/df967d9a-4365-4da0-9dac-72227574a640.jpg",
+      "itemCode": "",
+      "videoUrl": null,
+      "imageUrls": [
+        "https://npiebcgvqiatwodyjiet.supabase.co/storage/v1/object/public/rental-web/items/df967d9a-4365-4da0-9dac-72227574a640.jpg",
+        "https://npiebcgvqiatwodyjiet.supabase.co/storage/v1/object/public/rental-web/items/d4c7ac95-66a4-4135-bce1-4a3fb8706eae.jpg"
+      ],
+      "categoryId": 4,
+      "description": "test data",
+      "totalQuantity": 5,
+      "managementType": "BULK"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-20T08:27:07.889Z"
+  },
+  {
+    "id": "63",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/items/55",
+    "targetType": "items",
+    "targetId": null,
+    "details": {
+      "name": "test",
+      "imageUrl": "https://npiebcgvqiatwodyjiet.supabase.co/storage/v1/object/public/rental-web/items/df967d9a-4365-4da0-9dac-72227574a640.jpg",
+      "itemCode": "419",
+      "videoUrl": null,
+      "imageUrls": [
+        "https://npiebcgvqiatwodyjiet.supabase.co/storage/v1/object/public/rental-web/items/df967d9a-4365-4da0-9dac-72227574a640.jpg",
+        "https://npiebcgvqiatwodyjiet.supabase.co/storage/v1/object/public/rental-web/items/d4c7ac95-66a4-4135-bce1-4a3fb8706eae.jpg"
+      ],
+      "categoryId": 4,
+      "description": "test data",
+      "totalQuantity": 8,
+      "managementType": "BULK"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-20T08:27:17.450Z"
+  },
+  {
+    "id": "64",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/items/55",
+    "targetType": "items",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-20T08:27:21.770Z"
+  },
+  {
+    "id": "65",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-21T14:00:15.607Z"
+  },
+  {
+    "id": "66",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-21T15:05:11.239Z"
+  },
+  {
+    "id": "67",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTA1NTExLCJleHAiOjE3NzUzMTUxMTF9.QC0Lkp3Yqv0BjXYDyqMQUnQ1_FCoq_zuSwwU85U1n8g"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-21T15:05:22.401Z"
+  },
+  {
+    "id": "68",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-21T15:19:57.041Z"
+  },
+  {
+    "id": "69",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.11",
+    "createdAt": "2026-03-21T18:39:55.526Z"
+  },
+  {
+    "id": "70",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-21T18:55:20.987Z"
+  },
+  {
+    "id": "71",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.15",
+    "createdAt": "2026-03-21T19:09:07.649Z"
+  },
+  {
+    "id": "72",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-21T19:11:14.687Z"
+  },
+  {
+    "id": "73",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 43,
+      "quantity": 2
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-21T19:11:30.895Z"
+  },
+  {
+    "id": "74",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/3",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-27",
+      "quantity": 2,
+      "startDate": "2026-03-26"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-21T19:11:31.143Z"
+  },
+  {
+    "id": "75",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTIwMjc0LCJleHAiOjE3NzUzMjk4NzR9.vjUW577xsHUioXmjL9JJCi7x2IPyjwDC5ngpFJ-iweo"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-21T19:11:53.287Z"
+  },
+  {
+    "id": "76",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.16",
+    "createdAt": "2026-03-21T19:20:20.630Z"
+  },
+  {
+    "id": "77",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTIwODIwLCJleHAiOjE3NzUzMzA0MjB9.ck0xnGYZ4INziJKeKZ3t12otAT_bY59atWeqqsnQe3Y"
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-21T19:22:02.358Z"
+  },
+  {
+    "id": "78",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTIwMTQ3LCJleHAiOjE3NzUzMjk3NDd9._oNW_QKWuLiW9k9aBOwivc1syPKdy68sAdvSmm-BPn8"
+    },
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-21T19:24:04.333Z"
+  },
+  {
+    "id": "79",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.16",
+    "createdAt": "2026-03-21T19:30:49.003Z"
+  },
+  {
+    "id": "80",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.5",
+    "createdAt": "2026-03-21T19:31:14.566Z"
+  },
+  {
+    "id": "81",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-21T19:53:50.035Z"
+  },
+  {
+    "id": "82",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/4/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "취소 후 재활성화",
+      "status": "RESERVED"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-21T20:03:00.334Z"
+  },
+  {
+    "id": "83",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/4/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "취소 후 재활성화",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-21T20:03:07.432Z"
+  },
+  {
+    "id": "84",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/4/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-21T20:03:07.619Z"
+  },
+  {
+    "id": "85",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/4/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "화긴",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-21T20:03:17.609Z"
+  },
+  {
+    "id": "86",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/4/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "화긴",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-21T20:03:17.787Z"
+  },
+  {
+    "id": "87",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-21T20:33:48.466Z"
+  },
+  {
+    "id": "88",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 37,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.12",
+    "createdAt": "2026-03-21T20:40:26.709Z"
+  },
+  {
+    "id": "89",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/4",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-26",
+      "quantity": 1,
+      "startDate": "2026-03-24"
+    },
+    "ipAddress": "::ffff:100.64.0.12",
+    "createdAt": "2026-03-21T20:40:26.943Z"
+  },
+  {
+    "id": "90",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 43,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.12",
+    "createdAt": "2026-03-21T20:40:30.306Z"
+  },
+  {
+    "id": "91",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/3",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.12",
+    "createdAt": "2026-03-21T20:41:11.493Z"
+  },
+  {
+    "id": "92",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/4",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.12",
+    "createdAt": "2026-03-21T20:41:12.720Z"
+  },
+  {
+    "id": "93",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 37,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.12",
+    "createdAt": "2026-03-21T20:41:25.697Z"
+  },
+  {
+    "id": "94",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/5",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-25",
+      "quantity": 1,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.12",
+    "createdAt": "2026-03-21T20:41:25.938Z"
+  },
+  {
+    "id": "95",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 45,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.12",
+    "createdAt": "2026-03-21T20:41:30.531Z"
+  },
+  {
+    "id": "96",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/6",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-25",
+      "quantity": 1,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.12",
+    "createdAt": "2026-03-21T20:41:30.758Z"
+  },
+  {
+    "id": "97",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-21T20:48:48.440Z"
+  },
+  {
+    "id": "98",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-21T21:11:13.901Z"
+  },
+  {
+    "id": "99",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/4/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "화긴",
+      "status": "OVERDUE"
+    },
+    "ipAddress": "::ffff:100.64.0.12",
+    "createdAt": "2026-03-21T21:16:41.604Z"
+  },
+  {
+    "id": "100",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/4/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "OVERDUE"
+    },
+    "ipAddress": "::ffff:100.64.0.12",
+    "createdAt": "2026-03-21T21:16:41.780Z"
+  },
+  {
+    "id": "101",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/4/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.17",
+    "createdAt": "2026-03-21T21:19:39.210Z"
+  },
+  {
+    "id": "102",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/5",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.17",
+    "createdAt": "2026-03-21T21:20:45.873Z"
+  },
+  {
+    "id": "103",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/6",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.17",
+    "createdAt": "2026-03-21T21:20:48.793Z"
+  },
+  {
+    "id": "104",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.17",
+    "createdAt": "2026-03-22T01:09:12.852Z"
+  },
+  {
+    "id": "105",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.17",
+    "createdAt": "2026-03-22T01:09:40.267Z"
+  },
+  {
+    "id": "106",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTQxNzgwLCJleHAiOjE3NzUzNTEzODB9.OD-JpVoVLXCz3juzw_m7q5JXV6ri8ZURyvGEaiasybE"
+    },
+    "ipAddress": "::ffff:100.64.0.17",
+    "createdAt": "2026-03-22T01:10:21.571Z"
+  },
+  {
+    "id": "107",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.16",
+    "createdAt": "2026-03-22T01:17:21.737Z"
+  },
+  {
+    "id": "108",
+    "userId": null,
+    "action": "POST /api/auth/request-signup-verification",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "phoneNumber": "01090665493"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T02:37:09.960Z"
+  },
+  {
+    "id": "109",
+    "userId": null,
+    "action": "POST /api/auth/verify-signup-code",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "phoneNumber": "01090665493",
+      "verificationCode": "235172"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T02:37:23.743Z"
+  },
+  {
+    "id": "110",
+    "userId": null,
+    "action": "POST /api/auth/register",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "name": "정근녕",
+      "password": "@Jgn1517",
+      "username": "kkackit",
+      "studentId": "202112346",
+      "phoneNumber": "01090665493",
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구",
+      "verificationCode": "235172"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T02:37:25.618Z"
+  },
+  {
+    "id": "111",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "@Jgn1517",
+      "username": "kkackit"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-22T02:37:53.472Z"
+  },
+  {
+    "id": "112",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-22T03:13:02.453Z"
+  },
+  {
+    "id": "113",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/4/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "넹",
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-22T03:13:31.509Z"
+  },
+  {
+    "id": "114",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/4/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "넹",
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-22T03:13:31.711Z"
+  },
+  {
+    "id": "115",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "CREATE_PLOTTER_ORDER",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "3",
+    "details": {
+      "price": 45000,
+      "isPaidService": true
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-22T03:16:45.797Z"
+  },
+  {
+    "id": "116",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/plotter/orders",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.2",
+    "createdAt": "2026-03-22T03:16:45.816Z"
+  },
+  {
+    "id": "117",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImtrYWNraXQiLCJzdWIiOiJmYjQ1ZmQ5Ni00MDU4LTQ4ODUtOTM4Yi1mMDI1NzJiYmMyODkiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NDE0NzA3MywiZXhwIjoxNzc1MzU2NjczfQ.lpeW1nS_jd4KSrXRsyZpyIOQptHy3oGiK9jO08uLy0s"
+    },
+    "ipAddress": "::ffff:100.64.0.2",
+    "createdAt": "2026-03-22T03:42:37.326Z"
+  },
+  {
+    "id": "118",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T03:42:41.214Z"
+  },
+  {
+    "id": "119",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "CREATE_PLOTTER_ORDER",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "4",
+    "details": {
+      "price": 0,
+      "isPaidService": false
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-22T03:42:44.071Z"
+  },
+  {
+    "id": "120",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/plotter/orders",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T03:42:44.089Z"
+  },
+  {
+    "id": "121",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "CREATE_PLOTTER_ORDER",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "5",
+    "details": {
+      "price": 0,
+      "isPaidService": false
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-22T03:43:06.826Z"
+  },
+  {
+    "id": "122",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/plotter/orders",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-22T03:43:06.843Z"
+  },
+  {
+    "id": "123",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "CREATE_PLOTTER_ORDER",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "6",
+    "details": {
+      "price": 0,
+      "isPaidService": false
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-22T03:50:04.514Z"
+  },
+  {
+    "id": "124",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/plotter/orders",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.2",
+    "createdAt": "2026-03-22T03:50:04.533Z"
+  },
+  {
+    "id": "125",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T03:51:16.888Z"
+  },
+  {
+    "id": "126",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "CREATE_PLOTTER_ORDER",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "7",
+    "details": {
+      "price": 0,
+      "isPaidService": false
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-22T03:51:18.615Z"
+  },
+  {
+    "id": "127",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/plotter/orders",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-22T03:51:18.630Z"
+  },
+  {
+    "id": "128",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-22T04:02:22.585Z"
+  },
+  {
+    "id": "129",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "CREATE_PLOTTER_ORDER",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "8",
+    "details": {
+      "price": 0,
+      "isPaidService": false
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-22T04:11:37.823Z"
+  },
+  {
+    "id": "130",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/plotter/orders",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T04:11:37.838Z"
+  },
+  {
+    "id": "131",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.10",
+    "createdAt": "2026-03-22T04:39:56.228Z"
+  },
+  {
+    "id": "132",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "@Jgn1517",
+      "username": "tester01090665493z"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:58:45.675Z"
+  },
+  {
+    "id": "133",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 2,
+          "endDate": "2026-04-06",
+          "quantity": 1,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "departmentType": "학과 학생회"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:58:51.016Z"
+  },
+  {
+    "id": "134",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/plotter/calculate-price",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "purpose": "개인 소장용 포스터",
+      "pageCount": 1,
+      "paperSize": "A0",
+      "orderQuantity": 1,
+      "departmentType": "기타"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:58:55.577Z"
+  },
+  {
+    "id": "135",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "@Jgn1517",
+      "username": "tester01090665493z"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:08.345Z"
+  },
+  {
+    "id": "136",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:09.089Z"
+  },
+  {
+    "id": "137",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/plotter/calculate-price",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "purpose": "회칙 명시 사항 인쇄(예산안 등)",
+      "pageCount": 1,
+      "paperSize": "A0",
+      "orderQuantity": 1,
+      "departmentType": "중앙동아리"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:12.152Z"
+  },
+  {
+    "id": "138",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "CREATE_PLOTTER_ORDER",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "9",
+    "details": {
+      "price": 0,
+      "isPaidService": false
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-22T04:59:18.529Z"
+  },
+  {
+    "id": "139",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/plotter/orders",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:18.869Z"
+  },
+  {
+    "id": "140",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "9",
+    "details": {
+      "newStatus": "CONFIRMED",
+      "oldStatus": "PENDING"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-22T04:59:20.304Z"
+  },
+  {
+    "id": "141",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/9/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "CONFIRMED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:21.009Z"
+  },
+  {
+    "id": "142",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "9",
+    "details": {
+      "newStatus": "PRINTED",
+      "oldStatus": "CONFIRMED"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-22T04:59:22.513Z"
+  },
+  {
+    "id": "143",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/9/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "memo": "특수 용지 사용 완료",
+      "status": "PRINTED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:22.854Z"
+  },
+  {
+    "id": "144",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 2,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:26.173Z"
+  },
+  {
+    "id": "145",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 2,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-25"
+        }
+      ],
+      "departmentName": "테스트동아리",
+      "departmentType": "중앙동아리"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:30.263Z"
+  },
+  {
+    "id": "146",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/6/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:32.716Z"
+  },
+  {
+    "id": "147",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/6/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:35.167Z"
+  },
+  {
+    "id": "148",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/6/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "테스트 목적 재변경",
+      "status": "OVERDUE"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:37.686Z"
+  },
+  {
+    "id": "149",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/6/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "메모만 변경 테스트"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:41.229Z"
+  },
+  {
+    "id": "150",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 2,
+          "endDate": "2026-04-07",
+          "quantity": 1,
+          "startDate": "2026-04-06"
+        }
+      ],
+      "departmentName": "테스트동아리",
+      "departmentType": "중앙동아리"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:45.324Z"
+  },
+  {
+    "id": "151",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/7/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "CANCELED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:47.771Z"
+  },
+  {
+    "id": "152",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/7/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "취소 후 재활성화",
+      "status": "RESERVED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:50.228Z"
+  },
+  {
+    "id": "153",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/6",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 2,
+          "endDate": "2026-03-30",
+          "quantity": 1,
+          "startDate": "2026-03-27"
+        }
+      ],
+      "departmentName": "수정테스트동아리",
+      "departmentType": "중앙동아리"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T04:59:53.294Z"
+  },
+  {
+    "id": "154",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "@Jgn1517",
+      "username": "tester01090665493z"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:02.535Z"
+  },
+  {
+    "id": "155",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:03.274Z"
+  },
+  {
+    "id": "157",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "CREATE_PLOTTER_ORDER",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "10",
+    "details": {
+      "price": 0,
+      "isPaidService": false
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-22T05:02:12.311Z"
+  },
+  {
+    "id": "158",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/plotter/orders",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:12.650Z"
+  },
+  {
+    "id": "156",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/plotter/calculate-price",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "purpose": "회칙 명시 사항 인쇄(예산안 등)",
+      "pageCount": 1,
+      "paperSize": "A0",
+      "orderQuantity": 1,
+      "departmentType": "중앙동아리"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:06.330Z"
+  },
+  {
+    "id": "159",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "10",
+    "details": {
+      "newStatus": "CONFIRMED",
+      "oldStatus": "PENDING"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-22T05:02:14.088Z"
+  },
+  {
+    "id": "160",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/10/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "CONFIRMED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:14.812Z"
+  },
+  {
+    "id": "163",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 2,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:19.917Z"
+  },
+  {
+    "id": "165",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/8/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:26.430Z"
+  },
+  {
+    "id": "167",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/8/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "테스트 목적 재변경",
+      "status": "OVERDUE"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:31.392Z"
+  },
+  {
+    "id": "169",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 2,
+          "endDate": "2026-04-07",
+          "quantity": 1,
+          "startDate": "2026-04-06"
+        }
+      ],
+      "departmentName": "테스트동아리",
+      "departmentType": "중앙동아리"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:38.986Z"
+  },
+  {
+    "id": "171",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/9/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "취소 후 재활성화",
+      "status": "RESERVED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:43.869Z"
+  },
+  {
+    "id": "173",
+    "userId": null,
+    "action": "POST /api/auth/find-username",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "name": "홍길동",
+      "phoneNumber": "01090665493"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:52.699Z"
+  },
+  {
+    "id": "175",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "@Jgn1517",
+      "username": "tester01090665493z"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:58.352Z"
+  },
+  {
+    "id": "176",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 2,
+          "endDate": "2026-04-06",
+          "quantity": 1,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "departmentType": "학과 학생회"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:03:03.769Z"
+  },
+  {
+    "id": "161",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "10",
+    "details": {
+      "newStatus": "PRINTED",
+      "oldStatus": "CONFIRMED"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-22T05:02:16.308Z"
+  },
+  {
+    "id": "162",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/10/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "memo": "특수 용지 사용 완료",
+      "status": "PRINTED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:16.648Z"
+  },
+  {
+    "id": "164",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 2,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-25"
+        }
+      ],
+      "departmentName": "테스트동아리",
+      "departmentType": "중앙동아리"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:23.989Z"
+  },
+  {
+    "id": "166",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/8/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:28.876Z"
+  },
+  {
+    "id": "168",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/8/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "메모만 변경 테스트"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:34.922Z"
+  },
+  {
+    "id": "170",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/9/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "CANCELED"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:41.427Z"
+  },
+  {
+    "id": "172",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/8",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 2,
+          "endDate": "2026-03-30",
+          "quantity": 1,
+          "startDate": "2026-03-27"
+        }
+      ],
+      "departmentName": "수정테스트동아리",
+      "departmentType": "중앙동아리"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:47.008Z"
+  },
+  {
+    "id": "174",
+    "userId": null,
+    "action": "POST /api/auth/password-reset/request",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "username": "tester01090665493z",
+      "phoneNumber": "01090665493"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:02:54.727Z"
+  },
+  {
+    "id": "177",
+    "userId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+    "action": "POST /api/plotter/calculate-price",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "purpose": "개인 소장용 포스터",
+      "pageCount": 1,
+      "paperSize": "A0",
+      "orderQuantity": 1,
+      "departmentType": "기타"
+    },
+    "ipAddress": "::ffff:127.0.0.1",
+    "createdAt": "2026-03-22T05:03:08.280Z"
+  },
+  {
+    "id": "178",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T05:12:47.156Z"
+  },
+  {
+    "id": "179",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/9",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 2,
+          "endDate": "2026-03-27",
+          "quantity": 3,
+          "startDate": "2026-03-26"
+        }
+      ],
+      "departmentName": "공과대학 학생회",
+      "departmentType": "단과대 학생회"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-22T05:13:25.956Z"
+  },
+  {
+    "id": "180",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/10",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 2,
+          "endDate": "2026-03-25",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        }
+      ],
+      "departmentName": "미디어커뮤니케이션학과 학생회",
+      "departmentType": "학과 학생회"
+    },
+    "ipAddress": "::ffff:100.64.0.5",
+    "createdAt": "2026-03-22T05:15:14.302Z"
+  },
+  {
+    "id": "181",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/10",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 2,
+          "endDate": "2026-03-26",
+          "quantity": 7,
+          "startDate": "2026-03-26"
+        }
+      ],
+      "departmentName": "미디어커뮤니케이션학과 학생회",
+      "departmentType": "학과 학생회"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-22T05:18:33.922Z"
+  },
+  {
+    "id": "182",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.5",
+    "createdAt": "2026-03-22T05:42:06.308Z"
+  },
+  {
+    "id": "183",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/9",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 2,
+          "endDate": "2026-03-31",
+          "quantity": 5,
+          "startDate": "2026-03-30"
+        }
+      ],
+      "departmentName": "공과대학 학생회",
+      "departmentType": "단과대 학생회"
+    },
+    "ipAddress": "::ffff:100.64.0.5",
+    "createdAt": "2026-03-22T05:42:27.116Z"
+  },
+  {
+    "id": "184",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.20",
+    "createdAt": "2026-03-22T06:41:07.947Z"
+  },
+  {
+    "id": "185",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTAxNjE1LCJleHAiOjE3NzUzMTEyMTV9.eFR_XCgkrZs7CvT4nhMhIMqLD2hlqldwbr3P0TmWGsg"
+    },
+    "ipAddress": "::ffff:100.64.0.20",
+    "createdAt": "2026-03-22T06:52:33.067Z"
+  },
+  {
+    "id": "186",
+    "userId": null,
+    "action": "POST /api/auth/request-signup-verification",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "phoneNumber": "01068806465"
+    },
+    "ipAddress": "::ffff:100.64.0.20",
+    "createdAt": "2026-03-22T06:53:10.112Z"
+  },
+  {
+    "id": "187",
+    "userId": null,
+    "action": "POST /api/auth/verify-signup-code",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "phoneNumber": "01068806465",
+      "verificationCode": "886984"
+    },
+    "ipAddress": "::ffff:100.64.0.20",
+    "createdAt": "2026-03-22T06:53:19.146Z"
+  },
+  {
+    "id": "188",
+    "userId": null,
+    "action": "POST /api/auth/register",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "name": "총괄",
+      "password": "chdrhkf123!",
+      "username": "chdrhkf",
+      "studentId": "202000000",
+      "phoneNumber": "01068806465",
+      "departmentName": "총학생회",
+      "departmentType": "중앙자치기구",
+      "verificationCode": "886984"
+    },
+    "ipAddress": "::ffff:100.64.0.20",
+    "createdAt": "2026-03-22T06:53:22.416Z"
+  },
+  {
+    "id": "189",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "chdrhkf123!",
+      "username": "chdrhkf"
+    },
+    "ipAddress": "::ffff:100.64.0.20",
+    "createdAt": "2026-03-22T06:53:28.471Z"
+  },
+  {
+    "id": "190",
+    "userId": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNoZHJoa2YiLCJzdWIiOiJkMGJmNWUyZS00NzZiLTQwNmQtYTFhNi1kOGM0OGJiNDY4YjciLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NDE2MjQwOCwiZXhwIjoxNzc1MzcyMDA4fQ.dqjtMqXFgf2CgwHIZw-S46uYY-WgdcKyisDa7B5wJ6M"
+    },
+    "ipAddress": "::ffff:100.64.0.20",
+    "createdAt": "2026-03-22T06:53:31.042Z"
+  },
+  {
+    "id": "191",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.20",
+    "createdAt": "2026-03-22T06:53:40.494Z"
+  },
+  {
+    "id": "192",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTYyNDIwLCJleHAiOjE3NzUzNzIwMjB9.mzG9ZvoGK5uBs6TZZziR_FtAWjoP9Xmkf-MdAyU4WVI"
+    },
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-22T07:12:01.043Z"
+  },
+  {
+    "id": "193",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 37,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-22T07:17:53.269Z"
+  },
+  {
+    "id": "194",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/9",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-25",
+      "quantity": 1,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-22T07:17:53.491Z"
+  },
+  {
+    "id": "195",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 43,
+      "quantity": 2
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-22T07:17:57.995Z"
+  },
+  {
+    "id": "196",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/10",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-27",
+      "quantity": 2,
+      "startDate": "2026-03-25"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-22T07:17:58.211Z"
+  },
+  {
+    "id": "197",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTYyNDIwLCJleHAiOjE3NzUzNzIwMjB9.mzG9ZvoGK5uBs6TZZziR_FtAWjoP9Xmkf-MdAyU4WVI"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-22T07:36:14.656Z"
+  },
+  {
+    "id": "198",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 37,
+      "quantity": 2
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-22T07:36:23.345Z"
+  },
+  {
+    "id": "199",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/9",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-31",
+      "quantity": 2,
+      "startDate": "2026-03-30"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-22T07:36:23.588Z"
+  },
+  {
+    "id": "200",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 50,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-22T07:36:26.712Z"
+  },
+  {
+    "id": "201",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/11",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-27",
+      "quantity": 1,
+      "startDate": "2026-03-27"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-22T07:36:39.054Z"
+  },
+  {
+    "id": "237",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/20",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-25",
+      "quantity": 1,
+      "startDate": "2026-03-25"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T08:36:49.115Z"
+  },
+  {
+    "id": "202",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 37,
+          "endDate": "2026-03-31",
+          "quantity": 2,
+          "startDate": "2026-03-30"
+        },
+        {
+          "itemId": 43,
+          "endDate": "2026-03-27",
+          "quantity": 2,
+          "startDate": "2026-03-25"
+        },
+        {
+          "itemId": 50,
+          "endDate": "2026-03-27",
+          "quantity": 1,
+          "startDate": "2026-03-27"
+        }
+      ],
+      "departmentName": "운영국",
+      "departmentType": "기타"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-22T07:37:03.080Z"
+  },
+  {
+    "id": "203",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 37,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:48:03.311Z"
+  },
+  {
+    "id": "204",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/12",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-26",
+      "quantity": 1,
+      "startDate": "2026-03-24"
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:48:03.577Z"
+  },
+  {
+    "id": "205",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 38,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:48:06.277Z"
+  },
+  {
+    "id": "206",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 38,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:48:10.171Z"
+  },
+  {
+    "id": "207",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/13",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-25",
+      "quantity": 1,
+      "startDate": "2026-03-25"
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:48:10.432Z"
+  },
+  {
+    "id": "208",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 37,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        },
+        {
+          "itemId": 38,
+          "endDate": "2026-03-25",
+          "quantity": 1,
+          "startDate": "2026-03-25"
+        }
+      ],
+      "departmentName": "운영국",
+      "departmentType": "기타"
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:48:18.606Z"
+  },
+  {
+    "id": "209",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 50,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:48:28.570Z"
+  },
+  {
+    "id": "210",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 50,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:48:32.796Z"
+  },
+  {
+    "id": "211",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/14",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-23",
+      "quantity": 1,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:48:33.061Z"
+  },
+  {
+    "id": "212",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 50,
+          "endDate": "2026-03-23",
+          "quantity": 1,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "departmentName": "사학과 학생회",
+      "departmentType": "학과 학생회"
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:48:44.595Z"
+  },
+  {
+    "id": "213",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 7,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:49:31.827Z"
+  },
+  {
+    "id": "214",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/15",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-26",
+      "quantity": 1,
+      "startDate": "2026-03-25"
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:49:32.102Z"
+  },
+  {
+    "id": "215",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTYyNDIwLCJleHAiOjE3NzUzNzIwMjB9.mzG9ZvoGK5uBs6TZZziR_FtAWjoP9Xmkf-MdAyU4WVI"
+    },
+    "ipAddress": "::ffff:100.64.0.5",
+    "createdAt": "2026-03-22T07:54:01.646Z"
+  },
+  {
+    "id": "216",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 38,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:55:23.216Z"
+  },
+  {
+    "id": "217",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/16",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-26",
+      "quantity": 1,
+      "startDate": "2026-03-24"
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:55:23.445Z"
+  },
+  {
+    "id": "218",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 1,
+      "quantity": 4
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:55:27.555Z"
+  },
+  {
+    "id": "219",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/17",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-27",
+      "quantity": 4,
+      "startDate": "2026-03-27"
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T07:55:27.792Z"
+  },
+  {
+    "id": "220",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTYyNDIwLCJleHAiOjE3NzUzNzIwMjB9.mzG9ZvoGK5uBs6TZZziR_FtAWjoP9Xmkf-MdAyU4WVI"
+    },
+    "ipAddress": "::ffff:100.64.0.18",
+    "createdAt": "2026-03-22T08:15:26.816Z"
+  },
+  {
+    "id": "221",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 50,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-22T08:16:46.054Z"
+  },
+  {
+    "id": "222",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/18",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-24",
+      "quantity": 1,
+      "startDate": "2026-03-24"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-22T08:16:46.315Z"
+  },
+  {
+    "id": "223",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTYyNDIwLCJleHAiOjE3NzUzNzIwMjB9.mzG9ZvoGK5uBs6TZZziR_FtAWjoP9Xmkf-MdAyU4WVI"
+    },
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T08:32:13.714Z"
+  },
+  {
+    "id": "224",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals/admin",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 7,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-25"
+        },
+        {
+          "itemId": 38,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        },
+        {
+          "itemId": 1,
+          "endDate": "2026-03-27",
+          "quantity": 4,
+          "startDate": "2026-03-27"
+        },
+        {
+          "itemId": 50,
+          "endDate": "2026-03-24",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        }
+      ],
+      "targetUserId": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+      "departmentName": "총학생회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T08:32:19.744Z"
+  },
+  {
+    "id": "225",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 1,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T08:32:37.227Z"
+  },
+  {
+    "id": "226",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/17",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-26",
+      "quantity": 1,
+      "startDate": "2026-03-24"
+    },
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T08:32:37.475Z"
+  },
+  {
+    "id": "227",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 1,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T08:32:41.456Z"
+  },
+  {
+    "id": "228",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/17",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-26",
+      "quantity": 1,
+      "startDate": "2026-03-26"
+    },
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T08:32:41.692Z"
+  },
+  {
+    "id": "229",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/18",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T08:32:50.252Z"
+  },
+  {
+    "id": "230",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals/admin",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 7,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-25"
+        },
+        {
+          "itemId": 38,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        },
+        {
+          "itemId": 1,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-26"
+        }
+      ],
+      "targetUserId": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+      "departmentName": "총학생회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T08:32:56.306Z"
+  },
+  {
+    "id": "231",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/15",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T08:33:11.851Z"
+  },
+  {
+    "id": "232",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/16",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T08:33:12.441Z"
+  },
+  {
+    "id": "233",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/17",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T08:33:13.235Z"
+  },
+  {
+    "id": "234",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 45,
+      "quantity": 2
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T08:36:38.440Z"
+  },
+  {
+    "id": "235",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/19",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-25",
+      "quantity": 2,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T08:36:38.714Z"
+  },
+  {
+    "id": "236",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 50,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T08:36:42.915Z"
+  },
+  {
+    "id": "420",
+    "userId": "6434ae3f-75d9-4534-9fa4-3efc80b39eb9",
+    "action": "POST /api/plotter/orders",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:23:08.401Z"
+  },
+  {
+    "id": "238",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals/admin",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 45,
+          "endDate": "2026-03-25",
+          "quantity": 2,
+          "startDate": "2026-03-23"
+        },
+        {
+          "itemId": 50,
+          "endDate": "2026-03-25",
+          "quantity": 1,
+          "startDate": "2026-03-25"
+        }
+      ],
+      "targetUserId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+      "departmentName": "보안학과",
+      "departmentType": "학과 학생회"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T08:36:56.116Z"
+  },
+  {
+    "id": "239",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/19",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T08:36:56.529Z"
+  },
+  {
+    "id": "240",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/20",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T08:36:56.815Z"
+  },
+  {
+    "id": "241",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 1,
+      "quantity": 3
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T08:37:58.207Z"
+  },
+  {
+    "id": "242",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/21",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-31",
+      "quantity": 3,
+      "startDate": "2026-03-30"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T08:37:58.483Z"
+  },
+  {
+    "id": "243",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals/admin",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 1,
+          "endDate": "2026-03-31",
+          "quantity": 3,
+          "startDate": "2026-03-30"
+        }
+      ],
+      "targetUserId": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+      "departmentName": "총학생회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T08:38:05.520Z"
+  },
+  {
+    "id": "244",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/21",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T08:38:05.923Z"
+  },
+  {
+    "id": "245",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTYyNDIwLCJleHAiOjE3NzUzNzIwMjB9.mzG9ZvoGK5uBs6TZZziR_FtAWjoP9Xmkf-MdAyU4WVI"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T08:38:14.822Z"
+  },
+  {
+    "id": "246",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "chdrhkf123!",
+      "username": "chdrhkf"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T08:38:21.371Z"
+  },
+  {
+    "id": "247",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNoZHJoa2YiLCJzdWIiOiJkMGJmNWUyZS00NzZiLTQwNmQtYTFhNi1kOGM0OGJiNDY4YjciLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NDE2ODcwMSwiZXhwIjoxNzc1Mzc4MzAxfQ.AFbyHRLVwWhdmwIvWLb5BgWlwE0Vkg0f_P0BcZ3CQ8Y"
+    },
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-22T09:44:52.012Z"
+  },
+  {
+    "id": "248",
+    "userId": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNoZHJoa2YiLCJzdWIiOiJkMGJmNWUyZS00NzZiLTQwNmQtYTFhNi1kOGM0OGJiNDY4YjciLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NDE2ODcwMSwiZXhwIjoxNzc1Mzc4MzAxfQ.AFbyHRLVwWhdmwIvWLb5BgWlwE0Vkg0f_P0BcZ3CQ8Y"
+    },
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-22T09:44:52.134Z"
+  },
+  {
+    "id": "249",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-22T09:44:59.946Z"
+  },
+  {
+    "id": "250",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 12,
+      "quantity": 4
+    },
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-22T09:45:12.928Z"
+  },
+  {
+    "id": "251",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/22",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-31",
+      "quantity": 4,
+      "startDate": "2026-03-31"
+    },
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-22T09:45:13.204Z"
+  },
+  {
+    "id": "252",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals/admin",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 12,
+          "endDate": "2026-03-31",
+          "quantity": 4,
+          "startDate": "2026-03-31"
+        }
+      ],
+      "targetUserId": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+      "departmentName": "총학생회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-22T09:45:23.511Z"
+  },
+  {
+    "id": "253",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/22",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-22T09:45:23.917Z"
+  },
+  {
+    "id": "254",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTcyNjk5LCJleHAiOjE3NzUzODIyOTl9.cJ6m2ThjNn2DC7SiezlkCkpaDIDvST04ZtufzKHMtrc"
+    },
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-22T09:45:30.569Z"
+  },
+  {
+    "id": "255",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "chdrhkf123!",
+      "username": "chdrhkf"
+    },
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-22T09:45:36.512Z"
+  },
+  {
+    "id": "256",
+    "userId": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+    "action": "DELETE /api/rentals/27",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.14",
+    "createdAt": "2026-03-22T09:45:42.200Z"
+  },
+  {
+    "id": "257",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTUxNDc2LCJleHAiOjE3NzUzNjEwNzZ9.0DfgatlXnpGfeMqa7Zd1H7ZCu2jV07Ptt5-IV4dgZJ8"
+    },
+    "ipAddress": "::ffff:100.64.0.18",
+    "createdAt": "2026-03-22T09:47:51.566Z"
+  },
+  {
+    "id": "258",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T09:47:54.846Z"
+  },
+  {
+    "id": "259",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/27",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 12,
+          "endDate": "2026-03-31",
+          "quantity": 4,
+          "startDate": "2026-03-26"
+        }
+      ],
+      "departmentName": "총학생회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.18",
+    "createdAt": "2026-03-22T09:48:08.469Z"
+  },
+  {
+    "id": "260",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 38,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T09:49:19.507Z"
+  },
+  {
+    "id": "261",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/23",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-26",
+      "quantity": 1,
+      "startDate": "2026-03-24"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T09:49:19.771Z"
+  },
+  {
+    "id": "262",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 37,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T09:49:22.594Z"
+  },
+  {
+    "id": "263",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/24",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-26",
+      "quantity": 1,
+      "startDate": "2026-03-24"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T09:49:22.862Z"
+  },
+  {
+    "id": "264",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals/admin",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 38,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        },
+        {
+          "itemId": 37,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        }
+      ],
+      "targetUserId": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+      "departmentName": "총학생회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T09:50:29.224Z"
+  },
+  {
+    "id": "265",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/23",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T09:50:29.748Z"
+  },
+  {
+    "id": "266",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/24",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T09:50:30.001Z"
+  },
+  {
+    "id": "267",
+    "userId": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 38,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.21",
+    "createdAt": "2026-03-22T09:51:36.966Z"
+  },
+  {
+    "id": "268",
+    "userId": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+    "action": "PUT /api/cart/25",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-26",
+      "quantity": 1,
+      "startDate": "2026-03-24"
+    },
+    "ipAddress": "::ffff:100.64.0.21",
+    "createdAt": "2026-03-22T09:51:37.216Z"
+  },
+  {
+    "id": "269",
+    "userId": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 38,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        }
+      ],
+      "departmentName": "총학생회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.21",
+    "createdAt": "2026-03-22T09:51:43.780Z"
+  },
+  {
+    "id": "270",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNoZHJoa2YiLCJzdWIiOiJkMGJmNWUyZS00NzZiLTQwNmQtYTFhNi1kOGM0OGJiNDY4YjciLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NDE3MjczNiwiZXhwIjoxNzc1MzgyMzM2fQ.MFWerDIZkZtBTTzRKbLgvXTcsPndXUO6xms0vV70eQ8"
+    },
+    "ipAddress": "::ffff:100.64.0.20",
+    "createdAt": "2026-03-22T10:01:58.116Z"
+  },
+  {
+    "id": "271",
+    "userId": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNoZHJoa2YiLCJzdWIiOiJkMGJmNWUyZS00NzZiLTQwNmQtYTFhNi1kOGM0OGJiNDY4YjciLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NDE3MjczNiwiZXhwIjoxNzc1MzgyMzM2fQ.MFWerDIZkZtBTTzRKbLgvXTcsPndXUO6xms0vV70eQ8"
+    },
+    "ipAddress": "::ffff:100.64.0.20",
+    "createdAt": "2026-03-22T10:01:58.225Z"
+  },
+  {
+    "id": "272",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.20",
+    "createdAt": "2026-03-22T10:02:09.829Z"
+  },
+  {
+    "id": "273",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 12,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.18",
+    "createdAt": "2026-03-22T10:02:40.995Z"
+  },
+  {
+    "id": "274",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/26",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-23",
+      "quantity": 1,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.18",
+    "createdAt": "2026-03-22T10:02:41.263Z"
+  },
+  {
+    "id": "275",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 13,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.18",
+    "createdAt": "2026-03-22T10:02:44.323Z"
+  },
+  {
+    "id": "276",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/27",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-23",
+      "quantity": 1,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.18",
+    "createdAt": "2026-03-22T10:02:44.587Z"
+  },
+  {
+    "id": "277",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 12,
+          "endDate": "2026-03-23",
+          "quantity": 1,
+          "startDate": "2026-03-23"
+        },
+        {
+          "itemId": 13,
+          "endDate": "2026-03-23",
+          "quantity": 1,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "departmentName": "운영국",
+      "departmentType": "기타"
+    },
+    "ipAddress": "::ffff:100.64.0.18",
+    "createdAt": "2026-03-22T10:02:50.009Z"
+  },
+  {
+    "id": "278",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTcyODc0LCJleHAiOjE3NzUzODI0NzR9.DRxounIyu1tSgE8VlUt-9pfWTH2zqroc-ubkHoDDX0w"
+    },
+    "ipAddress": "::ffff:100.64.0.2",
+    "createdAt": "2026-03-22T10:14:12.118Z"
+  },
+  {
+    "id": "279",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTczNzI5LCJleHAiOjE3NzUzODMzMjl9.4pLT6cJyDC7HKPqd4G_n6O9qyghhEZF7u1ne2kUP_Z0"
+    },
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T10:24:29.088Z"
+  },
+  {
+    "id": "280",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/30/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T10:25:25.154Z"
+  },
+  {
+    "id": "281",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/28/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T10:25:43.785Z"
+  },
+  {
+    "id": "282",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/28/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T10:25:53.943Z"
+  },
+  {
+    "id": "283",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/28/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.19",
+    "createdAt": "2026-03-22T10:26:04.725Z"
+  },
+  {
+    "id": "284",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.13",
+    "createdAt": "2026-03-22T12:10:18.322Z"
+  },
+  {
+    "id": "285",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTgxNDE4LCJleHAiOjE3NzUzOTEwMTh9.hy2Wv3sgz6Bq3upVA96to4Uda4HqdzSoZik7bgYT5a8"
+    },
+    "ipAddress": "::ffff:100.64.0.18",
+    "createdAt": "2026-03-22T12:26:19.171Z"
+  },
+  {
+    "id": "286",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTgxNDE4LCJleHAiOjE3NzUzOTEwMTh9.hy2Wv3sgz6Bq3upVA96to4Uda4HqdzSoZik7bgYT5a8"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T12:53:52.542Z"
+  },
+  {
+    "id": "287",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/30/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "DEFECTIVE"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T12:53:52.778Z"
+  },
+  {
+    "id": "288",
+    "userId": null,
+    "action": "POST /api/auth/request-signup-verification",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "phoneNumber": "01057853121"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T15:35:28.693Z"
+  },
+  {
+    "id": "289",
+    "userId": null,
+    "action": "POST /api/auth/verify-signup-code",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "phoneNumber": "01057853121",
+      "verificationCode": "210212"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T15:35:45.347Z"
+  },
+  {
+    "id": "290",
+    "userId": null,
+    "action": "POST /api/auth/register",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "name": "김도은",
+      "password": "testpass123!",
+      "username": "kdoeun05",
+      "studentId": "202411257",
+      "phoneNumber": "01057853121",
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구",
+      "verificationCode": "210212"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T15:35:46.708Z"
+  },
+  {
+    "id": "291",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T15:35:50.572Z"
+  },
+  {
+    "id": "292",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 38,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T15:36:07.527Z"
+  },
+  {
+    "id": "293",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/28",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-24",
+      "quantity": 1,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T15:36:07.793Z"
+  },
+  {
+    "id": "294",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals/admin",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 38,
+          "endDate": "2026-03-24",
+          "quantity": 1,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "targetUserId": "005c9b6a-e01c-4250-bbbd-37aede719a63",
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T15:37:00.170Z"
+  },
+  {
+    "id": "295",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/28",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T15:37:00.714Z"
+  },
+  {
+    "id": "296",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTkzNzUwLCJleHAiOjE3NzU0MDMzNTB9.QnfX38UrSwQnvJEF361l0KyCDvpv6xp8Kjk2KYaOl0I"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-22T15:38:09.759Z"
+  },
+  {
+    "id": "297",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "testpass123!",
+      "username": "kdoeun05"
+    },
+    "ipAddress": "::ffff:100.64.0.7",
+    "createdAt": "2026-03-22T15:39:25.525Z"
+  },
+  {
+    "id": "298",
+    "userId": "005c9b6a-e01c-4250-bbbd-37aede719a63",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 38,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.7",
+    "createdAt": "2026-03-22T15:39:31.829Z"
+  },
+  {
+    "id": "299",
+    "userId": "005c9b6a-e01c-4250-bbbd-37aede719a63",
+    "action": "PUT /api/cart/29",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-24",
+      "quantity": 1,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.7",
+    "createdAt": "2026-03-22T15:39:32.099Z"
+  },
+  {
+    "id": "300",
+    "userId": "005c9b6a-e01c-4250-bbbd-37aede719a63",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imtkb2V1bjA1Iiwic3ViIjoiMDA1YzliNmEtZTAxYy00MjUwLWJiYmQtMzdhZWRlNzE5YTYzIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NzQxOTM5NjUsImV4cCI6MTc3NTQwMzU2NX0.zd8WowMs3tPVJ0AO69LIJw9woGae0d824nytr5_cbaA"
+    },
+    "ipAddress": "::ffff:100.64.0.7",
+    "createdAt": "2026-03-22T15:39:45.301Z"
+  },
+  {
+    "id": "301",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T15:41:24.626Z"
+  },
+  {
+    "id": "302",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/31",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 38,
+          "endDate": "2026-03-24",
+          "quantity": 2,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T15:42:14.709Z"
+  },
+  {
+    "id": "303",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/31/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "고장",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T15:42:38.781Z"
+  },
+  {
+    "id": "304",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/31/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "DEFECTIVE"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T15:42:39.217Z"
+  },
+  {
+    "id": "305",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/31/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "고장",
+      "status": "RESERVED"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T15:42:39.235Z"
+  },
+  {
+    "id": "306",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/31/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "고장",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T15:42:54.945Z"
+  },
+  {
+    "id": "307",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/31/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "DEFECTIVE"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T15:42:55.197Z"
+  },
+  {
+    "id": "308",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/29/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "ㅇ",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T15:43:14.983Z"
+  },
+  {
+    "id": "309",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/29/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T15:43:15.248Z"
+  },
+  {
+    "id": "310",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/29/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "ㅇ",
+      "status": "RESERVED"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T15:43:15.347Z"
+  },
+  {
+    "id": "311",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/29/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "ㅇ",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T15:43:26.547Z"
+  },
+  {
+    "id": "312",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/29/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "DEFECTIVE"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T15:43:26.835Z"
+  },
+  {
+    "id": "313",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/31/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T15:43:37.701Z"
+  },
+  {
+    "id": "314",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTk0MDg0LCJleHAiOjE3NzU0MDM2ODR9.mu2GVtG2EeLWduIIDd3rt--3uxEVypgeGNxu8ikBbRE"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-22T15:44:25.547Z"
+  },
+  {
+    "id": "315",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T01:42:25.750Z"
+  },
+  {
+    "id": "316",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/31/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "고장아닌뎅",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T01:44:28.489Z"
+  },
+  {
+    "id": "317",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/31/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T01:44:28.856Z"
+  },
+  {
+    "id": "318",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/31/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "고장아닌뎅",
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T01:44:28.937Z"
+  },
+  {
+    "id": "319",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/31/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "고장아닌뎅",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T01:45:03.288Z"
+  },
+  {
+    "id": "320",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/31/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "DEFECTIVE"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T01:45:03.527Z"
+  },
+  {
+    "id": "321",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/31",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 38,
+          "endDate": "2026-03-24",
+          "quantity": 2,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T01:52:08.762Z"
+  },
+  {
+    "id": "322",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/16",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 50,
+          "endDate": "2026-03-23",
+          "quantity": 1,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "departmentName": "사학과 학생회",
+      "departmentType": "학과 학생회"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T01:53:40.791Z"
+  },
+  {
+    "id": "323",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjMwMTQ1LCJleHAiOjE3NzU0Mzk3NDV9.HaoFxAHQT2czA6T2Ub0z8yBwDfFupoKGFJBo36GbhEM"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T01:58:43.004Z"
+  },
+  {
+    "id": "324",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/28",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 38,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        },
+        {
+          "itemId": 37,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        }
+      ],
+      "departmentName": "총학생회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T01:59:15.723Z"
+  },
+  {
+    "id": "325",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 8,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T01:59:32.167Z"
+  },
+  {
+    "id": "326",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/30",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-27",
+      "quantity": 1,
+      "startDate": "2026-03-25"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T01:59:32.534Z"
+  },
+  {
+    "id": "327",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals/admin",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 8,
+          "endDate": "2026-03-27",
+          "quantity": 1,
+          "startDate": "2026-03-25"
+        }
+      ],
+      "targetUserId": "7de3cb18-940d-49cd-a320-d8327876fc74",
+      "departmentName": "보안학과",
+      "departmentType": "학과 학생회"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T01:59:55.290Z"
+  },
+  {
+    "id": "328",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/30",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T01:59:55.902Z"
+  },
+  {
+    "id": "329",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 43,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T02:01:21.920Z"
+  },
+  {
+    "id": "330",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/31",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-24",
+      "quantity": 1,
+      "startDate": "2026-03-24"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T02:01:22.195Z"
+  },
+  {
+    "id": "331",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 1,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T02:01:27.034Z"
+  },
+  {
+    "id": "332",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/32",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-24",
+      "quantity": 1,
+      "startDate": "2026-03-24"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T02:01:27.317Z"
+  },
+  {
+    "id": "333",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals/admin",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 43,
+          "endDate": "2026-03-24",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        },
+        {
+          "itemId": 1,
+          "endDate": "2026-03-24",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        }
+      ],
+      "targetUserId": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+      "departmentName": "총학생회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T02:06:30.296Z"
+  },
+  {
+    "id": "334",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/31",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T02:06:30.976Z"
+  },
+  {
+    "id": "335",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/32",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T02:06:31.373Z"
+  },
+  {
+    "id": "336",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjMwMTQ1LCJleHAiOjE3NzU0Mzk3NDV9.HaoFxAHQT2czA6T2Ub0z8yBwDfFupoKGFJBo36GbhEM"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T02:18:51.521Z"
+  },
+  {
+    "id": "337",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/33",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 43,
+          "endDate": "2026-03-24",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        },
+        {
+          "itemId": 1,
+          "endDate": "2026-03-24",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        }
+      ],
+      "departmentName": "총학생회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T02:18:51.814Z"
+  },
+  {
+    "id": "338",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 43,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T02:19:22.592Z"
+  },
+  {
+    "id": "339",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/33",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-27",
+      "quantity": 1,
+      "startDate": "2026-03-25"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T02:19:22.932Z"
+  },
+  {
+    "id": "340",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals/admin",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 43,
+          "endDate": "2026-03-27",
+          "quantity": 1,
+          "startDate": "2026-03-25"
+        }
+      ],
+      "targetUserId": "005c9b6a-e01c-4250-bbbd-37aede719a63",
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T02:19:35.055Z"
+  },
+  {
+    "id": "341",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/33",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T02:19:35.859Z"
+  },
+  {
+    "id": "342",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/33/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.21",
+    "createdAt": "2026-03-23T02:23:16.182Z"
+  },
+  {
+    "id": "343",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/33/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.21",
+    "createdAt": "2026-03-23T02:23:16.393Z"
+  },
+  {
+    "id": "344",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/33/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "강강",
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.21",
+    "createdAt": "2026-03-23T02:23:28.989Z"
+  },
+  {
+    "id": "345",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/33/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.21",
+    "createdAt": "2026-03-23T02:23:29.232Z"
+  },
+  {
+    "id": "346",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/33/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "강강",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.21",
+    "createdAt": "2026-03-23T02:23:29.300Z"
+  },
+  {
+    "id": "347",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/33/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "강강ㄹㄹ",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.9",
+    "createdAt": "2026-03-23T02:26:28.747Z"
+  },
+  {
+    "id": "348",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/33/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "강강ㄹㄹ",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.9",
+    "createdAt": "2026-03-23T02:26:28.973Z"
+  },
+  {
+    "id": "349",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/34/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.9",
+    "createdAt": "2026-03-23T02:26:35.871Z"
+  },
+  {
+    "id": "350",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/34/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.9",
+    "createdAt": "2026-03-23T02:26:36.099Z"
+  },
+  {
+    "id": "351",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/34/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "ㅁㅁㅁ",
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.9",
+    "createdAt": "2026-03-23T02:26:42.820Z"
+  },
+  {
+    "id": "352",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/34/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "ㅁㅁㅁ",
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.9",
+    "createdAt": "2026-03-23T02:26:43.061Z"
+  },
+  {
+    "id": "353",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/34/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "ㅁㅁㅁㄹㄹ",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T02:31:02.517Z"
+  },
+  {
+    "id": "354",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/34/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "ㅁㅁㅁㄹㄹ",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T02:31:02.741Z"
+  },
+  {
+    "id": "355",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/32/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T02:31:23.024Z"
+  },
+  {
+    "id": "356",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/33/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "강강ㄹㄹ",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T02:31:35.422Z"
+  },
+  {
+    "id": "357",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/33/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "강강ㄹㄹ",
+      "status": "DEFECTIVE"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T02:31:35.658Z"
+  },
+  {
+    "id": "358",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/33/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "강강ㄹㄹㅂㅂㅂㅂ",
+      "status": "CANCELED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T02:31:48.482Z"
+  },
+  {
+    "id": "359",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/33/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "강강ㄹㄹㅂㅂㅂㅂ",
+      "status": "CANCELED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T02:31:48.702Z"
+  },
+  {
+    "id": "360",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjMwMTQ1LCJleHAiOjE3NzU0Mzk3NDV9.HaoFxAHQT2czA6T2Ub0z8yBwDfFupoKGFJBo36GbhEM"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:34:14.258Z"
+  },
+  {
+    "id": "361",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/33/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "강강ㄹㄹㅂㅂㅂㅂ",
+      "status": "CANCELED"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:34:14.505Z"
+  },
+  {
+    "id": "362",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/33/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "강강ㄹㄹㅂㅂㅂㅂ",
+      "status": "CANCELED"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:34:14.809Z"
+  },
+  {
+    "id": "363",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "testpass123!",
+      "username": "kdoeun05"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:37:41.809Z"
+  },
+  {
+    "id": "364",
+    "userId": "005c9b6a-e01c-4250-bbbd-37aede719a63",
+    "action": "CREATE_PLOTTER_ORDER",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "11",
+    "details": {
+      "price": 0,
+      "isPaidService": false
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T02:41:19.256Z"
+  },
+  {
+    "id": "365",
+    "userId": "005c9b6a-e01c-4250-bbbd-37aede719a63",
+    "action": "POST /api/plotter/orders",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:41:19.272Z"
+  },
+  {
+    "id": "366",
+    "userId": "005c9b6a-e01c-4250-bbbd-37aede719a63",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imtkb2V1bjA1Iiwic3ViIjoiMDA1YzliNmEtZTAxYy00MjUwLWJiYmQtMzdhZWRlNzE5YTYzIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NzQyMzM0NjEsImV4cCI6MTc3NTQ0MzA2MX0.hjuZdoKrTUpJNn-OBbs143THL87Jiw8ZZA3-gfSPCek"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:41:43.971Z"
+  },
+  {
+    "id": "367",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:41:48.182Z"
+  },
+  {
+    "id": "368",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "11",
+    "details": {
+      "newStatus": "REJECTED",
+      "oldStatus": "PENDING",
+      "rejectionReason": "pdf 깨짐"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T02:42:13.339Z"
+  },
+  {
+    "id": "369",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/11/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "REJECTED",
+      "rejectionReason": "pdf 깨짐"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:42:13.983Z"
+  },
+  {
+    "id": "370",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 13,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:42:42.495Z"
+  },
+  {
+    "id": "371",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/34",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-24",
+      "quantity": 1,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:42:42.835Z"
+  },
+  {
+    "id": "372",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals/admin",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 13,
+          "endDate": "2026-03-24",
+          "quantity": 1,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "targetUserId": "005c9b6a-e01c-4250-bbbd-37aede719a63",
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:42:50.785Z"
+  },
+  {
+    "id": "373",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/34",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:42:51.297Z"
+  },
+  {
+    "id": "374",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/35",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 13,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-25"
+        }
+      ],
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:43:10.099Z"
+  },
+  {
+    "id": "375",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/35/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "테스트",
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:43:42.061Z"
+  },
+  {
+    "id": "376",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/35/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "테스트",
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:43:42.339Z"
+  },
+  {
+    "id": "377",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.9",
+    "createdAt": "2026-03-23T02:44:02.887Z"
+  },
+  {
+    "id": "378",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjMzNzA4LCJleHAiOjE3NzU0NDMzMDh9.MHd3ZA512080Cdk1vZ7wWur6n23_-xb0YTrePDBwlUo"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:44:14.071Z"
+  },
+  {
+    "id": "379",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "testpass123!",
+      "username": "kdoeun05"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T02:44:20.905Z"
+  },
+  {
+    "id": "380",
+    "userId": "005c9b6a-e01c-4250-bbbd-37aede719a63",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imtkb2V1bjA1Iiwic3ViIjoiMDA1YzliNmEtZTAxYy00MjUwLWJiYmQtMzdhZWRlNzE5YTYzIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NzQyMzM4NjAsImV4cCI6MTc3NTQ0MzQ2MH0.82pVYEymm_oXD6a9KFfFuiRGVsFMnedudOGldmNq2es"
+    },
+    "ipAddress": "::ffff:100.64.0.26",
+    "createdAt": "2026-03-23T02:45:47.081Z"
+  },
+  {
+    "id": "381",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjMwMTQ1LCJleHAiOjE3NzU0Mzk3NDV9.HaoFxAHQT2czA6T2Ub0z8yBwDfFupoKGFJBo36GbhEM"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-23T04:18:01.809Z"
+  },
+  {
+    "id": "382",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjMwMTQ1LCJleHAiOjE3NzU0Mzk3NDV9.HaoFxAHQT2czA6T2Ub0z8yBwDfFupoKGFJBo36GbhEM"
+    },
+    "ipAddress": "::ffff:100.64.0.9",
+    "createdAt": "2026-03-23T04:39:51.891Z"
+  },
+  {
+    "id": "383",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjMwMTQ1LCJleHAiOjE3NzU0Mzk3NDV9.HaoFxAHQT2czA6T2Ub0z8yBwDfFupoKGFJBo36GbhEM"
+    },
+    "ipAddress": "::ffff:100.64.0.9",
+    "createdAt": "2026-03-23T04:39:52.209Z"
+  },
+  {
+    "id": "384",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/35",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 13,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-25"
+        }
+      ],
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.7",
+    "createdAt": "2026-03-23T04:54:35.300Z"
+  },
+  {
+    "id": "419",
+    "userId": "6434ae3f-75d9-4534-9fa4-3efc80b39eb9",
+    "action": "CREATE_PLOTTER_ORDER",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "12",
+    "details": {
+      "price": 0,
+      "isPaidService": false
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T05:23:08.386Z"
+  },
+  {
+    "id": "385",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjMwMTQ1LCJleHAiOjE3NzU0Mzk3NDV9.HaoFxAHQT2czA6T2Ub0z8yBwDfFupoKGFJBo36GbhEM"
+    },
+    "ipAddress": "::ffff:100.64.0.2",
+    "createdAt": "2026-03-23T04:56:59.952Z"
+  },
+  {
+    "id": "386",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/33",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 43,
+          "endDate": "2026-03-24",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        },
+        {
+          "itemId": 1,
+          "endDate": "2026-03-24",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        }
+      ],
+      "departmentName": "총학생회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.21",
+    "createdAt": "2026-03-23T05:03:00.364Z"
+  },
+  {
+    "id": "387",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/32",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 8,
+          "endDate": "2026-03-27",
+          "quantity": 1,
+          "startDate": "2026-03-25"
+        }
+      ],
+      "departmentName": "보안학과",
+      "departmentType": "학과 학생회"
+    },
+    "ipAddress": "::ffff:100.64.0.26",
+    "createdAt": "2026-03-23T05:10:58.441Z"
+  },
+  {
+    "id": "388",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 12,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.26",
+    "createdAt": "2026-03-23T05:11:39.009Z"
+  },
+  {
+    "id": "389",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/35",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-25",
+      "quantity": 1,
+      "startDate": "2026-03-25"
+    },
+    "ipAddress": "::ffff:100.64.0.26",
+    "createdAt": "2026-03-23T05:11:39.269Z"
+  },
+  {
+    "id": "390",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals/admin",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 12,
+          "endDate": "2026-03-25",
+          "quantity": 1,
+          "startDate": "2026-03-25"
+        }
+      ],
+      "targetUserId": "d0bf5e2e-476b-406d-a1a6-d8c48bb468b7",
+      "departmentName": "총학생회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.26",
+    "createdAt": "2026-03-23T05:11:52.244Z"
+  },
+  {
+    "id": "391",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/35",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.26",
+    "createdAt": "2026-03-23T05:11:53.195Z"
+  },
+  {
+    "id": "392",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjMwMTQ1LCJleHAiOjE3NzU0Mzk3NDV9.HaoFxAHQT2czA6T2Ub0z8yBwDfFupoKGFJBo36GbhEM"
+    },
+    "ipAddress": "::ffff:100.64.0.26",
+    "createdAt": "2026-03-23T05:12:09.294Z"
+  },
+  {
+    "id": "393",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 12,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.7",
+    "createdAt": "2026-03-23T05:14:56.086Z"
+  },
+  {
+    "id": "394",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/36",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-24",
+      "quantity": 1,
+      "startDate": "2026-03-24"
+    },
+    "ipAddress": "::ffff:100.64.0.7",
+    "createdAt": "2026-03-23T05:14:57.004Z"
+  },
+  {
+    "id": "395",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 39,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.7",
+    "createdAt": "2026-03-23T05:15:03.563Z"
+  },
+  {
+    "id": "396",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/37",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-24",
+      "quantity": 1,
+      "startDate": "2026-03-24"
+    },
+    "ipAddress": "::ffff:100.64.0.7",
+    "createdAt": "2026-03-23T05:15:04.383Z"
+  },
+  {
+    "id": "397",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals/admin",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 12,
+          "endDate": "2026-03-24",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        },
+        {
+          "itemId": 39,
+          "endDate": "2026-03-24",
+          "quantity": 1,
+          "startDate": "2026-03-24"
+        }
+      ],
+      "targetUserId": "16169ddd-eb3d-4808-b3b1-5a3f7b7b1976",
+      "departmentName": "사학과 학생회",
+      "departmentType": "학과 학생회"
+    },
+    "ipAddress": "::ffff:100.64.0.7",
+    "createdAt": "2026-03-23T05:15:21.629Z"
+  },
+  {
+    "id": "398",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/36",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.7",
+    "createdAt": "2026-03-23T05:15:22.844Z"
+  },
+  {
+    "id": "399",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/37",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.7",
+    "createdAt": "2026-03-23T05:15:23.538Z"
+  },
+  {
+    "id": "400",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTgxNDE4LCJleHAiOjE3NzUzOTEwMTh9.hy2Wv3sgz6Bq3upVA96to4Uda4HqdzSoZik7bgYT5a8"
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T05:18:19.980Z"
+  },
+  {
+    "id": "401",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MTgxNDE4LCJleHAiOjE3NzUzOTEwMTh9.hy2Wv3sgz6Bq3upVA96to4Uda4HqdzSoZik7bgYT5a8"
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T05:18:20.091Z"
+  },
+  {
+    "id": "402",
+    "userId": null,
+    "action": "POST /api/auth/request-signup-verification",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "phoneNumber": "01058547328"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:19:25.723Z"
+  },
+  {
+    "id": "403",
+    "userId": null,
+    "action": "POST /api/auth/verify-signup-code",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "phoneNumber": "01058547328",
+      "verificationCode": "758081"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:19:40.066Z"
+  },
+  {
+    "id": "404",
+    "userId": null,
+    "action": "POST /api/auth/register",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "name": "김준호",
+      "password": "eoguqwnsgh4$",
+      "username": "junho0414",
+      "studentId": "202510961",
+      "phoneNumber": "01058547328",
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구",
+      "verificationCode": "758081"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:19:41.200Z"
+  },
+  {
+    "id": "405",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "eoguqwnsgh4$",
+      "username": "junho0414"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:19:51.409Z"
+  },
+  {
+    "id": "406",
+    "userId": "6434ae3f-75d9-4534-9fa4-3efc80b39eb9",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 37,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:20:06.830Z"
+  },
+  {
+    "id": "407",
+    "userId": "6434ae3f-75d9-4534-9fa4-3efc80b39eb9",
+    "action": "PUT /api/cart/38",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-25",
+      "quantity": 1,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:20:07.145Z"
+  },
+  {
+    "id": "408",
+    "userId": "6434ae3f-75d9-4534-9fa4-3efc80b39eb9",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 37,
+          "endDate": "2026-03-25",
+          "quantity": 1,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:20:15.683Z"
+  },
+  {
+    "id": "409",
+    "userId": "6434ae3f-75d9-4534-9fa4-3efc80b39eb9",
+    "action": "PUT /api/rentals/38",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 37,
+          "endDate": "2026-03-25",
+          "quantity": 1,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:20:49.758Z"
+  },
+  {
+    "id": "410",
+    "userId": "6434ae3f-75d9-4534-9fa4-3efc80b39eb9",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 44,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:21:14.472Z"
+  },
+  {
+    "id": "411",
+    "userId": "6434ae3f-75d9-4534-9fa4-3efc80b39eb9",
+    "action": "PUT /api/cart/39",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-23",
+      "quantity": 1,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:21:14.796Z"
+  },
+  {
+    "id": "412",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T05:21:21.479Z"
+  },
+  {
+    "id": "413",
+    "userId": "6434ae3f-75d9-4534-9fa4-3efc80b39eb9",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 44,
+          "endDate": "2026-03-23",
+          "quantity": 1,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:21:24.881Z"
+  },
+  {
+    "id": "414",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/admin/38",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 37,
+          "endDate": "2026-03-25",
+          "quantity": 1,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T05:21:44.640Z"
+  },
+  {
+    "id": "415",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/39/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RESERVED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T05:21:53.340Z"
+  },
+  {
+    "id": "416",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/39/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "CANCELED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T05:21:59.230Z"
+  },
+  {
+    "id": "417",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/39/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "DEFECTIVE"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T05:22:08.109Z"
+  },
+  {
+    "id": "418",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/39/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "CANCELED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T05:22:11.300Z"
+  },
+  {
+    "id": "421",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/39/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "CANCELED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T05:23:21.478Z"
+  },
+  {
+    "id": "422",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/39/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RESERVED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T05:23:25.025Z"
+  },
+  {
+    "id": "423",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/39/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "CANCELED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T05:23:31.737Z"
+  },
+  {
+    "id": "424",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "12",
+    "details": {
+      "newStatus": "REJECTED",
+      "oldStatus": "PENDING",
+      "rejectionReason": "준호 빵꾸똥꾸"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T05:23:48.368Z"
+  },
+  {
+    "id": "425",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/12/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "REJECTED",
+      "rejectionReason": "준호 빵꾸똥꾸"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T05:23:48.960Z"
+  },
+  {
+    "id": "426",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "12",
+    "details": {
+      "newStatus": "PENDING",
+      "oldStatus": "REJECTED"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T05:24:07.657Z"
+  },
+  {
+    "id": "427",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/12/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "PENDING"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T05:24:07.671Z"
+  },
+  {
+    "id": "428",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "12",
+    "details": {
+      "newStatus": "CONFIRMED",
+      "oldStatus": "PENDING"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T05:24:12.833Z"
+  },
+  {
+    "id": "429",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/12/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "CONFIRMED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T05:24:13.589Z"
+  },
+  {
+    "id": "430",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "12",
+    "details": {
+      "newStatus": "PRINTED",
+      "oldStatus": "CONFIRMED"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T05:24:27.339Z"
+  },
+  {
+    "id": "431",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/12/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "PRINTED"
+    },
+    "ipAddress": "::ffff:100.64.0.3",
+    "createdAt": "2026-03-23T05:24:27.353Z"
+  },
+  {
+    "id": "432",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjQzMjgxLCJleHAiOjE3NzU0NTI4ODF9.pLreZM-A8oaL8GwJZ1Igc58G5lpMpIWeMCqcQHyTP64"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T05:36:39.570Z"
+  },
+  {
+    "id": "433",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/39/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "DEFECTIVE"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T05:36:44.779Z"
+  },
+  {
+    "id": "434",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/39/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "DEFECTIVE"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T05:37:03.698Z"
+  },
+  {
+    "id": "435",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/39/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "김준호 빵꾸똥꾸\n",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T05:37:19.392Z"
+  },
+  {
+    "id": "436",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/39/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "김준호 빵꾸똥꾸\n",
+      "status": "DEFECTIVE"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T05:37:19.619Z"
+  },
+  {
+    "id": "437",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/39/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "김준호 빵꾸똥꾸\n",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T05:38:01.722Z"
+  },
+  {
+    "id": "438",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/39/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "김준호 빵꾸똥꾸\n",
+      "status": "DEFECTIVE"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T05:38:01.959Z"
+  },
+  {
+    "id": "439",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjMzODQyLCJleHAiOjE3NzU0NDM0NDJ9.wBprQxZTSH7pMaGsZH2qYpgs6d-nrOPonxpCh90CC94"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:44:35.923Z"
+  },
+  {
+    "id": "440",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 8,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:45:27.028Z"
+  },
+  {
+    "id": "441",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/40",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-26",
+      "quantity": 1,
+      "startDate": "2026-03-25"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:45:27.343Z"
+  },
+  {
+    "id": "442",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals/admin",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 8,
+          "endDate": "2026-03-26",
+          "quantity": 1,
+          "startDate": "2026-03-25"
+        }
+      ],
+      "targetUserId": "005c9b6a-e01c-4250-bbbd-37aede719a63",
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:45:38.827Z"
+  },
+  {
+    "id": "443",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "DELETE /api/cart/40",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:45:39.686Z"
+  },
+  {
+    "id": "444",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/40/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RESERVED"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:46:04.896Z"
+  },
+  {
+    "id": "445",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/40/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RESERVED"
+    },
+    "ipAddress": "::ffff:100.64.0.22",
+    "createdAt": "2026-03-23T05:46:05.123Z"
+  },
+  {
+    "id": "446",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:53:25.233Z"
+  },
+  {
+    "id": "447",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/40/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:53:29.491Z"
+  },
+  {
+    "id": "448",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/40/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:53:32.176Z"
+  },
+  {
+    "id": "449",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/40/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RESERVED"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:53:35.110Z"
+  },
+  {
+    "id": "450",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/40/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "DEFECTIVE"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:53:37.491Z"
+  },
+  {
+    "id": "451",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 37,
+      "quantity": 3
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:53:47.746Z"
+  },
+  {
+    "id": "452",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/41",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-31",
+      "quantity": 3,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:53:47.997Z"
+  },
+  {
+    "id": "453",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 37,
+          "endDate": "2026-03-31",
+          "quantity": 3,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "departmentName": "총학생회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:53:53.884Z"
+  },
+  {
+    "id": "454",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 37,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:54:08.530Z"
+  },
+  {
+    "id": "455",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/42",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-27",
+      "quantity": 1,
+      "startDate": "2026-03-26"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:54:08.786Z"
+  },
+  {
+    "id": "456",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 37,
+          "endDate": "2026-03-27",
+          "quantity": 1,
+          "startDate": "2026-03-26"
+        }
+      ],
+      "departmentName": "사학과 학생회",
+      "departmentType": "학과 학생회"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:54:14.328Z"
+  },
+  {
+    "id": "457",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 37,
+      "quantity": 1
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:54:19.978Z"
+  },
+  {
+    "id": "458",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/43",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-27",
+      "quantity": 1,
+      "startDate": "2026-03-27"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:54:37.943Z"
+  },
+  {
+    "id": "459",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.21",
+    "createdAt": "2026-03-23T05:54:42.468Z"
+  },
+  {
+    "id": "460",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/43",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-27",
+      "quantity": 1,
+      "startDate": "2026-03-27"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:54:51.306Z"
+  },
+  {
+    "id": "461",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/43",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-23",
+      "quantity": 1,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:54:53.031Z"
+  },
+  {
+    "id": "462",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/cart/43",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-27",
+      "quantity": 1,
+      "startDate": "2026-03-27"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:54:54.413Z"
+  },
+  {
+    "id": "463",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 37,
+          "endDate": "2026-03-27",
+          "quantity": 1,
+          "startDate": "2026-03-27"
+        }
+      ],
+      "departmentName": "운영국",
+      "departmentType": "기타"
+    },
+    "ipAddress": "::ffff:100.64.0.6",
+    "createdAt": "2026-03-23T05:54:55.997Z"
+  },
+  {
+    "id": "464",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "8",
+    "details": {
+      "newStatus": "CONFIRMED",
+      "oldStatus": "PENDING"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T05:57:06.009Z"
+  },
+  {
+    "id": "465",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/8/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "CONFIRMED"
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T05:57:06.492Z"
+  },
+  {
+    "id": "466",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "4",
+    "details": {
+      "newStatus": "CONFIRMED",
+      "oldStatus": "PENDING"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T06:07:14.175Z"
+  },
+  {
+    "id": "467",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/4/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "CONFIRMED"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T06:07:15.084Z"
+  },
+  {
+    "id": "468",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "3",
+    "details": {
+      "newStatus": "CONFIRMED",
+      "oldStatus": "PENDING"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T06:07:15.931Z"
+  },
+  {
+    "id": "469",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/3/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "CONFIRMED"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T06:07:16.266Z"
+  },
+  {
+    "id": "470",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjQ1MjgyLCJleHAiOjE3NzU0NTQ4ODJ9.pbviCTnnKrhfAOENZXXqojY4PuqZB_r7rzfWdtE-ZXA"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T06:07:39.193Z"
+  },
+  {
+    "id": "471",
+    "userId": null,
+    "action": "POST /api/auth/request-signup-verification",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "phoneNumber": "01043284958"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T06:08:26.071Z"
+  },
+  {
+    "id": "472",
+    "userId": null,
+    "action": "POST /api/auth/verify-signup-code",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "phoneNumber": "01043284958",
+      "verificationCode": "950180"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T06:08:33.460Z"
+  },
+  {
+    "id": "473",
+    "userId": null,
+    "action": "POST /api/auth/register",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "name": "이동현",
+      "password": "qpwo1029@",
+      "username": "dlehdgus924",
+      "studentId": "202211845",
+      "phoneNumber": "01043284958",
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구",
+      "verificationCode": "950180"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T06:08:34.416Z"
+  },
+  {
+    "id": "474",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "qpwo1029@",
+      "username": "dlehdgus924"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T06:08:40.584Z"
+  },
+  {
+    "id": "475",
+    "userId": "972932cf-25ab-4745-9c20-9a5bfa0252fb",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 5,
+      "quantity": 10
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T06:11:28.740Z"
+  },
+  {
+    "id": "476",
+    "userId": "972932cf-25ab-4745-9c20-9a5bfa0252fb",
+    "action": "PUT /api/cart/44",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-27",
+      "quantity": 10,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T06:11:30.261Z"
+  },
+  {
+    "id": "477",
+    "userId": "972932cf-25ab-4745-9c20-9a5bfa0252fb",
+    "action": "POST /api/cart",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "itemId": 5,
+      "quantity": 10
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T06:11:30.977Z"
+  },
+  {
+    "id": "478",
+    "userId": "972932cf-25ab-4745-9c20-9a5bfa0252fb",
+    "action": "PUT /api/cart/44",
+    "targetType": "cart",
+    "targetId": null,
+    "details": {
+      "endDate": "2026-03-27",
+      "quantity": 10,
+      "startDate": "2026-03-23"
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T06:11:31.288Z"
+  },
+  {
+    "id": "479",
+    "userId": "972932cf-25ab-4745-9c20-9a5bfa0252fb",
+    "action": "POST /api/rentals",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "items": [
+        {
+          "itemId": 5,
+          "endDate": "2026-03-27",
+          "quantity": 10,
+          "startDate": "2026-03-23"
+        }
+      ],
+      "departmentName": "학생복지위원회",
+      "departmentType": "중앙자치기구"
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T06:12:28.618Z"
+  },
+  {
+    "id": "480",
+    "userId": "972932cf-25ab-4745-9c20-9a5bfa0252fb",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRsZWhkZ3VzOTI0Iiwic3ViIjoiOTcyOTMyY2YtMjVhYi00NzQ1LTljMjAtOWE1YmZhMDI1MmZiIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NzQyNDYxMjAsImV4cCI6MTc3NTQ1NTcyMH0.H2IEkBlnM909Z8B7Nx82OU44nxHLcay6WeAys10Ff2c"
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T06:12:33.705Z"
+  },
+  {
+    "id": "481",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "qpwo1029@",
+      "username": "dlehdgus924"
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T06:12:46.805Z"
+  },
+  {
+    "id": "482",
+    "userId": "972932cf-25ab-4745-9c20-9a5bfa0252fb",
+    "action": "CREATE_PLOTTER_ORDER",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "13",
+    "details": {
+      "price": 0,
+      "isPaidService": false
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T06:13:16.386Z"
+  },
+  {
+    "id": "483",
+    "userId": "972932cf-25ab-4745-9c20-9a5bfa0252fb",
+    "action": "POST /api/plotter/orders",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {},
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T06:13:16.408Z"
+  },
+  {
+    "id": "484",
+    "userId": "972932cf-25ab-4745-9c20-9a5bfa0252fb",
+    "action": "POST /api/auth/logout",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRsZWhkZ3VzOTI0Iiwic3ViIjoiOTcyOTMyY2YtMjVhYi00NzQ1LTljMjAtOWE1YmZhMDI1MmZiIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NzQyNDYzNjYsImV4cCI6MTc3NTQ1NTk2Nn0.EH9b1D3c1sUBAY4A0HdJQuXObqc614dmJoYlbdMCA2Q"
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T06:13:19.799Z"
+  },
+  {
+    "id": "485",
+    "userId": null,
+    "action": "POST /api/auth/login",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "password": "admin123!",
+      "username": "admin"
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T06:13:31.600Z"
+  },
+  {
+    "id": "486",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "13",
+    "details": {
+      "newStatus": "REJECTED",
+      "oldStatus": "PENDING",
+      "rejectionReason": "귀찮음"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T06:14:53.535Z"
+  },
+  {
+    "id": "487",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/13/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "REJECTED",
+      "rejectionReason": "귀찮음"
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T06:14:54.049Z"
+  },
+  {
+    "id": "488",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "13",
+    "details": {
+      "newStatus": "CONFIRMED",
+      "oldStatus": "REJECTED"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T06:15:26.300Z"
+  },
+  {
+    "id": "489",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/13/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "CONFIRMED"
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T06:15:26.679Z"
+  },
+  {
+    "id": "490",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "13",
+    "details": {
+      "newStatus": "PRINTED",
+      "oldStatus": "CONFIRMED"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T06:21:05.014Z"
+  },
+  {
+    "id": "491",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/13/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "PRINTED"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T06:21:05.035Z"
+  },
+  {
+    "id": "492",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "UPDATE_PLOTTER_STATUS",
+    "targetType": "PLOTTER_ORDER",
+    "targetId": "13",
+    "details": {
+      "newStatus": "COMPLETED",
+      "oldStatus": "PRINTED"
+    },
+    "ipAddress": null,
+    "createdAt": "2026-03-23T06:21:13.160Z"
+  },
+  {
+    "id": "493",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/plotter/orders/13/status",
+    "targetType": "plotter",
+    "targetId": null,
+    "details": {
+      "status": "COMPLETED"
+    },
+    "ipAddress": "::ffff:100.64.0.4",
+    "createdAt": "2026-03-23T06:21:13.179Z"
+  },
+  {
+    "id": "494",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjQ1MjA1LCJleHAiOjE3NzU0NTQ4MDV9.b0s7khS8txjvurEOm3QruS0bukHzbzxM5tqqw534EqU"
+    },
+    "ipAddress": "::ffff:100.64.0.8",
+    "createdAt": "2026-03-23T06:25:17.923Z"
+  },
+  {
+    "id": "495",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjQ2NDExLCJleHAiOjE3NzU0NTYwMTF9.VguzODDRA22Z25IwlT9LR3zNuvgSxKLUa5ydvKUwq9w"
+    },
+    "ipAddress": "::ffff:100.64.0.2",
+    "createdAt": "2026-03-23T06:28:50.947Z"
+  },
+  {
+    "id": "496",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/44/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.2",
+    "createdAt": "2026-03-23T06:29:03.682Z"
+  },
+  {
+    "id": "497",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/44/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "CANCELED"
+    },
+    "ipAddress": "::ffff:100.64.0.2",
+    "createdAt": "2026-03-23T06:29:08.419Z"
+  },
+  {
+    "id": "498",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/44/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "DEFECTIVE"
+    },
+    "ipAddress": "::ffff:100.64.0.2",
+    "createdAt": "2026-03-23T06:29:16.640Z"
+  },
+  {
+    "id": "499",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/44/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.2",
+    "createdAt": "2026-03-23T06:29:20.499Z"
+  },
+  {
+    "id": "500",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/44/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RENTED"
+    },
+    "ipAddress": "::ffff:100.64.0.2",
+    "createdAt": "2026-03-23T06:29:24.085Z"
+  },
+  {
+    "id": "501",
+    "userId": null,
+    "action": "POST /api/auth/refresh",
+    "targetType": "auth",
+    "targetId": null,
+    "details": {
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwic3ViIjoiZTE2OGQ3MmEtZWEyMS00ZDgwLTgyNTgtZjZmOTdkZDRiMmUyIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0MjQ1MjA1LCJleHAiOjE3NzU0NTQ4MDV9.b0s7khS8txjvurEOm3QruS0bukHzbzxM5tqqw534EqU"
+    },
+    "ipAddress": "::ffff:100.64.0.29",
+    "createdAt": "2026-03-23T06:41:11.478Z"
+  },
+  {
+    "id": "502",
+    "userId": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "action": "PUT /api/rentals/44/status",
+    "targetType": "rentals",
+    "targetId": null,
+    "details": {
+      "memo": "",
+      "status": "RETURNED"
+    },
+    "ipAddress": "::ffff:100.64.0.9",
+    "createdAt": "2026-03-23T06:41:47.739Z"
+  }
+]

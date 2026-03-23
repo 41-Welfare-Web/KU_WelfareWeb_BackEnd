@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "행사",
+    "deletedAt": null
+  },
+  {
+    "id": 2,
+    "name": "음향기기",
+    "deletedAt": null
+  },
+  {
+    "id": 3,
+    "name": "체육",
+    "deletedAt": null
+  },
+  {
+    "id": 4,
+    "name": "기타",
+    "deletedAt": null
+  }
+]
