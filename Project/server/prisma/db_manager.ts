@@ -7,7 +7,6 @@ async function resetDynamicData() {
   console.log('🧹 [Mode: QA] 유동적 데이터(트랜잭션) 초기화 중...');
 
   // 삭제 순서 (외래키 제약 준수)
-  await prisma.auditLog.deleteMany();
   await prisma.verificationCode.deleteMany();
   await prisma.cartItem.deleteMany();
   await prisma.rentalHistory.deleteMany();
