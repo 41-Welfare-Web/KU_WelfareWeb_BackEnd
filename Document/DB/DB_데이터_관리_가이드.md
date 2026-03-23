@@ -25,10 +25,45 @@
     ```
 
 ### **B. 물품 데이터 복구 (`restore_items.ts`)**
-JSON 백업 파일(`backups/2026-03-15`)을 기반으로 카테고리와 물품 목록을 복구합니다. 이미지가 포함된 상태 그대로 복원됩니다.
+JSON 백업 파일(`backups/2026-03-15`)을 기반으로 카테고리, 물품 목록, 개별 인스턴스를 복구합니다.
+> ⚠️ 이 스크립트는 `itemImages`(갤러리 이미지)를 복구하지 않습니다. 이미지 복구는 아래 `upload_images.ts`를 사용하세요.
 ```bash
 npx ts-node prisma/restore_items.ts
 ```
+
+### **D. 이미지 업로드 및 DB 복구 (`upload_images.ts`)**
+로컬 이미지 파일을 Supabase Storage에 업로드하고, `itemImages` 테이블과 `items.imageUrl`을 한번에 동기화합니다.
+
+**실행 조건:** `Project/data/2026_03_23_Item_Image/` 폴더에 이미지 파일이 있어야 합니다.
+
+```bash
+npx ts-node prisma/upload_images.ts
+```
+
+**처리 흐름:**
+1. `Project/data/20260309_Item_Image/` 내 `.jpg`, `.png` 파일을 Supabase `rental-web` 버킷 `items/` 경로에 upsert 업로드
+2. 파일명 패턴(`{itemCode}_{순서}.{확장자}`)을 파싱 → DB에서 itemCode로 itemId 조회 → `itemImages` 테이블에 upsert
+3. 각 물품의 order=1 이미지를 `items.imageUrl` 대표 이미지로 자동 업데이트
+
+**이미지 파일 명명 규칙:**
+
+| 항목 | 규칙 | 예시 |
+|------|------|------|
+| 파일명 형식 | `{itemCode}_{순서}.{확장자}` | `101_1.jpg`, `206_2.jpg` |
+| 확장자 | `.jpg` 또는 `.png` 허용 | `412_1.png` (포토월) |
+| 순서 번호 | 1부터 시작, 갤러리 순서와 일치 | `104_1.jpg`, `104_2.jpg` |
+
+**DB 이미지 구조:**
+
+```
+items.imageUrl       ← order=1 이미지 URL (대표 이미지, 목록 썸네일용)
+itemImages[]         ← 갤러리 이미지 전체 (order 오름차순 정렬)
+  - itemId
+  - imageUrl
+  - order (1, 2, ...)
+```
+
+> **주의:** `items.imageUrl`과 `itemImages` order=1의 URL은 항상 동일해야 합니다. 스크립트가 자동으로 맞춰줍니다.
 
 ### **C. 시퀀스 동기화 (`fix_sequences.ts`)**
 데이터를 수동으로 삽입(Restore 등)한 후, DB의 자동 증가(Auto-increment) ID 카운터가 어긋나 발생하는 `Unique constraint failed (P2002)` 에러를 해결합니다.
