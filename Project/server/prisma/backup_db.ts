@@ -7,11 +7,13 @@ dotenv.config();
 
 const prisma = new PrismaClient();
 
-async function backup() {
+export async function backup() {
   console.log('🚀 DB 백업 시작...');
-  
-  const today = new Date().toISOString().split('T')[0];
-  const backupDir = path.join(process.cwd(), 'backups', today);
+
+  const now = new Date();
+  const dateStr = now.toISOString().slice(0, 10); // 2026-03-23
+  const timeStr = now.toISOString().slice(11, 19).replace(/:/g, '-'); // 14-30-00
+  const backupDir = path.join(process.cwd(), 'backups', `${dateStr}_${timeStr}`);
 
   if (!fs.existsSync(backupDir)) {
     fs.mkdirSync(backupDir, { recursive: true });
@@ -40,7 +42,7 @@ async function backup() {
       // @ts-ignore
       const data = await prisma[model].findMany();
       const filePath = path.join(backupDir, `${model}.json`);
-      
+
       fs.writeFileSync(
         filePath,
         JSON.stringify(
@@ -56,13 +58,17 @@ async function backup() {
   }
 
   console.log(`\n📂 백업 완료 위치: ${backupDir}`);
+  return backupDir;
 }
 
-backup()
-  .catch((e) => {
-    console.error('❌ 백업 중 치명적 오류 발생:', e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+// 단독 실행 시에만 직접 동작
+if (require.main === module) {
+  backup()
+    .catch((e) => {
+      console.error('❌ 백업 중 치명적 오류 발생:', e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

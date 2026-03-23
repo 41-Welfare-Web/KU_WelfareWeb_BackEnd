@@ -1,10 +1,11 @@
 import { PrismaClient, Role } from '@prisma/client';
+import { backup } from './backup_db';
 
 const prisma = new PrismaClient();
 
 async function resetDynamicData() {
   console.log('🧹 [Mode: QA] 유동적 데이터(트랜잭션) 초기화 중...');
-  
+
   // 삭제 순서 (외래키 제약 준수)
   await prisma.auditLog.deleteMany();
   await prisma.verificationCode.deleteMany();
@@ -14,7 +15,7 @@ async function resetDynamicData() {
   await prisma.rental.deleteMany();
   await prisma.plotterOrderHistory.deleteMany();
   await prisma.plotterOrder.deleteMany();
-  
+
   // 관리자를 제외한 일반 사용자만 삭제 (재가입 테스트 가능하게)
   const deleteUsers = await prisma.user.deleteMany({
     where: { role: Role.USER }
@@ -26,7 +27,7 @@ async function resetDynamicData() {
 
 async function resetCatalogData() {
   console.log('📦 [Mode: Catalog] 물품 카탈로그 및 마스터 데이터 초기화 중...');
-  
+
   // 유동적 데이터 먼저 삭제
   await resetDynamicData();
 
@@ -35,14 +36,14 @@ async function resetCatalogData() {
   await prisma.itemImage.deleteMany();
   await prisma.itemInstance.deleteMany();
   await prisma.item.deleteMany();
-  
+
   console.log('✅ 완료: 모든 물품 및 자산 정보가 삭제되었습니다.');
   console.log('💡 이후 "npx prisma db seed"를 실행하여 마스터 데이터를 다시 채우세요.');
 }
 
 async function fullFactoryReset() {
   console.log('🚨 [Mode: FULL] 전체 데이터베이스 공장 초기화 중...');
-  
+
   const tablenames = await prisma.$queryRaw<Array<{ tablename: string }>>`
     SELECT tablename FROM pg_tables WHERE schemaname='public'
   `;
@@ -68,6 +69,11 @@ async function main() {
   console.log('==============================================');
 
   try {
+    // 삭제 전 자동 백업
+    console.log('\n💾 삭제 전 자동 백업을 시작합니다...');
+    await backup();
+    console.log('');
+
     switch (mode.toLowerCase()) {
       case 'qa':
         await resetDynamicData();
