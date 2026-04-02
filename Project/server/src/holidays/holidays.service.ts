@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateHolidayDto } from './dto/create-holiday.dto';
-import { getStartOfDayKst, parseDateOnlyKst } from '../common/utils/date.util';
+import { parseDateOnlyKst } from '../common/utils/date.util';
 
 @Injectable()
 export class HolidaysService {
@@ -81,16 +81,22 @@ export class HolidaysService {
 
   // Check if a specific date is a holiday (Weekend or Registered Holiday)
   async isHoliday(date: Date): Promise<boolean> {
-    // date가 이미 자정 기준(UTC 00:00 or KST 00:00) 객체라고 가정
-    const day = date.getDay(); 
-    if (day === 0 || day === 6) {
+    // getDay()는 로컬 타임존 기준이라 서버 환경(UTC/KST)에 따라 오작동할 수 있음
+    // holidayDate가 @db.Date(UTC 기준)이므로 항상 UTC 기준으로 처리
+    const dayOfWeek = date.getUTCDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
       return true; // Weekend
     }
 
-    const startOfDay = getStartOfDayKst(date);
+    // UTC 자정으로 정규화 (parseDateOnlyKst와 동일한 기준)
+    const utcMidnight = new Date(Date.UTC(
+      date.getUTCFullYear(),
+      date.getUTCMonth(),
+      date.getUTCDate(),
+    ));
 
     const holiday = await this.prisma.holiday.findUnique({
-      where: { holidayDate: startOfDay },
+      where: { holidayDate: utcMidnight },
     });
 
     return !!holiday;
@@ -102,7 +108,8 @@ export class HolidaysService {
     let addedDays = 0;
 
     while (addedDays < days) {
-      currentDate.setDate(currentDate.getDate() + 1);
+      // setUTCDate로 UTC 기준 날짜 이동 (로컬 타임존 영향 방지)
+      currentDate.setUTCDate(currentDate.getUTCDate() + 1);
       if (!(await this.isHoliday(currentDate))) {
         addedDays++;
       }
