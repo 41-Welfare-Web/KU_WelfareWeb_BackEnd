@@ -1,0 +1,920 @@
+[
+  {
+    "id": 34,
+    "orderId": 14,
+    "changedBy": "2fe3048c-6d57-44fd-bdec-df374a00e866",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-23T06:51:21.264Z"
+  },
+  {
+    "id": 35,
+    "orderId": 15,
+    "changedBy": "3c60f4e9-731b-4b55-b2a5-e5229413aa7d",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-23T09:01:44.487Z"
+  },
+  {
+    "id": 36,
+    "orderId": 16,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-23T09:13:56.860Z"
+  },
+  {
+    "id": 37,
+    "orderId": 16,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "CANCELED",
+    "memo": "사용자 직접 취소 (주문 시 소속: 중앙자치기구 / 학생복지위원회)",
+    "changedAt": "2026-03-23T10:34:00.694Z"
+  },
+  {
+    "id": 38,
+    "orderId": 15,
+    "changedBy": "3c60f4e9-731b-4b55-b2a5-e5229413aa7d",
+    "oldStatus": "PENDING",
+    "newStatus": "CANCELED",
+    "memo": "사용자 직접 취소 (주문 시 소속: 중앙자치기구 / 학생복지위원회)",
+    "changedAt": "2026-03-23T10:36:25.727Z"
+  },
+  {
+    "id": 39,
+    "orderId": 17,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-23T12:01:26.708Z"
+  },
+  {
+    "id": 40,
+    "orderId": 17,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PENDING",
+    "memo": "근무자교육용",
+    "changedAt": "2026-03-23T12:14:28.392Z"
+  },
+  {
+    "id": 41,
+    "orderId": 17,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "CONFIRMED",
+    "memo": "상태 변경: CONFIRMED",
+    "changedAt": "2026-03-24T04:41:42.424Z"
+  },
+  {
+    "id": 42,
+    "orderId": 17,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CONFIRMED",
+    "newStatus": "REJECTED",
+    "memo": "적절하지 않음",
+    "changedAt": "2026-03-24T04:42:06.021Z"
+  },
+  {
+    "id": 43,
+    "orderId": 18,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-24T04:43:58.985Z"
+  },
+  {
+    "id": 44,
+    "orderId": 18,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-03-24T04:44:11.314Z"
+  },
+  {
+    "id": 45,
+    "orderId": 18,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "PRINTED",
+    "memo": "3/24 수령",
+    "changedAt": "2026-03-24T04:44:23.064Z"
+  },
+  {
+    "id": 46,
+    "orderId": 19,
+    "changedBy": "4073d94f-be30-42e2-b483-46e4fcccedc5",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-24T06:25:57.052Z"
+  },
+  {
+    "id": 47,
+    "orderId": 19,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PENDING",
+    "memo": "테스트용",
+    "changedAt": "2026-03-24T06:26:23.095Z"
+  },
+  {
+    "id": 48,
+    "orderId": 19,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "CONFIRMED",
+    "memo": "상태 변경: CONFIRMED",
+    "changedAt": "2026-03-24T06:26:59.095Z"
+  },
+  {
+    "id": 49,
+    "orderId": 19,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CONFIRMED",
+    "newStatus": "REJECTED",
+    "memo": "반려해보고싶어서용",
+    "changedAt": "2026-03-24T06:27:41.759Z"
+  },
+  {
+    "id": 50,
+    "orderId": 19,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "REJECTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-03-24T06:29:17.691Z"
+  },
+  {
+    "id": 51,
+    "orderId": 18,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-03-24T06:49:56.754Z"
+  },
+  {
+    "id": 52,
+    "orderId": 20,
+    "changedBy": "47791983-5b33-4b90-8af3-e0fe50d07c99",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-24T22:20:43.937Z"
+  },
+  {
+    "id": 53,
+    "orderId": 20,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "CONFIRMED",
+    "memo": "상태 변경: CONFIRMED",
+    "changedAt": "2026-03-25T04:41:23.148Z"
+  },
+  {
+    "id": 54,
+    "orderId": 20,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CONFIRMED",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-03-25T06:03:20.854Z"
+  },
+  {
+    "id": 55,
+    "orderId": 21,
+    "changedBy": "89e54170-32b1-4a23-b9ba-cd0232996afc",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-25T08:59:09.475Z"
+  },
+  {
+    "id": 56,
+    "orderId": 21,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "CONFIRMED",
+    "memo": "상태 변경: CONFIRMED",
+    "changedAt": "2026-03-25T10:35:47.274Z"
+  },
+  {
+    "id": 57,
+    "orderId": 21,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CONFIRMED",
+    "newStatus": "REJECTED",
+    "memo": "형식에 맞지 않는 파일입니다. 입금 내역 확인 부탁드립니다.",
+    "changedAt": "2026-03-25T10:38:52.821Z"
+  },
+  {
+    "id": 58,
+    "orderId": 21,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "REJECTED",
+    "newStatus": "CONFIRMED",
+    "memo": "상태 변경: CONFIRMED",
+    "changedAt": "2026-03-27T04:54:18.033Z"
+  },
+  {
+    "id": 59,
+    "orderId": 21,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CONFIRMED",
+    "newStatus": "REJECTED",
+    "memo": "gg",
+    "changedAt": "2026-03-27T04:54:30.449Z"
+  },
+  {
+    "id": 60,
+    "orderId": 21,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "REJECTED",
+    "newStatus": "PENDING",
+    "memo": "상태 변경: PENDING",
+    "changedAt": "2026-03-27T06:08:55.611Z"
+  },
+  {
+    "id": 61,
+    "orderId": 21,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "REJECTED",
+    "memo": "ㄷㅇㄱㄷㅇㄱㄱㄷㅇㄱ",
+    "changedAt": "2026-03-27T06:09:12.491Z"
+  },
+  {
+    "id": 62,
+    "orderId": 20,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-03-27T06:17:42.311Z"
+  },
+  {
+    "id": 63,
+    "orderId": 22,
+    "changedBy": "834ae078-cf24-4b35-ad96-3d6224c4c5dc",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-29T07:04:04.772Z"
+  },
+  {
+    "id": 64,
+    "orderId": 23,
+    "changedBy": "834ae078-cf24-4b35-ad96-3d6224c4c5dc",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-29T07:04:47.014Z"
+  },
+  {
+    "id": 65,
+    "orderId": 22,
+    "changedBy": "834ae078-cf24-4b35-ad96-3d6224c4c5dc",
+    "oldStatus": "PENDING",
+    "newStatus": "CANCELED",
+    "memo": "사용자 직접 취소 (주문 시 소속: 중앙자치기구 / 총학생회)",
+    "changedAt": "2026-03-29T07:07:01.516Z"
+  },
+  {
+    "id": 66,
+    "orderId": 23,
+    "changedBy": "834ae078-cf24-4b35-ad96-3d6224c4c5dc",
+    "oldStatus": "PENDING",
+    "newStatus": "CANCELED",
+    "memo": "사용자 직접 취소 (주문 시 소속: 중앙자치기구 / 총학생회)",
+    "changedAt": "2026-03-29T07:07:05.126Z"
+  },
+  {
+    "id": 67,
+    "orderId": 24,
+    "changedBy": "834ae078-cf24-4b35-ad96-3d6224c4c5dc",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-29T07:07:40.383Z"
+  },
+  {
+    "id": 68,
+    "orderId": 25,
+    "changedBy": "834ae078-cf24-4b35-ad96-3d6224c4c5dc",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-29T07:08:01.314Z"
+  },
+  {
+    "id": 69,
+    "orderId": 26,
+    "changedBy": "3c60f4e9-731b-4b55-b2a5-e5229413aa7d",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-30T04:28:13.098Z"
+  },
+  {
+    "id": 70,
+    "orderId": 26,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-03-30T04:28:56.565Z"
+  },
+  {
+    "id": 71,
+    "orderId": 26,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "COMPLETED",
+    "newStatus": "COMPLETED",
+    "memo": "문구 테스트용",
+    "changedAt": "2026-03-30T04:29:08.088Z"
+  },
+  {
+    "id": 72,
+    "orderId": 25,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-03-30T07:27:50.297Z"
+  },
+  {
+    "id": 73,
+    "orderId": 24,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-03-30T07:27:55.691Z"
+  },
+  {
+    "id": 74,
+    "orderId": 21,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "REJECTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-03-30T07:50:00.108Z"
+  },
+  {
+    "id": 75,
+    "orderId": 17,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "REJECTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-03-30T07:50:09.680Z"
+  },
+  {
+    "id": 76,
+    "orderId": 21,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "COMPLETED",
+    "newStatus": "COMPLETED",
+    "memo": "테스트용",
+    "changedAt": "2026-03-30T07:50:26.931Z"
+  },
+  {
+    "id": 77,
+    "orderId": 26,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "COMPLETED",
+    "newStatus": "COMPLETED",
+    "memo": "문구 테스트",
+    "changedAt": "2026-03-30T14:16:33.530Z"
+  },
+  {
+    "id": 78,
+    "orderId": 26,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "COMPLETED",
+    "newStatus": "COMPLETED",
+    "memo": "문구 테스트용",
+    "changedAt": "2026-03-30T14:16:37.869Z"
+  },
+  {
+    "id": 79,
+    "orderId": 24,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-03-31T07:23:11.526Z"
+  },
+  {
+    "id": 80,
+    "orderId": 25,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-03-31T07:23:36.186Z"
+  },
+  {
+    "id": 81,
+    "orderId": 27,
+    "changedBy": "72feacf5-26d8-4cec-82ff-f35715030bdd",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-06T00:35:40.648Z"
+  },
+  {
+    "id": 82,
+    "orderId": 28,
+    "changedBy": "72feacf5-26d8-4cec-82ff-f35715030bdd",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-06T00:36:06.606Z"
+  },
+  {
+    "id": 83,
+    "orderId": 29,
+    "changedBy": "95dee4fc-9537-4dff-b9be-ac198c4eeb46",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-06T02:04:37.743Z"
+  },
+  {
+    "id": 84,
+    "orderId": 21,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "COMPLETED",
+    "newStatus": "PENDING",
+    "memo": "상태 변경: PENDING",
+    "changedAt": "2026-04-06T07:28:20.672Z"
+  },
+  {
+    "id": 85,
+    "orderId": 21,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "CONFIRMED",
+    "memo": "상태 변경: CONFIRMED",
+    "changedAt": "2026-04-06T07:28:57.183Z"
+  },
+  {
+    "id": 86,
+    "orderId": 21,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CONFIRMED",
+    "newStatus": "CONFIRMED",
+    "memo": "상태 변경: CONFIRMED",
+    "changedAt": "2026-04-06T07:29:10.344Z"
+  },
+  {
+    "id": 87,
+    "orderId": 21,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CONFIRMED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-04-06T07:52:49.439Z"
+  },
+  {
+    "id": 88,
+    "orderId": 30,
+    "changedBy": "e651b074-8db7-46f0-af20-088cd923882d",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-06T10:04:04.452Z"
+  },
+  {
+    "id": 89,
+    "orderId": 31,
+    "changedBy": "e651b074-8db7-46f0-af20-088cd923882d",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-06T10:04:23.041Z"
+  },
+  {
+    "id": 90,
+    "orderId": 32,
+    "changedBy": "35ba0c32-897c-47b9-b984-6ec79d97beb7",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-06T10:05:20.927Z"
+  },
+  {
+    "id": 91,
+    "orderId": 33,
+    "changedBy": "3a4db788-506d-4431-bec1-98190d56d5f8",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-07T01:34:07.867Z"
+  },
+  {
+    "id": 92,
+    "orderId": 34,
+    "changedBy": "c9f800fd-efd0-4dcf-9ae2-7248cfcc7f73",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-07T04:48:10.082Z"
+  },
+  {
+    "id": 93,
+    "orderId": 34,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PENDING",
+    "memo": "출력 4/10 이후 연기",
+    "changedAt": "2026-04-07T05:42:27.236Z"
+  },
+  {
+    "id": 94,
+    "orderId": 33,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PENDING",
+    "memo": "출력 4/10 이후 연기",
+    "changedAt": "2026-04-07T05:42:34.789Z"
+  },
+  {
+    "id": 95,
+    "orderId": 34,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PENDING",
+    "memo": "수령 4/10 이후 연기",
+    "changedAt": "2026-04-07T05:42:41.756Z"
+  },
+  {
+    "id": 96,
+    "orderId": 33,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PENDING",
+    "memo": "수령 4/10 이후 연기",
+    "changedAt": "2026-04-07T05:42:46.443Z"
+  },
+  {
+    "id": 97,
+    "orderId": 32,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PENDING",
+    "memo": "수령 4/10 이후 연기",
+    "changedAt": "2026-04-07T05:42:53.459Z"
+  },
+  {
+    "id": 98,
+    "orderId": 31,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PENDING",
+    "memo": "수령 4/10 이후 연기",
+    "changedAt": "2026-04-07T05:43:04.004Z"
+  },
+  {
+    "id": 99,
+    "orderId": 30,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PENDING",
+    "memo": "수령 4/10 이후 연기",
+    "changedAt": "2026-04-07T05:43:06.677Z"
+  },
+  {
+    "id": 100,
+    "orderId": 29,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PENDING",
+    "memo": "수령 4/10 이후 연기",
+    "changedAt": "2026-04-07T05:43:08.318Z"
+  },
+  {
+    "id": 101,
+    "orderId": 28,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PENDING",
+    "memo": "수령 4/10 이후 연기",
+    "changedAt": "2026-04-07T05:43:10.027Z"
+  },
+  {
+    "id": 102,
+    "orderId": 27,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PENDING",
+    "memo": "수령 4/10 이후 연기",
+    "changedAt": "2026-04-07T05:43:12.007Z"
+  },
+  {
+    "id": 103,
+    "orderId": 32,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-04-08T08:06:22.918Z"
+  },
+  {
+    "id": 104,
+    "orderId": 31,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-04-08T08:13:33.278Z"
+  },
+  {
+    "id": 105,
+    "orderId": 30,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-04-08T08:13:36.698Z"
+  },
+  {
+    "id": 106,
+    "orderId": 28,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-04-08T08:28:40.767Z"
+  },
+  {
+    "id": 107,
+    "orderId": 27,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-04-08T08:28:44.802Z"
+  },
+  {
+    "id": 108,
+    "orderId": 33,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-04-08T08:38:43.919Z"
+  },
+  {
+    "id": 109,
+    "orderId": 35,
+    "changedBy": "38c648e5-a60a-4ab1-97df-0865e7057a67",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-08T08:39:26.225Z"
+  },
+  {
+    "id": 110,
+    "orderId": 35,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-04-08T08:39:37.627Z"
+  },
+  {
+    "id": 111,
+    "orderId": 35,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "CONFIRMED",
+    "memo": "상태 변경: CONFIRMED",
+    "changedAt": "2026-04-08T08:39:52.137Z"
+  },
+  {
+    "id": 112,
+    "orderId": 35,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CONFIRMED",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-04-08T08:40:03.026Z"
+  },
+  {
+    "id": 113,
+    "orderId": 34,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-04-08T08:40:47.036Z"
+  },
+  {
+    "id": 114,
+    "orderId": 29,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-04-08T08:45:45.247Z"
+  },
+  {
+    "id": 115,
+    "orderId": 33,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-04-09T05:54:39.504Z"
+  },
+  {
+    "id": 116,
+    "orderId": 29,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-04-09T05:58:12.774Z"
+  },
+  {
+    "id": 117,
+    "orderId": 34,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-04-09T07:36:22.731Z"
+  },
+  {
+    "id": 118,
+    "orderId": 31,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-04-09T07:40:23.457Z"
+  },
+  {
+    "id": 119,
+    "orderId": 30,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-04-09T07:40:28.898Z"
+  },
+  {
+    "id": 120,
+    "orderId": 28,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-04-09T07:59:51.771Z"
+  },
+  {
+    "id": 121,
+    "orderId": 28,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "COMPLETED",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-04-09T07:59:57.136Z"
+  },
+  {
+    "id": 122,
+    "orderId": 28,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-04-09T08:02:01.079Z"
+  },
+  {
+    "id": 123,
+    "orderId": 27,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-04-09T08:02:06.217Z"
+  },
+  {
+    "id": 124,
+    "orderId": 36,
+    "changedBy": "3bea07ff-9b66-4e2d-b2cc-e5552a2f7188",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-09T11:49:13.366Z"
+  },
+  {
+    "id": 125,
+    "orderId": 37,
+    "changedBy": "3bea07ff-9b66-4e2d-b2cc-e5552a2f7188",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-09T11:49:51.946Z"
+  },
+  {
+    "id": 126,
+    "orderId": 37,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "CONFIRMED",
+    "memo": "상태 변경: CONFIRMED",
+    "changedAt": "2026-04-09T12:11:49.678Z"
+  },
+  {
+    "id": 127,
+    "orderId": 36,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PENDING",
+    "newStatus": "CONFIRMED",
+    "memo": "상태 변경: CONFIRMED",
+    "changedAt": "2026-04-09T12:11:53.737Z"
+  },
+  {
+    "id": 128,
+    "orderId": 36,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CONFIRMED",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-04-09T12:11:56.445Z"
+  },
+  {
+    "id": 129,
+    "orderId": 37,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "CONFIRMED",
+    "newStatus": "PRINTED",
+    "memo": "상태 변경: PRINTED",
+    "changedAt": "2026-04-09T12:12:00.119Z"
+  },
+  {
+    "id": 130,
+    "orderId": 37,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "PRINTED",
+    "memo": "4/10 수령",
+    "changedAt": "2026-04-09T12:12:20.653Z"
+  },
+  {
+    "id": 131,
+    "orderId": 36,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "PRINTED",
+    "memo": "4/10 수령",
+    "changedAt": "2026-04-09T12:12:27.482Z"
+  },
+  {
+    "id": 132,
+    "orderId": 35,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-04-10T06:09:21.522Z"
+  },
+  {
+    "id": 133,
+    "orderId": 32,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-04-10T06:24:40.165Z"
+  },
+  {
+    "id": 134,
+    "orderId": 37,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-04-10T06:32:42.727Z"
+  },
+  {
+    "id": 135,
+    "orderId": 36,
+    "changedBy": "e168d72a-ea21-4d80-8258-f6f97dd4b2e2",
+    "oldStatus": "PRINTED",
+    "newStatus": "COMPLETED",
+    "memo": "상태 변경: COMPLETED",
+    "changedAt": "2026-04-10T06:32:47.251Z"
+  }
+]
