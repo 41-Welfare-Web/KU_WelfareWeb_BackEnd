@@ -45,6 +45,7 @@ export class RentalsService {
     const actualActorId = actorId || userId;
 
     const today = getStartOfDayKst();
+    const isAdminAction = !!(actorId && actorId !== userId);
 
     const maxMonthsStr = await this.configService.getValue(
       'rental_max_period_months',
@@ -80,22 +81,22 @@ export class RentalsService {
           `품목(ID: ${item.itemId}): 종료일이 시작일보다 빠를 수 없습니다.`,
         );
       }
-      if (start < today) {
+      if (!isAdminAction && start < today) {
         throw new BadRequestException(
           `품목(ID: ${item.itemId}): 과거 날짜로 예약할 수 없습니다.`,
         );
       }
-      if (await this.holidaysService.isHoliday(start)) {
+      if (!isAdminAction && await this.holidaysService.isHoliday(start)) {
         throw new BadRequestException(
           `품목(ID: ${item.itemId}): 대여 시작일이 휴무일(주말 포함)입니다.`,
         );
       }
-      if (await this.holidaysService.isHoliday(end)) {
+      if (!isAdminAction && await this.holidaysService.isHoliday(end)) {
         throw new BadRequestException(
           `품목(ID: ${item.itemId}): 반납일이 휴무일(주말 포함)입니다.`,
         );
       }
-      if (end > maxDate) {
+      if (!isAdminAction && end > maxDate) {
         throw new BadRequestException(
           `품목(ID: ${item.itemId}): 최대 ${maxMonths}개월까지만 예약할 수 있습니다.`,
         );
@@ -607,12 +608,13 @@ export class RentalsService {
     }
 
     if (
+      !actorId &&
       items?.[0]?.startDate &&
       (await this.holidaysService.isHoliday(start))
     ) {
       throw new BadRequestException('수정하려는 시작일이 휴무일입니다.');
     }
-    if (items?.[0]?.endDate && (await this.holidaysService.isHoliday(end))) {
+    if (!actorId && items?.[0]?.endDate && (await this.holidaysService.isHoliday(end))) {
       throw new BadRequestException('수정하려는 반납일이 휴무일입니다.');
     }
 
