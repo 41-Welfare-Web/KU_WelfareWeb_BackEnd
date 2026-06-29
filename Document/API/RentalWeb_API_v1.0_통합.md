@@ -2481,6 +2481,63 @@
 
 ---
 
+# 관리자 알림 조회 (Get Admin Notifications)
+
+관리자 패널에서 새 대여 예약 및 플로터 주문 신청을 폴링 방식으로 확인합니다.
+
+## **ENDPOINT:** `GET /api/admin/notifications`
+**Description:** `since` 파라미터 이후 생성된 새 대여 예약과 플로터 주문을 최신순으로 반환합니다. 별도 알림 테이블 없이 기존 테이블을 직접 조회합니다.
+**Required Permissions:** Admin Only
+
+> **프론트엔드 연동 방법 (폴링):** 프론트에서 `setInterval`로 주기적으로 호출 시, `since`에 이전 호출 시각을 ISO 8601 형식으로 전달하면 그 이후 생성된 항목만 반환됩니다. 읽음 처리는 프론트엔드 `localStorage`에서 관리합니다.
+
+---
+
+#### **Query Parameters**
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `since` | `string` | Optional | 이 시각 이후 생성된 항목만 반환 (ISO 8601). 생략 시 최근 24시간 |
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "since": "2026-06-29T09:00:00.000Z",
+  "count": 2,
+  "notifications": [
+    {
+      "type": "RENTAL",
+      "id": 301,
+      "createdAt": "2026-06-29T10:15:00.000Z",
+      "message": "홍길동(2023001) 님이 대여 예약을 신청했습니다.",
+      "detail": "무선마이크, 의자"
+    },
+    {
+      "type": "PLOTTER",
+      "id": 52,
+      "createdAt": "2026-06-29T09:30:00.000Z",
+      "message": "김철수(2022005) 님이 플로터 주문을 신청했습니다.",
+      "detail": "학과 행사 목적 / A1"
+    }
+  ]
+}
+```
+
+| 필드 | 설명 |
+| :--- | :--- |
+| `since` | 실제 적용된 기준 시각 |
+| `count` | 반환된 알림 수 |
+| `notifications[].type` | `RENTAL` 또는 `PLOTTER` |
+| `notifications[].id` | 해당 대여 또는 플로터 주문 ID |
+| `notifications[].detail` | 대여: 물품명 목록 / 플로터: 목적 + 용지 크기 |
+
+---
+
 # 감사 로그 조회 (Get Audit Logs)
 
 ## **ENDPOINT:** `GET /api/admin/audit-logs`

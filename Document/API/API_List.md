@@ -65,6 +65,7 @@
 *   `DELETE /api/admin/holidays/{id}` (휴무일 삭제 - **Admin**)
 *   `GET /api/admin/configurations` (시스템 설정 목록 조회 - **Admin**)
 *   `PUT /api/admin/configurations` (시스템 설정 수정 - **Admin**)
+*   `GET /api/admin/notifications` (새 대여/플로터 주문 알림 조회 - **Admin**, 폴링용)
 *   `GET /api/admin/audit-logs` (감사 로그 조회 - **Admin**, 페이지네이션/검색/필터)
 *   `GET /api/admin/maintenance/status` (DB 관리 현황 조회 - **Admin**)
 *   `POST /api/admin/maintenance/cleanup` (DB 데이터 정밀 청소 - **Admin**)
