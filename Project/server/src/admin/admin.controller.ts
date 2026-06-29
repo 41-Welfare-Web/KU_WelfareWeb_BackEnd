@@ -87,6 +87,13 @@ export class AdminController {
     return this.adminService.getAuditLogs(+page, +pageSize, search, action);
   }
 
+  @Get('notifications')
+  @ApiOperation({ summary: '관리자 알림 조회 (새 대여/플로터 주문) [Admin]' })
+  @ApiQuery({ name: 'since', required: false, description: '이 시각 이후 생성된 항목만 반환 (ISO 8601). 생략 시 최근 24시간' })
+  getNotifications(@Query('since') since?: string) {
+    return this.adminService.getNotifications(since);
+  }
+
   @Get('maintenance/status')
   @ApiOperation({ summary: 'DB 관리 현황 조회' })
   getDbStatus() {

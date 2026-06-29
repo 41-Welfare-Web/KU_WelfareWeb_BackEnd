@@ -102,6 +102,53 @@ export class AdminService {
     };
   }
 
+  async getNotifications(since?: string) {
+    const sinceDate = since ? new Date(since) : new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    const [rentals, plotterOrders] = await Promise.all([
+      this.prisma.rental.findMany({
+        where: { createdAt: { gt: sinceDate }, deletedAt: null },
+        select: {
+          id: true,
+          createdAt: true,
+          user: { select: { name: true, studentId: true } },
+          rentalItems: { select: { item: { select: { name: true } } } },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.plotterOrder.findMany({
+        where: { createdAt: { gt: sinceDate }, deletedAt: null },
+        select: {
+          id: true,
+          createdAt: true,
+          purpose: true,
+          paperSize: true,
+          user: { select: { name: true, studentId: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+    ]);
+
+    const notifications = [
+      ...rentals.map((r) => ({
+        type: 'RENTAL' as const,
+        id: r.id,
+        createdAt: r.createdAt,
+        message: `${r.user.name}(${r.user.studentId}) 님이 대여 예약을 신청했습니다.`,
+        detail: r.rentalItems.map((ri) => ri.item.name).join(', '),
+      })),
+      ...plotterOrders.map((p) => ({
+        type: 'PLOTTER' as const,
+        id: p.id,
+        createdAt: p.createdAt,
+        message: `${p.user.name}(${p.user.studentId}) 님이 플로터 주문을 신청했습니다.`,
+        detail: `${p.purpose} / ${p.paperSize}`,
+      })),
+    ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    return { since: sinceDate, count: notifications.length, notifications };
+  }
+
   // 1. DB 관리 상태 조회
   async getDbMaintenanceStatus() {
     const tables = [
