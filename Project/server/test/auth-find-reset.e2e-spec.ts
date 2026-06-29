@@ -36,13 +36,58 @@ describe('Auth - 아이디 찾기 / 비밀번호 재설정 요청', () => {
 
     // 테스트 유저 보장
     const hashedPassword = await bcrypt.hash(testUser.password, 10);
-    // 전화번호 충돌 방지: 동일 번호를 가진 다른 유저 제거
-    await prisma.user.deleteMany({
+
+    // 전화번호 충돌 방지: 동일 번호를 가진 다른 유저 제거 (FK 의존성 순서대로)
+    const conflictUsers = await prisma.user.findMany({
       where: { phoneNumber: testUser.phoneNumber, NOT: { username: testUser.username } },
+      select: { id: true },
     });
+
+    if (conflictUsers.length > 0) {
+      const conflictUserIds = conflictUsers.map((u) => u.id);
+
+      // 1. RentalHistory (소유자 대여 이력 + changedBy 참조)
+      await prisma.rentalHistory.deleteMany({
+        where: {
+          OR: [
+            { rental: { userId: { in: conflictUserIds } } },
+            { changedBy: { in: conflictUserIds } },
+          ],
+        },
+      });
+
+      // 2. RentalItem / Rental
+      await prisma.rentalItem.deleteMany({ where: { rental: { userId: { in: conflictUserIds } } } });
+      await prisma.rental.deleteMany({ where: { userId: { in: conflictUserIds } } });
+
+      // 3. PlotterOrderHistory (소유자 주문 이력 + changedBy 참조)
+      const orders = await prisma.plotterOrder.findMany({ where: { userId: { in: conflictUserIds } } });
+      const orderIds = orders.map((o) => o.id);
+      await prisma.plotterOrderHistory.deleteMany({
+        where: {
+          OR: [
+            ...(orderIds.length > 0 ? [{ orderId: { in: orderIds } }] : []),
+            { changedBy: { in: conflictUserIds } },
+          ],
+        },
+      });
+
+      // 4. PlotterOrder
+      await prisma.plotterOrder.deleteMany({ where: { userId: { in: conflictUserIds } } });
+
+      // 5. Cart
+      await prisma.cartItem.deleteMany({ where: { userId: { in: conflictUserIds } } });
+
+      // 6. AuditLog
+      await prisma.auditLog.deleteMany({ where: { userId: { in: conflictUserIds } } });
+
+      // 7. User 삭제
+      await prisma.user.deleteMany({ where: { id: { in: conflictUserIds } } });
+    }
+
     await prisma.user.upsert({
       where: { username: testUser.username },
-      update: { password: hashedPassword, deletedAt: null, name: testUser.name, phoneNumber: testUser.phoneNumber },
+      update: { password: hashedPassword, deletedAt: null, name: testUser.name, phoneNumber: testUser.phoneNumber, loginAttempts: 0, lockUntil: null },
       create: {
         username: testUser.username,
         password: hashedPassword,

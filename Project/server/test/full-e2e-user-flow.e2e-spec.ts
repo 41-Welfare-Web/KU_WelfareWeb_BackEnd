@@ -34,7 +34,14 @@ describe('Production-Ready Full E2E Flow', () => {
   let createdRentalId: number;
   let createdOrderId: number;
 
-  // 날짜 헬퍼: n일 뒤 평일(월~금) 반환
+  // DB 등록 휴무일 캐시 (beforeAll에서 채워짐)
+  let registeredHolidays: Set<string> = new Set();
+
+  function toDateStr(d: Date): string {
+    return d.toISOString().split('T')[0];
+  }
+
+  // 날짜 헬퍼: n일 뒤 평일(월~금) 반환 (주말만 스킵, 관리자 우회용)
   function getFutureWeekday(daysFromNow: number): Date {
     const d = new Date();
     d.setDate(d.getDate() + daysFromNow);
@@ -44,8 +51,24 @@ describe('Production-Ready Full E2E Flow', () => {
     return d;
   }
 
-  function toDateStr(d: Date): string {
-    return d.toISOString().split('T')[0];
+  // 날짜 헬퍼: n일 뒤 대여 가능일(주말 + 등록 휴무일 모두 스킵) 반환
+  function getNextAvailableWeekday(daysFromNow: number): Date {
+    const d = new Date();
+    d.setDate(d.getDate() + daysFromNow);
+    while (d.getDay() === 0 || d.getDay() === 6 || registeredHolidays.has(toDateStr(d))) {
+      d.setDate(d.getDate() + 1);
+    }
+    return d;
+  }
+
+  // 특정 날짜 이후 첫 번째 대여 가능일 반환
+  function getNextAvailableAfter(fromDate: Date): Date {
+    const d = new Date(fromDate);
+    d.setDate(d.getDate() + 1);
+    while (d.getDay() === 0 || d.getDay() === 6 || registeredHolidays.has(toDateStr(d))) {
+      d.setDate(d.getDate() + 1);
+    }
+    return d;
   }
 
   beforeAll(async () => {
@@ -78,21 +101,40 @@ describe('Production-Ready Full E2E Flow', () => {
     if (existingUsers.length > 0) {
       const userIds = existingUsers.map(u => u.id);
       
-      // 1. Plotter 관련 데이터 삭제
-      const userOrders = await prisma.plotterOrder.findMany({ where: { userId: { in: userIds } } });
-      const orderIds = userOrders.map((o) => o.id);
-      if (orderIds.length > 0) {
-        await prisma.plotterOrderHistory.deleteMany({ where: { orderId: { in: orderIds } } });
-      }
-      await prisma.plotterOrder.deleteMany({ where: { userId: { in: userIds } } });
+      // 1. RentalHistory (소유자 대여 이력 + changedBy 참조)
+      await prisma.rentalHistory.deleteMany({
+        where: {
+          OR: [
+            { rental: { userId: { in: userIds } } },
+            { changedBy: { in: userIds } },
+          ],
+        },
+      });
 
-      // 2. Rental 관련 데이터 삭제
-      await prisma.rentalHistory.deleteMany({ where: { rental: { userId: { in: userIds } } } });
+      // 2. RentalItem / Rental
       await prisma.rentalItem.deleteMany({ where: { rental: { userId: { in: userIds } } } });
       await prisma.rental.deleteMany({ where: { userId: { in: userIds } } });
 
-      // 3. Cart 관련 데이터 삭제
+      // 3. PlotterOrderHistory (소유자 주문 이력 + changedBy 참조)
+      const userOrders = await prisma.plotterOrder.findMany({ where: { userId: { in: userIds } } });
+      const orderIds = userOrders.map((o) => o.id);
+      await prisma.plotterOrderHistory.deleteMany({
+        where: {
+          OR: [
+            ...(orderIds.length > 0 ? [{ orderId: { in: orderIds } }] : []),
+            { changedBy: { in: userIds } },
+          ],
+        },
+      });
+
+      // 4. PlotterOrder
+      await prisma.plotterOrder.deleteMany({ where: { userId: { in: userIds } } });
+
+      // 5. Cart
       await prisma.cartItem.deleteMany({ where: { userId: { in: userIds } } });
+
+      // 6. AuditLog
+      await prisma.auditLog.deleteMany({ where: { userId: { in: userIds } } });
 
       // 4. (필요 시) 중복 유저 삭제 - admin은 제외
       await prisma.user.deleteMany({
@@ -123,7 +165,7 @@ describe('Production-Ready Full E2E Flow', () => {
       },
     });
 
-    // 관리자 계정 보장
+    // 관리자 계정 보장 (잠금 상태도 초기화)
     const adminHashedPassword = await bcrypt.hash(adminCredentials.password, 10);
     await prisma.user.upsert({
       where: { username: adminCredentials.username },
@@ -131,6 +173,8 @@ describe('Production-Ready Full E2E Flow', () => {
         password: adminHashedPassword,
         role: 'ADMIN',
         deletedAt: null,
+        loginAttempts: 0,
+        lockUntil: null,
       },
       create: {
         username: adminCredentials.username,
@@ -143,6 +187,10 @@ describe('Production-Ready Full E2E Flow', () => {
         role: 'ADMIN',
       },
     });
+
+    // 등록된 휴무일 미리 로드 (날짜 헬퍼에서 사용)
+    const holidays = await prisma.holiday.findMany({ select: { holidayDate: true } });
+    registeredHolidays = new Set(holidays.map((h) => h.holidayDate.toISOString().split('T')[0]));
   });
 
   afterAll(async () => {
@@ -163,7 +211,9 @@ describe('Production-Ready Full E2E Flow', () => {
       const response = await request(app.getHttpServer())
         .post('/api/auth/login')
         .send(adminCredentials);
+      expect(response.status).toBe(200);
       adminAccessToken = response.body.accessToken;
+      expect(adminAccessToken).toBeDefined();
     });
   });
 
@@ -254,13 +304,9 @@ describe('Production-Ready Full E2E Flow', () => {
     });
 
     it('should create rental from cart', async () => {
-      // 10일 뒤 평일로 설정 (축제 기간 등 피함)
-      const rentalStart = getFutureWeekday(10);
-      const rentalEnd = new Date(rentalStart);
-      rentalEnd.setDate(rentalEnd.getDate() + 1);
-      while (rentalEnd.getDay() === 0 || rentalEnd.getDay() === 6) {
-        rentalEnd.setDate(rentalEnd.getDate() + 1);
-      }
+      // 10일 뒤부터 주말 + 등록 휴무일 모두 제외한 첫 가용일
+      const rentalStart = getNextAvailableWeekday(10);
+      const rentalEnd = getNextAvailableAfter(rentalStart);
       const startDateStr = toDateStr(rentalStart);
       const endDateStr = toDateStr(rentalEnd);
 
@@ -327,12 +373,8 @@ describe('Production-Ready Full E2E Flow', () => {
 
     it('should allow admin to change status of a CANCELED rental', async () => {
       // 새 대여 생성 후 CANCELED → 다시 상태 변경 테스트
-      const cancelStart = getFutureWeekday(14);
-      const cancelEnd = new Date(cancelStart);
-      cancelEnd.setDate(cancelEnd.getDate() + 1);
-      while (cancelEnd.getDay() === 0 || cancelEnd.getDay() === 6) {
-        cancelEnd.setDate(cancelEnd.getDate() + 1);
-      }
+      const cancelStart = getNextAvailableWeekday(14);
+      const cancelEnd = getNextAvailableAfter(cancelStart);
       const startDateStr = toDateStr(cancelStart);
       const endDateStr = toDateStr(cancelEnd);
 

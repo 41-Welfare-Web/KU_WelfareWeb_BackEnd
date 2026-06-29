@@ -14,7 +14,14 @@ describe('Edge Cases & Security Stress Test', () => {
   // 타임아웃 30초로 연장
   jest.setTimeout(30000);
 
-  // 날짜 헬퍼: n일 뒤 평일(월~금) 반환
+  // DB 등록 휴무일 캐시 (beforeAll에서 채워짐)
+  let registeredHolidays: Set<string> = new Set();
+
+  function toDateStr(d: Date): string {
+    return d.toISOString().split('T')[0];
+  }
+
+  // 날짜 헬퍼: n일 뒤 평일(월~금) 반환 (주말만 스킵)
   function getFutureWeekday(daysFromNow: number): Date {
     const d = new Date();
     d.setDate(d.getDate() + daysFromNow);
@@ -24,8 +31,14 @@ describe('Edge Cases & Security Stress Test', () => {
     return d;
   }
 
-  function toDateStr(d: Date): string {
-    return d.toISOString().split('T')[0];
+  // 날짜 헬퍼: n일 뒤 대여 가능일(주말 + 등록 휴무일 모두 스킵) 반환
+  function getNextAvailableWeekday(daysFromNow: number): Date {
+    const d = new Date();
+    d.setDate(d.getDate() + daysFromNow);
+    while (d.getDay() === 0 || d.getDay() === 6 || registeredHolidays.has(toDateStr(d))) {
+      d.setDate(d.getDate() + 1);
+    }
+    return d;
   }
 
   const testUser = {
@@ -51,7 +64,7 @@ describe('Edge Cases & Security Stress Test', () => {
 
     prisma = app.get<PrismaService>(PrismaService);
 
-    // 테스트용 사용자 강제 생성 또는 업데이트
+    // 테스트용 사용자 강제 생성 또는 업데이트 (잠금 상태도 초기화)
     const hashedPassword = await bcrypt.hash(testUser.password, 10);
     await prisma.user.upsert({
       where: { username: testUser.username },
@@ -59,6 +72,8 @@ describe('Edge Cases & Security Stress Test', () => {
         password: hashedPassword,
         role: 'USER',
         deletedAt: null,
+        loginAttempts: 0,
+        lockUntil: null,
       },
       create: {
         username: testUser.username,
@@ -80,6 +95,10 @@ describe('Edge Cases & Security Stress Test', () => {
 
     const itemsRes = await request(app.getHttpServer()).get('/api/items');
     testItemId = itemsRes.body[0].id;
+
+    // 등록된 휴무일 미리 로드 (날짜 헬퍼에서 사용)
+    const holidays = await prisma.holiday.findMany({ select: { holidayDate: true } });
+    registeredHolidays = new Set(holidays.map((h) => h.holidayDate.toISOString().split('T')[0]));
   });
 
   afterAll(async () => {
@@ -88,9 +107,9 @@ describe('Edge Cases & Security Stress Test', () => {
 
   describe('1. Rental Duration Boundary (Max 15 Days)', () => {
     it('should ALLOW rental of EXACTLY 15 days', async () => {
-      const start = getFutureWeekday(1); // 내일 이후 첫 평일
+      const start = getNextAvailableWeekday(1); // 내일 이후 첫 대여 가능일 (휴무일 포함 스킵)
       const end = new Date(start);
-      end.setDate(start.getDate() + 14); // 시작일 포함 총 15일 (평일+14는 항상 평일)
+      end.setDate(start.getDate() + 14); // 시작일 포함 총 15일 (같은 요일이므로 휴무일 아님)
 
       const response = await request(app.getHttpServer())
         .post('/api/rentals')
