@@ -15,6 +15,7 @@ import { HolidaysModule } from './holidays/holidays.module';
 import { SmsModule } from './sms/sms.module';
 import { CommonModule } from './common/common.module';
 import { CartModule } from './cart/cart.module';
+import { PopupsModule } from './popups/popups.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -42,6 +43,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     SmsModule,
     CommonModule,
     CartModule,
+    PopupsModule,
   ],
   controllers: [AppController],
   providers: [
