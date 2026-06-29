@@ -63,10 +63,46 @@ describe('Production-Ready Full E2E Flow', () => {
 
     // 테스트용 사용자 강제 생성 또는 업데이트 (401 방지)
     const hashedPassword = await bcrypt.hash(testUser.password, 10);
-    // 전화번호 충돌 방지: 동일 번호를 가진 다른 유저 제거
-    await prisma.user.deleteMany({
-      where: { phoneNumber: testUser.phoneNumber, NOT: { username: testUser.username } },
+    
+    // 기존 데이터 청소 (테스트 독립성 보장) - 의존성 순서대로 삭제
+    const existingUsers = await prisma.user.findMany({
+      where: {
+        OR: [
+          { username: testUser.username },
+          { phoneNumber: testUser.phoneNumber }
+        ]
+      },
+      select: { id: true }
     });
+
+    if (existingUsers.length > 0) {
+      const userIds = existingUsers.map(u => u.id);
+      
+      // 1. Plotter 관련 데이터 삭제
+      const userOrders = await prisma.plotterOrder.findMany({ where: { userId: { in: userIds } } });
+      const orderIds = userOrders.map((o) => o.id);
+      if (orderIds.length > 0) {
+        await prisma.plotterOrderHistory.deleteMany({ where: { orderId: { in: orderIds } } });
+      }
+      await prisma.plotterOrder.deleteMany({ where: { userId: { in: userIds } } });
+
+      // 2. Rental 관련 데이터 삭제
+      await prisma.rentalHistory.deleteMany({ where: { rental: { userId: { in: userIds } } } });
+      await prisma.rentalItem.deleteMany({ where: { rental: { userId: { in: userIds } } } });
+      await prisma.rental.deleteMany({ where: { userId: { in: userIds } } });
+
+      // 3. Cart 관련 데이터 삭제
+      await prisma.cartItem.deleteMany({ where: { userId: { in: userIds } } });
+
+      // 4. (필요 시) 중복 유저 삭제 - admin은 제외
+      await prisma.user.deleteMany({
+        where: {
+          phoneNumber: testUser.phoneNumber,
+          username: { notIn: [testUser.username, 'admin'] }
+        },
+      });
+    }
+
     const user = await prisma.user.upsert({
       where: { username: testUser.username },
       update: {
@@ -87,19 +123,26 @@ describe('Production-Ready Full E2E Flow', () => {
       },
     });
 
-    // 기존 데이터 청소 (테스트 독립성 보장)
-    await prisma.rentalHistory.deleteMany({ where: { rental: { userId: user.id } } });
-    await prisma.rentalItem.deleteMany({ where: { rental: { userId: user.id } } });
-    await prisma.rental.deleteMany({ where: { userId: user.id } });
-
-    const userOrders = await prisma.plotterOrder.findMany({ where: { userId: user.id } });
-    const orderIds = userOrders.map((o) => o.id);
-    if (orderIds.length > 0) {
-      await prisma.plotterOrderHistory.deleteMany({
-        where: { orderId: { in: orderIds } },
-      });
-    }
-    await prisma.plotterOrder.deleteMany({ where: { userId: user.id } });
+    // 관리자 계정 보장
+    const adminHashedPassword = await bcrypt.hash(adminCredentials.password, 10);
+    await prisma.user.upsert({
+      where: { username: adminCredentials.username },
+      update: {
+        password: adminHashedPassword,
+        role: 'ADMIN',
+        deletedAt: null,
+      },
+      create: {
+        username: adminCredentials.username,
+        password: adminHashedPassword,
+        name: '관리자',
+        studentId: '00000000',
+        phoneNumber: '01000000000',
+        departmentType: '관리',
+        departmentName: '관리팀',
+        role: 'ADMIN',
+      },
+    });
   });
 
   afterAll(async () => {
@@ -211,7 +254,8 @@ describe('Production-Ready Full E2E Flow', () => {
     });
 
     it('should create rental from cart', async () => {
-      const rentalStart = getFutureWeekday(3);
+      // 10일 뒤 평일로 설정 (축제 기간 등 피함)
+      const rentalStart = getFutureWeekday(10);
       const rentalEnd = new Date(rentalStart);
       rentalEnd.setDate(rentalEnd.getDate() + 1);
       while (rentalEnd.getDay() === 0 || rentalEnd.getDay() === 6) {
@@ -234,6 +278,9 @@ describe('Production-Ready Full E2E Flow', () => {
           }]
         });
 
+      if (response.status !== 201) {
+        console.error('Rental Creation Failed:', JSON.stringify(response.body, null, 2));
+      }
       expect(response.status).toBe(201);
       createdRentalId = response.body.rentals[0].id;
     });
@@ -259,14 +306,14 @@ describe('Production-Ready Full E2E Flow', () => {
         .send({ status: 'OVERDUE', memo: '테스트 목적 재변경' });
 
       expect(response.status).toBe(200);
-      expect(response.body.status).toBe('OVERDUE');
+      expect(response.body.rentalItems[0].status).toBe('OVERDUE');
     });
 
     it('should allow admin to update memo only without changing status', async () => {
       const before = await request(app.getHttpServer())
         .get(`/api/rentals/${createdRentalId}`)
         .set('Authorization', `Bearer ${adminAccessToken}`);
-      const statusBefore = before.body.status;
+      const statusBefore = before.body.rentalItems[0].status;
 
       const response = await request(app.getHttpServer())
         .put(`/api/rentals/${createdRentalId}/status`)
@@ -274,7 +321,7 @@ describe('Production-Ready Full E2E Flow', () => {
         .send({ memo: '메모만 변경 테스트' });
 
       expect(response.status).toBe(200);
-      expect(response.body.status).toBe(statusBefore); // 상태 유지
+      expect(response.body.rentalItems[0].status).toBe(statusBefore); // 상태 유지
       expect(response.body.memo).toBe('메모만 변경 테스트');
     });
 
@@ -313,7 +360,7 @@ describe('Production-Ready Full E2E Flow', () => {
         .send({ status: 'RESERVED', memo: '취소 후 재활성화' });
 
       expect(response.status).toBe(200);
-      expect(response.body.status).toBe('RESERVED');
+      expect(response.body.rentalItems[0].status).toBe('RESERVED');
     });
   });
 

@@ -143,7 +143,6 @@ model Rental {
   endDate   DateTime     @map("end_date") @db.Date
   departmentType String  @map("department_type") @db.VarChar(30)
   departmentName String? @map("department_name") @db.VarChar(50)
-  status    RentalStatus @default(RESERVED)
   memo      String?      @db.Text
   deletedAt DateTime?    @map("deleted_at") @db.Timestamptz
   createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz
@@ -166,11 +165,12 @@ enum RentalStatus {
 
 // 6. Rental Items
 model RentalItem {
-  id         Int    @id @default(autoincrement())
-  rentalId   Int    @map("rental_id")
-  itemId     Int    @map("item_id")
-  quantity   Int    @default(1)
-  instanceId Int?   @map("instance_id")
+  id         Int          @id @default(autoincrement())
+  rentalId   Int          @map("rental_id")
+  itemId     Int          @map("item_id")
+  quantity   Int          @default(1)
+  instanceId Int?         @map("instance_id")
+  status     RentalStatus @default(RESERVED)
 
   rental          Rental          @relation(fields: [rentalId], references: [id])
   item            Item            @relation(fields: [itemId], references: [id])

@@ -139,7 +139,7 @@ Invoke-RestMethod -Method Get -Uri "$baseUrl/items/1"
 ### 5.4 대여 (Rentals)
 ```powershell
 # 대여 상태 변경 (Update Rental Status - Admin)
-Invoke-RestMethod -Method Put -Uri "$baseUrl/rentals/{rentalId}/status" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"status":"RENTED","memo":"물품 전달 완료"}'
+Invoke-RestMethod -Method Put -Uri "$baseUrl/rentals/{rentalId}/status" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"status":"RENTED","memo":"물품 전달 완료","rentalItemId":1}'
 ```
 
 ### 5.5 플로터 (Plotter)

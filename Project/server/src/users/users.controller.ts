@@ -77,9 +77,10 @@ export class UsersController {
   @Roles(Role.ADMIN)
   @ApiOperation({ summary: '사용자 역할 변경 (관리자)' })
   async updateRole(
+    @GetUser() admin: any,
     @Param('id', ParseUUIDPipe) userId: string,
     @Body('role') role: Role,
   ) {
-    return this.usersService.updateRole(userId, role);
+    return this.usersService.updateRole(userId, role, admin.userId);
   }
 }

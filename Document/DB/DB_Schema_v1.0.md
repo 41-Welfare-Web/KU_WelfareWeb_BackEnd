@@ -1,6 +1,6 @@
-### **RentalWeb 데이터베이스 스키마 (v1.0.2)**
+### **RentalWeb 데이터베이스 스키마 (v1.0.3)**
 
-최종 수정일: 2026-03-23 (DEFECTIVE 상태 추가 반영)
+최종 수정일: 2026-05-31 (RentalItem 단위 상태 관리 및 보안 로깅 반영)
 
 ---
 
@@ -90,7 +90,6 @@
 | `end_date` | `date` | 반납 예정일 | Not Null |
 | `department_type` | `varchar(30)` | 신청 당시 소속 유형 | Not Null |
 | `department_name` | `varchar(50)` | 신청 당시 소속 단위명 | |
-| `status` | `enum(RentalStatus)` | 대여 상태 | Default: `RESERVED` |
 | `memo` | `text` | 관리자 비고 | |
 | `deleted_at` | `timestampz` | 소프트 삭제 시간 | |
 | `created_at` | `timestampz` | 생성일 | Default: `now()` |
@@ -103,6 +102,7 @@
 | `rental_id` | `integer` | 대여 ID | Foreign Key (`rentals.id`) |
 | `item_id` | `integer` | 물품 ID | Foreign Key (`items.id`) |
 | `quantity` | `integer` | 대여 수량 | Default: 1 |
+| `status` | `enum(RentalStatus)` | 품목별 대여 상태 (Source of Truth) | Default: `RESERVED` |
 | `instance_id` | `integer` | 개별 실물 ID (INDIVIDUAL 물품) | Foreign Key (`item_instances.id`), Nullable |
 
 #### **7. `rental_history` (대여 상태 변경 이력)**
@@ -188,26 +188,26 @@
 | 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
 | :--- | :--- | :--- | :--- |
 | `id` | `bigserial` | ID | **Primary Key** |
-| `user_id` | `uuid` | 요청한 사용자 ID | Foreign Key (`users.id`), Nullable |
+| `user_id" | `uuid` | 요청한 사용자 ID | Foreign Key (`users.id`), Nullable |
 | `action` | `varchar(50)` | 수행된 액션 (예: `CREATE`, `UPDATE`, `DELETE`) | Not Null |
 | `target_type` | `varchar(50)` | 대상 리소스 타입 (예: `rental`, `item`) | Nullable |
 | `target_id` | `text` | 대상 리소스 ID | Nullable |
-| `details` | `jsonb` | 변경 상세 내용 | Nullable |
-| `ip_address` | `varchar(45)` | 요청 IP (IPv6 포함) | Nullable |
-| `created_at` | `timestampz` | 기록 시각 | Default: `now()` |
+| `details` | `jsonb` | 변경 상세 내용 (비밀번호 등 민감 정보는 `[MASKED]` 처리됨) | Nullable |
+| `ip_address" | `varchar(45)` | 요청 IP (IPv6 포함) | Nullable |
+| `created_at" | `timestampz` | 기록 시각 | Default: `now()` |
 
-#### **14. `cart_items` (장바구니)**
+#### **14. `cart_items" (장바구니)**
 
 | 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
 | :--- | :--- | :--- | :--- |
 | `id` | `serial` | ID | **Primary Key** |
-| `user_id` | `uuid` | 사용자 ID | Foreign Key (`users.id`) |
-| `item_id` | `integer` | 물품 ID | Foreign Key (`items.id`) |
-| `quantity` | `integer` | 수량 | Default: 1 |
-| `start_date` | `date` | 대여 시작일 | Nullable |
-| `end_date` | `date` | 반납 예정일 | Nullable |
-| `created_at` | `timestampz` | 생성일 | Default: `now()` |
-| `updated_at` | `timestampz` | 수정일 | Auto-updated |
+| `user_id" | `uuid` | 사용자 ID | Foreign Key (`users.id`) |
+| `item_id" | `integer` | 물품 ID | Foreign Key (`items.id`) |
+| `quantity` | `integer" | 수량 | Default: 1 |
+| `start_date" | `date` | 대여 시작일 | Nullable |
+| `end_date" | `date` | 반납 예정일 | Nullable |
+| `created_at" | `timestampz` | 생성일 | Default: `now()` |
+| `updated_at" | `timestampz` | 수정일 | Auto-updated |
 
 > **Unique Constraint**: (`user_id`, `item_id`) — 동일 사용자가 동일 물품을 장바구니에 중복 추가 불가
 
@@ -218,8 +218,8 @@
 | 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
 | :--- | :--- | :--- | :--- |
 | `id` | `serial` | ID | **Primary Key** |
-| `parent_id` | `integer` | 세트 물품 ID | Foreign Key (`items.id`) |
-| `component_id` | `integer` | 구성품 물품 ID | Foreign Key (`items.id`) |
-| `quantity` | `integer` | 구성품 수량 | Default: 1 |
+| `parent_id" | `integer` | 세트 물품 ID | Foreign Key (`items.id`) |
+| `component_id" | `integer` | 구성품 물품 ID | Foreign Key (`items.id`) |
+| `quantity` | `integer" | 구성품 수량 | Default: 1 |
 
 > **Unique Constraint**: (`parent_id`, `component_id`)

@@ -10,7 +10,7 @@ async function main() {
         { memo: { contains: '축제' } },
         { memo: { contains: '불가' } }
       ],
-      status: 'RESERVED'
+      rentalItems: { some: { status: 'RESERVED' } }
     },
     include: {
       user: { select: { name: true } },
@@ -23,9 +23,9 @@ async function main() {
   // 2. Item의 description(설명)에 '축제'나 '불가'가 포함된 물품이 포함된 예약 검색
   const rentalsWithRestrictedItems = await prisma.rental.findMany({
     where: {
-      status: 'RESERVED',
       rentalItems: {
         some: {
+          status: 'RESERVED',
           item: {
             OR: [
               { description: { contains: '축제' } },

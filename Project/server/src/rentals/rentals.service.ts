@@ -32,6 +32,7 @@ export class RentalsService {
     userId: string,
     createRentalDto: CreateRentalDto,
     actorId?: string,
+    actorRole?: string,
   ) {
     // 대상 사용자 존재 확인
     const user = await this.prisma.user.findFirst({
@@ -45,7 +46,7 @@ export class RentalsService {
     const actualActorId = actorId || userId;
 
     const today = getStartOfDayKst();
-    const isAdminAction = !!(actorId && actorId !== userId);
+    const isAdmin = actorRole === Role.ADMIN;
 
     const maxMonthsStr = await this.configService.getValue(
       'rental_max_period_months',
@@ -70,36 +71,46 @@ export class RentalsService {
       const diffTime = Math.abs(end.getTime() - start.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
-      if (diffDays > maxDuration) {
-        throw new BadRequestException(
-          `최대 대여 가능 기간은 ${maxDuration}일입니다. (현재 요청: ${diffDays}일)`,
-        );
-      }
+      // 관리자가 아니면 기간 및 날짜 제한 체크
+      if (!isAdmin) {
+        if (diffDays > maxDuration) {
+          throw new BadRequestException(
+            `최대 대여 가능 기간은 ${maxDuration}일입니다. (현재 요청: ${diffDays}일)`,
+          );
+        }
 
-      if (start > end) {
-        throw new BadRequestException(
-          `품목(ID: ${item.itemId}): 종료일이 시작일보다 빠를 수 없습니다.`,
-        );
-      }
-      if (!isAdminAction && start < today) {
-        throw new BadRequestException(
-          `품목(ID: ${item.itemId}): 과거 날짜로 예약할 수 없습니다.`,
-        );
-      }
-      if (!isAdminAction && await this.holidaysService.isHoliday(start)) {
-        throw new BadRequestException(
-          `품목(ID: ${item.itemId}): 대여 시작일이 휴무일(주말 포함)입니다.`,
-        );
-      }
-      if (!isAdminAction && await this.holidaysService.isHoliday(end)) {
-        throw new BadRequestException(
-          `품목(ID: ${item.itemId}): 반납일이 휴무일(주말 포함)입니다.`,
-        );
-      }
-      if (!isAdminAction && end > maxDate) {
-        throw new BadRequestException(
-          `품목(ID: ${item.itemId}): 최대 ${maxMonths}개월까지만 예약할 수 있습니다.`,
-        );
+        if (start > end) {
+          throw new BadRequestException(
+            `품목(ID: ${item.itemId}): 종료일이 시작일보다 빠를 수 없습니다.`,
+          );
+        }
+        if (start < today) {
+          throw new BadRequestException(
+            `품목(ID: ${item.itemId}): 과거 날짜로 예약할 수 없습니다.`,
+          );
+        }
+        if (await this.holidaysService.isHoliday(start)) {
+          throw new BadRequestException(
+            `품목(ID: ${item.itemId}): 대여 시작일이 휴무일(주말 포함)입니다.`,
+          );
+        }
+        if (await this.holidaysService.isHoliday(end)) {
+          throw new BadRequestException(
+            `품목(ID: ${item.itemId}): 반납일이 휴무일(주말 포함)입니다.`,
+          );
+        }
+        if (end > maxDate) {
+          throw new BadRequestException(
+            `품목(ID: ${item.itemId}): 최대 ${maxMonths}개월까지만 예약할 수 있습니다.`,
+          );
+        }
+      } else {
+        // 관리자라도 최소한의 정합성 체크 (종료일이 시작일보다 빠를 수 없음)
+        if (start > end) {
+          throw new BadRequestException(
+            `품목(ID: ${item.itemId}): 종료일이 시작일보다 빠를 수 없습니다.`,
+          );
+        }
       }
     }
 
@@ -168,8 +179,8 @@ export class RentalsService {
           const overlappingRentals = await tx.rentalItem.findMany({
             where: {
               itemId: finalItem.itemId,
+              status: { in: [RentalStatus.RESERVED, RentalStatus.RENTED] },
               rental: {
-                status: { in: [RentalStatus.RESERVED, RentalStatus.RENTED] },
                 deletedAt: null,
                 OR: [
                   {
@@ -188,7 +199,7 @@ export class RentalsService {
           const curr = new Date(start);
           while (curr <= end) {
             const dateStr = curr.toISOString().split('T')[0];
-            const reservedOnDay = overlappingRentals.reduce((sum, r) => {
+            const reservedOnDay = (overlappingRentals as any[]).reduce((sum, r) => {
               const rStart = new Date(r.rental.startDate).toISOString().split('T')[0];
               const rEnd = new Date(r.rental.endDate).toISOString().split('T')[0];
               if (dateStr >= rStart && dateStr <= rEnd) {
@@ -217,11 +228,11 @@ export class RentalsService {
             endDate: end,
             departmentType,
             departmentName: departmentName || null,
-            status: RentalStatus.RESERVED,
             rentalItems: {
               create: finalItemsToRent.map((i) => ({
                 itemId: i.itemId,
                 quantity: i.quantity,
+                status: RentalStatus.RESERVED,
               })),
             },
             rentalHistories: {
@@ -305,7 +316,9 @@ export class RentalsService {
     }
 
     if (status) {
-      where.status = status as RentalStatus;
+      where.rentalItems = {
+        some: { status: status as RentalStatus },
+      };
     }
 
     const [rentals, total] = await this.prisma.$transaction([
@@ -411,24 +424,37 @@ export class RentalsService {
 
     if (rental.userId !== userId)
       throw new ForbiddenException('권한이 없습니다.');
-    if (rental.status !== RentalStatus.RESERVED) {
-      throw new BadRequestException('예약 상태일 때만 취소할 수 있습니다.');
+
+    // 모든 품목이 RESERVED 상태일 때만 전체 취소 가능
+    const canCancel = rental.rentalItems.every(
+      (ri) => ri.status === RentalStatus.RESERVED,
+    );
+    if (!canCancel) {
+      throw new BadRequestException(
+        '예약(RESERVED) 상태가 아닌 물품이 포함되어 있어 취소할 수 없습니다.',
+      );
     }
 
-    await this.prisma.rental.update({
-      where: { id },
-      data: {
-        status: RentalStatus.CANCELED,
-        rentalHistories: {
-          create: {
-            changedBy: userId,
-            oldStatus: RentalStatus.RESERVED,
-            newStatus: RentalStatus.CANCELED,
-            memo: '사용자 예약 취소',
+    await this.prisma.$transaction([
+      this.prisma.rentalItem.updateMany({
+        where: { rentalId: id },
+        data: { status: RentalStatus.CANCELED },
+      }),
+      this.prisma.rental.update({
+        where: { id },
+        data: {
+          deletedAt: new Date(),
+          rentalHistories: {
+            create: {
+              changedBy: userId,
+              oldStatus: RentalStatus.RESERVED,
+              newStatus: RentalStatus.CANCELED,
+              memo: '사용자 예약 취소 (전체)',
+            },
           },
         },
-      },
-    });
+      }),
+    ]);
 
     const itemSummary =
       rental.rentalItems.length > 0
@@ -459,7 +485,7 @@ export class RentalsService {
     userId: string,
     updateDto: UpdateRentalStatusDto,
   ) {
-    const { status: newStatus, memo } = updateDto;
+    const { status: newStatus, memo, rentalItemId } = updateDto;
 
     const rental = await this.prisma.rental.findFirst({
       where: { id, deletedAt: null },
@@ -482,22 +508,108 @@ export class RentalsService {
     });
     if (!rental) throw new NotFoundException('대여 건을 찾을 수 없습니다.');
 
-    const resolvedStatus = newStatus ?? rental.status;
+    // 1. 특정 품목만 상태 변경하는 경우
+    if (rentalItemId) {
+      const targetItem = rental.rentalItems.find((ri) => ri.id === rentalItemId);
+      if (!targetItem) {
+        throw new NotFoundException(
+          '해당 대여 건에서 지정한 품목을 찾을 수 없습니다.',
+        );
+      }
 
-    const updated = await this.prisma.rental.update({
-      where: { id },
-      data: {
-        status: resolvedStatus,
-        memo: memo,
-        rentalHistories: {
-          create: {
+      const oldStatus = targetItem.status;
+
+      await this.prisma.$transaction(async (tx) => {
+        // 메모 업데이트
+        if (memo !== undefined) {
+          await tx.rental.update({
+            where: { id },
+            data: { memo },
+          });
+        }
+
+        // DEFECTIVE 처리 시 실물 상태 변경
+        if (newStatus === RentalStatus.DEFECTIVE && targetItem.instanceId) {
+          await tx.itemInstance.update({
+            where: { id: targetItem.instanceId },
+            data: { status: 'BROKEN' },
+          });
+        }
+
+        // 품목 상태 업데이트
+        await tx.rentalItem.update({
+          where: { id: rentalItemId },
+          data: { status: newStatus || oldStatus },
+        });
+
+        // 히스토리 기록
+        await tx.rentalHistory.create({
+          data: {
+            rentalId: id,
+            rentalItemId: rentalItemId,
             changedBy: userId,
-            oldStatus: rental.status,
-            newStatus: resolvedStatus,
-            memo: memo || (newStatus ? `상태 변경: ${resolvedStatus}` : '메모 변경'),
+            oldStatus: oldStatus,
+            newStatus: newStatus || oldStatus,
+            memo: memo || `품목 상태 변경: ${targetItem.item.name} (${newStatus || '유지'})`,
           },
-        },
-      },
+        });
+      });
+    }
+    // 2. 전체 품목 상태를 일괄 변경하는 경우 (또는 메모만 변경)
+    else {
+      await this.prisma.$transaction(async (tx) => {
+        // 메모 업데이트
+        if (memo !== undefined) {
+          await tx.rental.update({
+            where: { id },
+            data: { memo },
+          });
+        }
+
+        if (newStatus) {
+          for (const ri of rental.rentalItems) {
+            // DEFECTIVE 처리 시 실물 상태 변경
+            if (newStatus === RentalStatus.DEFECTIVE && ri.instanceId) {
+              await tx.itemInstance.update({
+                where: { id: ri.instanceId },
+                data: { status: 'BROKEN' },
+              });
+            }
+
+            await tx.rentalItem.update({
+              where: { id: ri.id },
+              data: { status: newStatus },
+            });
+          }
+
+          // 전체 변경 히스토리 기록
+          await tx.rentalHistory.create({
+            data: {
+              rentalId: id,
+              changedBy: userId,
+              oldStatus: 'MIXED',
+              newStatus: newStatus,
+              memo: memo || `대여 건 전체 상태 변경: ${newStatus}`,
+            },
+          });
+        } else if (memo !== undefined) {
+          // 메모만 변경한 경우 히스토리
+          await tx.rentalHistory.create({
+            data: {
+              rentalId: id,
+              changedBy: userId,
+              oldStatus: 'N/A',
+              newStatus: 'MEMO_UPDATED',
+              memo: `메모 수정: ${memo}`,
+            },
+          });
+        }
+      });
+    }
+
+    // 결과 반환을 위해 다시 조회
+    const updatedRental = await this.prisma.rental.findFirst({
+      where: { id },
       include: {
         user: {
           select: {
@@ -513,22 +625,28 @@ export class RentalsService {
           },
         },
         rentalItems: { include: { item: true } },
+        rentalHistories: {
+          orderBy: { changedAt: 'desc' },
+          include: { user: { select: { name: true } } },
+          take: 5,
+        },
       },
     });
 
-    const itemSummary =
-      updated.rentalItems.length > 0
-        ? `${updated.rentalItems[0].item.name} 외 ${updated.rentalItems.length - 1}건`
-        : '물품 없음';
+    // SMS 알림 (상태가 실제로 변경된 경우)
+    if (newStatus && updatedRental) {
+      const itemSummary = rentalItemId
+        ? rental.rentalItems.find((ri) => ri.id === rentalItemId)?.item.name || '물품'
+        : rental.rentalItems.length > 0
+          ? `${rental.rentalItems[0].item.name} 외 ${rental.rentalItems.length - 1}건`
+          : '물품 없음';
 
-    // 실제 상태 변경이 있을 때만 SMS 발송
-    if (newStatus && newStatus !== rental.status) {
       try {
         const smsEnabled = await this.configService.getValue('sms_notifications_enabled', 'true');
         if (smsEnabled === 'true') {
           await this.smsService.sendRentalStatusNotice(
-            updated.user.phoneNumber,
-            updated.user.name,
+            updatedRental.user.phoneNumber,
+            updatedRental.user.name,
             itemSummary,
             newStatus,
             memo,
@@ -536,17 +654,22 @@ export class RentalsService {
         }
       } catch (smsError) {
         console.error(
-          '[RentalsService] 상태 변경 SMS 알림 실패 (무시):',
-          smsError.message,
+          `[RentalsService] 상태 변경 SMS 알림 실패: ${smsError.message}`,
         );
       }
     }
 
-    return updated;
+    return updatedRental;
   }
 
   // 6. 예약 내용 수정 (날짜, 수량 변경) — 단일 rental 수정, items 각각 동일 날짜여야 함
-  async update(id: number, userId: string, updateDto: UpdateRentalDto, actorId?: string) {
+  async update(
+    id: number,
+    userId: string,
+    updateDto: UpdateRentalDto,
+    actorId?: string,
+    actorRole?: string,
+  ) {
     const { items, departmentType, departmentName } = updateDto;
 
     const rental = await this.prisma.rental.findFirst({
@@ -555,10 +678,17 @@ export class RentalsService {
     });
 
     if (!rental) throw new NotFoundException('대여 건을 찾을 수 없습니다.');
-    if (!actorId && rental.userId !== userId)
+    const isAdmin = actorRole === Role.ADMIN;
+
+    if (!isAdmin && rental.userId !== userId)
       throw new ForbiddenException('수정 권한이 없습니다.');
-    if (!actorId && rental.status !== RentalStatus.RESERVED) {
-      throw new BadRequestException('예약 상태일 때만 수정할 수 있습니다.');
+
+    // 예약 상태(RESERVED)인 물품이 하나라도 있어야 수정 가능 여부 판단
+    const hasReservedItems = rental.rentalItems.some(
+      (ri) => ri.status === RentalStatus.RESERVED,
+    );
+    if (!isAdmin && !hasReservedItems) {
+      throw new BadRequestException('예약 상태의 물품이 없어 수정할 수 없습니다.');
     }
 
     // items가 있을 경우 날짜 추출 및 단일 그룹 검증
@@ -589,6 +719,15 @@ export class RentalsService {
       }
     }
 
+    const today = getStartOfDayKst();
+    const maxMonthsStr = await this.configService.getValue(
+      'rental_max_period_months',
+      '2',
+    );
+    const maxMonths = parseInt(maxMonthsStr, 10);
+    const maxDate = new Date(today);
+    maxDate.setMonth(maxDate.getMonth() + maxMonths);
+
     const maxDurationStr = await this.configService.getValue(
       'rental_max_duration_days',
       '15',
@@ -597,25 +736,39 @@ export class RentalsService {
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
-    if (diffDays > maxDuration) {
-      throw new BadRequestException(
-        `최대 대여 가능 기간은 ${maxDuration}일입니다. (현재 요청: ${diffDays}일)`,
-      );
-    }
+    // 관리자가 아니면 기간 제한 체크
+    if (!isAdmin) {
+      if (diffDays > maxDuration) {
+        throw new BadRequestException(
+          `최대 대여 가능 기간은 ${maxDuration}일입니다. (현재 요청: ${diffDays}일)`,
+        );
+      }
 
-    if (start > end) {
-      throw new BadRequestException('종료일이 시작일보다 빠를 수 없습니다.');
-    }
+      if (start > end) {
+        throw new BadRequestException('종료일이 시작일보다 빠를 수 없습니다.');
+      }
 
-    if (
-      !actorId &&
-      items?.[0]?.startDate &&
-      (await this.holidaysService.isHoliday(start))
-    ) {
-      throw new BadRequestException('수정하려는 시작일이 휴무일입니다.');
-    }
-    if (!actorId && items?.[0]?.endDate && (await this.holidaysService.isHoliday(end))) {
-      throw new BadRequestException('수정하려는 반납일이 휴무일입니다.');
+      if (items?.[0]?.startDate && start < today) {
+        throw new BadRequestException('과거 날짜로 수정할 수 없습니다.');
+      }
+
+      if (items?.[0]?.startDate && (await this.holidaysService.isHoliday(start))) {
+        throw new BadRequestException('수정하려는 시작일이 휴무일입니다.');
+      }
+      if (items?.[0]?.endDate && (await this.holidaysService.isHoliday(end))) {
+        throw new BadRequestException('수정하려는 반납일이 휴무일입니다.');
+      }
+
+      if (items?.[0]?.endDate && end > maxDate) {
+        throw new BadRequestException(
+          `최대 ${maxMonths}개월까지만 예약할 수 있습니다.`,
+        );
+      }
+    } else {
+      // 관리자라도 최소한의 정합성 체크 (종료일이 시작일보다 빠를 수 없음)
+      if (start > end) {
+        throw new BadRequestException('종료일이 시작일보다 빠를 수 없습니다.');
+      }
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -635,7 +788,11 @@ export class RentalsService {
               rental: {
                 id: { not: id },
                 deletedAt: null,
-                status: { in: [RentalStatus.RESERVED, RentalStatus.RENTED] },
+                rentalItems: {
+                  some: {
+                    status: { in: [RentalStatus.RESERVED, RentalStatus.RENTED] }
+                  }
+                },
                 OR: [
                   {
                     startDate: { lte: end },
@@ -654,7 +811,7 @@ export class RentalsService {
           const curr = new Date(start);
           while (curr <= end) {
             const dateStr = curr.toISOString().split('T')[0];
-            const reservedOnDay = overlappingRentals.reduce((sum, r) => {
+            const reservedOnDay = (overlappingRentals as any[]).reduce((sum, r) => {
               const rStart = new Date(r.rental.startDate).toISOString().split('T')[0];
               const rEnd = new Date(r.rental.endDate).toISOString().split('T')[0];
               if (dateStr >= rStart && dateStr <= rEnd) {
@@ -691,13 +848,14 @@ export class RentalsService {
               create: items.map((i) => ({
                 itemId: i.itemId,
                 quantity: i.quantity,
+                status: RentalStatus.RESERVED, // 수정 시에는 RESERVED로 초기화 (또는 기존 상태 유지 전략)
               })),
             },
             rentalHistories: {
               create: {
                 changedBy: actorId || userId,
-                oldStatus: RentalStatus.RESERVED,
-                newStatus: RentalStatus.RESERVED,
+                oldStatus: 'MIXED',
+                newStatus: 'DATE_UPDATED',
                 memo: actorId ? '관리자 대리 예약 수정' : '예약 내용(날짜/수량) 수정',
               },
             },
@@ -717,8 +875,8 @@ export class RentalsService {
             rentalHistories: {
               create: {
                 changedBy: actorId || userId,
-                oldStatus: RentalStatus.RESERVED,
-                newStatus: RentalStatus.RESERVED,
+                oldStatus: 'N/A',
+                newStatus: 'DATE_UPDATED',
                 memo: actorId ? '관리자 대리 예약 수정' : '예약 기간 수정',
               },
             },
@@ -737,53 +895,51 @@ export class RentalsService {
 
     const today = getStartOfDayKst();
 
-    const overdueRentals = await this.prisma.rental.findMany({
+    const overdueItems = await this.prisma.rentalItem.findMany({
       where: {
         status: RentalStatus.RENTED,
-        deletedAt: null,
-        endDate: {
-          lt: today,
+        rental: {
+          deletedAt: null,
+          endDate: {
+            lt: today,
+          },
         },
       },
       include: {
-        user: true,
-        rentalItems: { include: { item: true } },
+        rental: { include: { user: true } },
+        item: true,
       },
     });
 
     console.log(
-      `[RentalsService] Found ${overdueRentals.length} overdue rentals.`,
+      `[RentalsService] Found ${overdueItems.length} overdue rental items.`,
     );
 
-    for (const rental of overdueRentals) {
-      await this.prisma.rental.update({
-        where: { id: rental.id },
+    for (const ri of overdueItems) {
+      await this.prisma.rentalItem.update({
+        where: { id: ri.id },
+        data: { status: RentalStatus.OVERDUE },
+      });
+
+      await this.prisma.rentalHistory.create({
         data: {
-          status: RentalStatus.OVERDUE,
-          rentalHistories: {
-            create: {
-              changedBy: rental.userId,
-              oldStatus: RentalStatus.RENTED,
-              newStatus: RentalStatus.OVERDUE,
-              memo: '반납 기한 도래로 인한 시스템 자동 연체 처리',
-            },
-          },
+          rentalId: ri.rentalId,
+          rentalItemId: ri.id,
+          changedBy: ri.rental.userId,
+          oldStatus: RentalStatus.RENTED,
+          newStatus: RentalStatus.OVERDUE,
+          memo: '반납 기한 도래로 인한 시스템 자동 연체 처리',
         },
       });
 
-      const itemSummary =
-        rental.rentalItems.length > 0
-          ? `${rental.rentalItems[0].item.name} 외 ${rental.rentalItems.length - 1}건`
-          : '물품 없음';
-
       try {
         await this.smsService.sendSMS(
-          rental.user.phoneNumber,
-          `[RentalWeb] ${rental.user.name}님, [${itemSummary}]의 반납 기한이 지났습니다. 현재 연체 상태이오니 즉시 반납 부탁드립니다.`,
+          ri.rental.user.phoneNumber,
+          `[RentalWeb] ${ri.rental.user.name}님, [${ri.item.name}]의 반납 기한이 지났습니다. 현재 연체 상태이오니 즉시 반납 부탁드립니다.`,
         );
       } catch (smsError) {
         console.error(
-          `[RentalsService] 연체 SMS 발송 실패 (rental #${rental.id}):`,
+          `[RentalsService] 연체 SMS 발송 실패 (item #${ri.id}):`,
           smsError.message,
         );
       }
@@ -801,43 +957,45 @@ export class RentalsService {
     const dayAfterTomorrow = new Date(tomorrow);
     dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 1);
 
-    const rentalsDueTomorrow = await this.prisma.rental.findMany({
+    const itemsDueTomorrow = await this.prisma.rentalItem.findMany({
       where: {
         status: RentalStatus.RENTED,
-        deletedAt: null,
-        endDate: {
-          gte: tomorrow,
-          lt: dayAfterTomorrow,
+        rental: {
+          deletedAt: null,
+          endDate: {
+            gte: tomorrow,
+            lt: dayAfterTomorrow,
+          },
         },
       },
       include: {
-        user: true,
-        rentalItems: { include: { item: true } },
+        rental: { include: { user: true } },
+        item: true,
       },
     });
 
     console.log(
-      `[RentalsService] Found ${rentalsDueTomorrow.length} rentals due tomorrow.`,
+      `[RentalsService] Found ${itemsDueTomorrow.length} items due tomorrow.`,
     );
 
-    for (const rental of rentalsDueTomorrow) {
-      const itemSummary =
-        rental.rentalItems.length > 0
-          ? `${rental.rentalItems[0].item.name} 외 ${rental.rentalItems.length - 1}건`
-          : '물품 없음';
+    const notifiedRentals = new Set<number>();
 
-      const dueDateStr = rental.endDate.toISOString().split('T')[0];
+    for (const ri of itemsDueTomorrow) {
+      if (notifiedRentals.has(ri.rentalId)) continue;
+
+      const dueDateStr = ri.rental.endDate.toISOString().split('T')[0];
 
       try {
         await this.smsService.sendReturnReminder(
-          rental.user.phoneNumber,
-          rental.user.name,
-          itemSummary,
+          ri.rental.user.phoneNumber,
+          ri.rental.user.name,
+          `${ri.item.name} 등`,
           dueDateStr,
         );
+        notifiedRentals.add(ri.rentalId);
       } catch (smsError) {
         console.error(
-          `[RentalsService] D-1 반납 안내 SMS 실패 (rental #${rental.id}):`,
+          `[RentalsService] D-1 반납 안내 SMS 실패 (rental #${ri.rentalId}):`,
           smsError.message,
         );
       }

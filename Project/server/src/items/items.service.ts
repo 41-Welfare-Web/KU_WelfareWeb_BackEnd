@@ -12,6 +12,7 @@ import { UpdateItemInstanceDto } from './dto/update-item-instance.dto';
 import { AddItemComponentDto } from './dto/add-item-component.dto';
 import { FilesService } from '../common/files.service';
 import { getNowKst, getStartOfDayKst } from '../common/utils/date.util';
+import { RentalStatus } from '@prisma/client';
 
 @Injectable()
 export class ItemsService {
@@ -130,8 +131,8 @@ export class ItemsService {
         },
         rentalItems: {
           where: {
+            status: { in: ['RESERVED', 'RENTED'] },
             rental: {
-              status: { in: ['RESERVED', 'RENTED'] },
               deletedAt: null,
               startDate: { lte: todayEnd },
               endDate: { gte: todayStart },
@@ -142,9 +143,9 @@ export class ItemsService {
       },
     });
 
-    return items.map((item) => {
+    return items.map((item: any) => {
       const reservedQty = item.rentalItems.reduce(
-        (sum, ri) => sum + ri.quantity,
+        (sum: number, ri: any) => sum + ri.quantity,
         0,
       );
       const { rentalItems: _rentalItems, ...itemData } = item;
@@ -242,20 +243,23 @@ export class ItemsService {
   async remove(id: number, actorId?: string) {
     const item = await this.prisma.item.findFirst({
       where: { id, deletedAt: null },
-      include: { 
-        _count: { 
-          select: { 
+      include: {
+        _count: {
+          select: {
             rentalItems: {
-              where: { rental: { status: { in: ['RESERVED', 'RENTED', 'OVERDUE'] }, deletedAt: null } }
-            } 
-          } 
-        } 
+              where: {
+                status: { in: ['RESERVED', 'RENTED', 'OVERDUE'] },
+                rental: { deletedAt: null },
+              },
+            },
+          },
+        },
       },
     });
 
     if (!item) throw new NotFoundException('물품을 찾을 수 없습니다.');
 
-    if (item._count.rentalItems > 0) {
+    if ((item as any)._count.rentalItems > 0) {
       throw new ConflictException(
         '활성 대여 예약이 있는 물품은 삭제할 수 없습니다. (반납 완료 후 시도하세요)',
       );
@@ -314,8 +318,8 @@ export class ItemsService {
     const rentals = await this.prisma.rentalItem.findMany({
       where: {
         itemId,
+        status: { in: [RentalStatus.RESERVED, RentalStatus.RENTED] },
         rental: {
-          status: { in: ['RESERVED', 'RENTED'] },
           deletedAt: null,
           startDate: { lte: endDate },
           endDate: { gte: startDate },
@@ -329,7 +333,7 @@ export class ItemsService {
     while (current <= end) {
       const currentDateStr = toLocalDateStr(current);
 
-      const reservedQty = rentals.reduce((sum, r) => {
+      const reservedQty = (rentals as any[]).reduce((sum, r) => {
         const rStartStr = toLocalDateStr(new Date(r.rental.startDate));
         const rEndStr = toLocalDateStr(new Date(r.rental.endDate));
 
@@ -429,19 +433,22 @@ export class ItemsService {
   async removeInstance(instanceId: number, actorId?: string) {
     const instance = await this.prisma.itemInstance.findFirst({
       where: { id: instanceId, deletedAt: null },
-      include: { 
-        _count: { 
-          select: { 
+      include: {
+        _count: {
+          select: {
             rentalItems: {
-              where: { rental: { status: { in: ['RENTED', 'OVERDUE'] }, deletedAt: null } }
-            } 
-          } 
-        } 
+              where: {
+                status: { in: ['RENTED', 'OVERDUE'] },
+                rental: { deletedAt: null },
+              },
+            },
+          },
+        },
       },
     });
     if (!instance) throw new NotFoundException('실물을 찾을 수 없습니다.');
 
-    if (instance._count.rentalItems > 0) {
+    if ((instance as any)._count.rentalItems > 0) {
       throw new BadRequestException(
         '현재 대여 중인 실물은 삭제할 수 없습니다. 반납 후 시도하거나 상태를 BROKEN으로 변경하세요.',
       );

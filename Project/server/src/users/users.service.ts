@@ -10,168 +10,17 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteUserDto } from './dto/delete-user.dto';
 import * as bcrypt from 'bcrypt';
-import { Role } from '@prisma/client';
+import { Role, RentalStatus } from '@prisma/client';
 import { getNowKst, getStartOfDayKst } from '../common/utils/date.util';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  // 1. 내 정보 조회
-  async findMe(userId: string) {
-    const user = await this.prisma.user.findFirst({
-      where: { id: userId, deletedAt: null },
-      select: {
-        id: true,
-        username: true,
-        name: true,
-        studentId: true,
-        phoneNumber: true,
-        departmentType: true,
-        departmentName: true,
-        role: true,
-        createdAt: true,
-      },
-    });
-    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
-    return user;
-  }
-
-  // 2. 내 정보 수정
-  async updateMe(userId: string, updateUserDto: UpdateUserDto) {
-    const {
-      currentPassword,
-      newPassword,
-      phoneNumber,
-      departmentType,
-      departmentName,
-    } = updateUserDto;
-
-    const user = await this.prisma.user.findFirst({
-      where: { id: userId, deletedAt: null },
-    });
-    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
-
-    if (newPassword) {
-      if (!currentPassword) {
-        throw new UnauthorizedException(
-          '비밀번호 변경을 위해 현재 비밀번호가 필요합니다.',
-        );
-      }
-      const isMatch = await bcrypt.compare(currentPassword, user.password);
-      if (!isMatch) {
-        throw new UnauthorizedException('현재 비밀번호가 일치하지 않습니다.');
-      }
-    }
-
-    if (phoneNumber && phoneNumber !== user.phoneNumber) {
-      const existing = await this.prisma.user.findFirst({
-        where: { phoneNumber, deletedAt: null },
-      });
-      if (existing)
-        throw new ConflictException('이미 사용 중인 전화번호입니다.');
-    }
-
-    const data: any = {};
-    if (newPassword) {
-      const salt = await bcrypt.genSalt();
-      data.password = await bcrypt.hash(newPassword, salt);
-    }
-    if (phoneNumber) data.phoneNumber = phoneNumber;
-    if (departmentType) {
-      data.departmentType = departmentType;
-      data.departmentName = departmentName ?? null;
-    }
-
-    const updatedUser = await this.prisma.user.update({
-      where: { id: userId },
-      data,
-      select: {
-        id: true,
-        username: true,
-        name: true,
-        studentId: true,
-        phoneNumber: true,
-        departmentType: true,
-        departmentName: true,
-        role: true,
-        createdAt: true,
-      },
-    });
-
-    return updatedUser;
-  }
-
-  // 3. 회원 탈퇴 (Soft Delete)
-  async deleteMe(userId: string, deleteUserDto: DeleteUserDto) {
-    const { password } = deleteUserDto;
-    const user = await this.prisma.user.findFirst({
-      where: { id: userId, deletedAt: null },
-      include: {
-        _count: {
-          select: {
-            rentals: {
-              where: { status: { in: ['RENTED', 'OVERDUE'] }, deletedAt: null }
-            }
-          }
-        }
-      }
-    });
-
-    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
-
-    if (user.role === Role.ADMIN) {
-      throw new ForbiddenException(
-        '관리자 계정은 직접 탈퇴할 수 없습니다.',
-      );
-    }
-
-    if (user._count.rentals > 0) {
-      throw new BadRequestException('현재 대여 중인 물품이 있어 탈퇴할 수 없습니다.');
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
-    }
-
-    const now = getNowKst();
-    const timestamp = Date.now().toString().slice(-10);
-    const suffix = `_d${timestamp}`;
-
-    await this.prisma.$transaction([
-      this.prisma.user.update({
-        where: { id: userId },
-        data: {
-          deletedAt: now,
-          username: `${user.username.slice(0, 8)}${suffix}`,
-          studentId: `${user.studentId.slice(0, 8)}${suffix}`,
-          phoneNumber: `${user.phoneNumber.slice(0, 8)}${suffix}`,
-        },
-      }),
-      this.prisma.cartItem.deleteMany({ where: { userId } }),
-      this.prisma.plotterOrder.updateMany({
-        where: { userId, status: 'PENDING', deletedAt: null },
-        data: { deletedAt: now }
-      }),
-      this.prisma.auditLog.create({
-        data: {
-          userId,
-          action: 'USER_WITHDRAWAL',
-          targetType: 'USER',
-          targetId: userId,
-          details: { username: user.username }
-        }
-      })
-    ]);
-
-    return { message: '회원 탈퇴가 성공적으로 처리되었습니다.' };
-  }
-
-  // 4. 관리자: 전체 사용자 조회
+  // 1. 전체 사용자 조회 (Admin Only)
   async findAll(
-    page: number,
-    pageSize: number,
+    page: number = 1,
+    pageSize: number = 20,
     search?: string,
     role?: Role,
     sortBy: string = 'createdAt',
@@ -182,42 +31,22 @@ export class UsersService {
 
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { username: { contains: search, mode: 'insensitive' } },
-        { studentId: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search } },
+        { username: { contains: search } },
+        { studentId: { contains: search } },
       ];
     }
+
     if (role) {
       where.role = role;
     }
 
-    let orderBy: any = {};
-    const sortFieldMap: { [key: string]: string } = {
-      name: 'name',
-      studentId: 'studentId',
-      createdAt: 'createdAt',
-    };
-
-    const prismaSortField = sortFieldMap[sortBy] || 'createdAt';
-    orderBy = { [prismaSortField]: sortOrder };
-
-    const [users, total] = await this.prisma.$transaction([
+    const [items, total] = await this.prisma.$transaction([
       this.prisma.user.findMany({
         where,
         skip,
         take: pageSize,
-        orderBy,
-        select: {
-          id: true,
-          username: true,
-          name: true,
-          studentId: true,
-          phoneNumber: true,
-          departmentType: true,
-          departmentName: true,
-          role: true,
-          createdAt: true,
-        },
+        orderBy: { [sortBy]: sortOrder },
       }),
       this.prisma.user.count({ where }),
     ]);
@@ -229,16 +58,140 @@ export class UsersService {
         totalItems: total,
         totalPages: Math.ceil(total / pageSize),
       },
-      users,
+      users: items,
     };
   }
 
-  // 5. 관리자: 사용자 역할 변경
-  async updateRole(userId: string, role: Role, actorId?: string) {
-    if (!Object.values(Role).includes(role)) {
-      throw new BadRequestException('유효하지 않은 역할입니다.');
+  // 2. 내 정보 조회
+  async findMe(userId: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
+    });
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    return user;
+  }
+
+  // 3. 회원 탈퇴 (Soft Delete)
+  async deleteMe(userId: string, deleteUserDto: DeleteUserDto) {
+    const { password } = deleteUserDto;
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
+      include: {
+        _count: {
+          select: {
+            rentals: {
+              where: {
+                rentalItems: {
+                  some: {
+                    status: { in: [RentalStatus.RENTED, RentalStatus.OVERDUE] },
+                  },
+                },
+                deletedAt: null,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+
+    if (user.role === Role.ADMIN) {
+      throw new ForbiddenException(
+        '관리자 계정은 직접 탈퇴할 수 없습니다.',
+      );
     }
 
+    if ((user as any)._count.rentals > 0) {
+      throw new BadRequestException('현재 대여 중인 물품이 있어 탈퇴할 수 없습니다.');
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
+    }
+
+    // Soft delete
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        deletedAt: getNowKst(),
+        loginAttempts: 0, // 혹시 모를 재가입 대비 초기화
+      },
+    });
+
+    // Audit log
+    await this.prisma.auditLog.create({
+      data: {
+        userId,
+        action: 'USER_WITHDRAWAL',
+        targetType: 'USER',
+        targetId: userId,
+        details: { username: user.username }
+      }
+    });
+
+    return { message: '회원 탈퇴가 성공적으로 처리되었습니다.' };
+  }
+
+  // 4. 특정 사용자 조회
+  async findOne(userId: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
+    });
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    return user;
+  }
+
+  // 5. 회원 정보 수정 (Password, Name, Department 등)
+  async updateMe(userId: string, updateUserDto: UpdateUserDto) {
+    const { currentPassword, newPassword, ...rest } = updateUserDto;
+
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
+    });
+    if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+
+    // 1. 현재 비밀번호 확인
+    const isMatch = await bcrypt.compare(currentPassword || '', user.password);
+    if (!isMatch) {
+      throw new ForbiddenException('현재 비밀번호가 일치하지 않습니다.');
+    }
+
+    // 2. 새 비밀번호 해싱
+    let hashedPassword = user.password;
+    if (newPassword) {
+      hashedPassword = await bcrypt.hash(newPassword, 10);
+    }
+
+    // 3. 정보 업데이트
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...rest,
+        password: hashedPassword,
+      },
+    });
+
+    // 4. Audit Log
+    await this.prisma.auditLog.create({
+      data: {
+        userId,
+        action: 'UPDATE_PROFILE',
+        targetType: 'USER',
+        targetId: userId,
+        details: {
+          changedFields: Object.keys(rest),
+          passwordChanged: !!newPassword,
+        },
+      },
+    });
+
+    return updated;
+  }
+
+  // 5. 사용자 역할 변경 (Admin Only)
+  async updateRole(userId: string, role: Role, actorId?: string) {
     const user = await this.prisma.user.findFirst({
       where: { id: userId, deletedAt: null },
     });
@@ -247,30 +200,18 @@ export class UsersService {
     const updated = await this.prisma.user.update({
       where: { id: userId },
       data: { role },
-      select: {
-        id: true,
-        username: true,
-        name: true,
-        studentId: true,
-        phoneNumber: true,
-        departmentType: true,
-        departmentName: true,
-        role: true,
-        createdAt: true,
-      },
     });
 
-    if (actorId) {
-      await this.prisma.auditLog.create({
-        data: {
-          userId: actorId,
-          action: 'UPDATE_USER_ROLE',
-          targetType: 'USER',
-          targetId: userId,
-          details: { oldRole: user.role, newRole: role }
-        }
-      });
-    }
+    // Audit Log
+    await this.prisma.auditLog.create({
+      data: {
+        userId: actorId || null,
+        action: 'UPDATE_USER_ROLE',
+        targetType: 'USER',
+        targetId: userId,
+        details: { oldRole: user.role, newRole: role }
+      }
+    });
 
     return updated;
   }
@@ -279,18 +220,42 @@ export class UsersService {
   async getDashboardSummary(userId: string) {
     const today = getStartOfDayKst();
 
-    const activeRentalsCount = await this.prisma.rental.count({
-      where: {
-        userId,
-        status: 'RENTED',
-        deletedAt: null,
-      },
-    });
+    const [activeRentalsCount, plotterOrdersCount, recentRentals] = await Promise.all([
+      // 1. 활성 대여 (RENTED/OVERDUE 물품이 하나라도 있는 대여 건수)
+      this.prisma.rental.count({
+        where: {
+          userId,
+          rentalItems: {
+            some: { status: { in: [RentalStatus.RENTED, RentalStatus.OVERDUE] } },
+          },
+          deletedAt: null,
+        },
+      }),
+      // 2. 활성 플로터 주문
+      this.prisma.plotterOrder.count({
+        where: {
+          userId,
+          status: { in: ['PENDING', 'CONFIRMED', 'PRINTED'] },
+          deletedAt: null,
+        },
+      }),
+      // 3. 최근 대여 목록
+      this.prisma.rental.findMany({
+        where: { userId, deletedAt: null },
+        take: 3,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          rentalItems: {
+            include: { item: { select: { name: true } } },
+          },
+        },
+      }),
+    ]);
 
     const nearestReturn = await this.prisma.rental.findFirst({
       where: {
         userId,
-        status: 'RENTED',
+        rentalItems: { some: { status: RentalStatus.RENTED } },
         endDate: { gte: today },
         deletedAt: null,
       },
@@ -298,39 +263,33 @@ export class UsersService {
       select: { endDate: true },
     });
 
-    const plotterOrdersCount = await this.prisma.plotterOrder.count({
-      where: {
-        userId,
-        status: { in: ['PENDING', 'CONFIRMED', 'PRINTED'] },
-        deletedAt: null,
-      },
-    });
-
-    const recentRentals = await this.prisma.rental.findMany({
-      where: { userId, deletedAt: null },
-      take: 3,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        rentalItems: {
-          include: { item: { select: { name: true } } },
-        },
-      },
-    });
-
     return {
       activeRentalsCount,
       nearestReturnDate: nearestReturn?.endDate || null,
       activePlotterOrdersCount: plotterOrdersCount,
-      recentRentals: recentRentals.map((r) => ({
-        id: r.id,
-        status: r.status,
-        startDate: r.startDate,
-        endDate: r.endDate,
-        itemSummary:
-          r.rentalItems.length > 0
-            ? `${r.rentalItems[0].item.name} 외 ${r.rentalItems.length - 1}건`
-            : '물품 없음',
-      })),
+      recentRentals: recentRentals.map((r: any) => {
+        const statuses = r.rentalItems.map((ri: any) => ri.status);
+        let representativeStatus: RentalStatus = RentalStatus.RETURNED;
+        if (statuses.includes(RentalStatus.OVERDUE))
+          representativeStatus = RentalStatus.OVERDUE;
+        else if (statuses.includes(RentalStatus.RENTED))
+          representativeStatus = RentalStatus.RENTED;
+        else if (statuses.includes(RentalStatus.RESERVED))
+          representativeStatus = RentalStatus.RESERVED;
+        else if (statuses.includes(RentalStatus.CANCELED))
+          representativeStatus = RentalStatus.CANCELED;
+
+        return {
+          id: r.id,
+          status: representativeStatus,
+          startDate: r.startDate,
+          endDate: r.endDate,
+          itemSummary:
+            r.rentalItems.length > 0
+              ? `${r.rentalItems[0].item.name}${r.rentalItems.length > 1 ? ` 외 ${r.rentalItems.length - 1}건` : ''}`
+              : '물품 없음',
+        };
+      }),
     };
   }
 }

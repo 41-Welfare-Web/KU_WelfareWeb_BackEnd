@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { RentalStatus } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -21,4 +21,13 @@ export class UpdateRentalStatusDto {
   @IsString()
   @IsOptional()
   memo?: string;
+
+  @ApiProperty({
+    example: 12,
+    description: 'DEFECTIVE 처리 시 불량 처리할 RentalItem ID (DEFECTIVE 상태 전용)',
+    required: false,
+  })
+  @IsInt()
+  @IsOptional()
+  rentalItemId?: number;
 }

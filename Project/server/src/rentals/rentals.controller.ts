@@ -41,6 +41,7 @@ export class RentalsController {
       user.userId,
       createRentalDto,
       user.userId,
+      user.role,
     );
   }
 
@@ -52,7 +53,7 @@ export class RentalsController {
     @Body() createRentalByAdminDto: CreateRentalByAdminDto,
   ) {
     const { targetUserId, ...rest } = createRentalByAdminDto;
-    return this.rentalsService.create(targetUserId, rest, admin.userId);
+    return this.rentalsService.create(targetUserId, rest, admin.userId, admin.role);
   }
 
   @Get()
@@ -109,7 +110,7 @@ export class RentalsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateRentalDto,
   ) {
-    return this.rentalsService.update(id, '', updateDto, admin.userId);
+    return this.rentalsService.update(id, '', updateDto, admin.userId, admin.role);
   }
 
   @Put(':id')
@@ -119,7 +120,7 @@ export class RentalsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateRentalDto,
   ) {
-    return this.rentalsService.update(id, user.userId, updateDto);
+    return this.rentalsService.update(id, user.userId, updateDto, user.userId, user.role);
   }
 
   @Delete(':id')

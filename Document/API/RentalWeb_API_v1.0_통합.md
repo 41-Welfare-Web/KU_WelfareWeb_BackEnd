@@ -1,8 +1,8 @@
 **[주의] 이 문서는 RentalWeb 서비스의 통합 API 명세서입니다. 분류별로 분리된 문서들은 이 문서의 내용을 기반으로 합니다.**
 
-### **RentalWeb API 명세서 (v1.0)**
+### **RentalWeb API 명세서 (v1.1)**
 
-이 문서는 RentalWeb 프론트엔드와 백엔드 간의 데이터 통신을 위한 API 엔드포인트를 정의합니다.
+이 문서는 RentalWeb 프론트엔드와 백엔드 간의 데이터 통신을 위한 API 엔드포인트를 정의합니다. (v1.1: 대여 상태 관리 주체 변경 반영)
 
 > 💡 **Tip:** 이 문서의 모든 내용은 서버 실행 후 **[Swagger UI (http://localhost:3000/api-docs)](http://localhost:3000/api-docs)**를 통해 웹 화면으로 더 편하게 확인하고 직접 테스트해 볼 수 있습니다.
 
@@ -624,10 +624,12 @@
   "recentRentals": [
     {
       "id": 101,
-      "status": "RENTED",
       "startDate": "2024-08-01T00:00:00.000Z",
       "endDate": "2024-08-05T00:00:00.000Z",
-      "itemSummary": "DSLR 카메라 외 1건"
+      "itemSummary": "DSLR 카메라 외 1건",
+      "rentalItems": [
+         { "status": "RENTED", "name": "DSLR 카메라", "quantity": 1 }
+      ]
     }
   ]
 }
@@ -1519,10 +1521,9 @@
       "userId": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
       "startDate": "2026-06-02",
       "endDate": "2026-06-04",
-      "status": "RESERVED",
       "createdAt": "2026-05-20T10:00:00Z",
       "rentalItems": [
-        { "itemId": 1, "name": "DSLR 카메라", "quantity": 1 }
+        { "id": 1, "itemId": 1, "name": "DSLR 카메라", "quantity": 1, "status": "RESERVED" }
       ]
     },
     {
@@ -1530,10 +1531,9 @@
       "userId": "a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6",
       "startDate": "2026-06-09",
       "endDate": "2026-06-11",
-      "status": "RESERVED",
       "createdAt": "2026-05-20T10:00:00Z",
       "rentalItems": [
-        { "itemId": 5, "name": "삼각대", "quantity": 2 }
+        { "id": 2, "itemId": 5, "name": "삼각대", "quantity": 2, "status": "RESERVED" }
       ]
     }
   ]
@@ -1634,8 +1634,10 @@
       "user": { "name": "김테스트", "studentId": "202412345", "phoneNumber": "01012345678", "departmentType": "공과대학", "departmentName": "컴퓨터공학과" },
       "startDate": "2024-08-01",
       "endDate": "2024-08-05",
-      "status": "RESERVED",
       "itemSummary": "DSLR 카메라 외 1건",
+      "rentalItems": [
+        { "id": 1, "itemId": 1, "name": "DSLR 카메라", "quantity": 1, "status": "RENTED" }
+      ],
       "createdAt": "2024-07-20T10:00:00Z"
     }
   ]
@@ -1716,7 +1718,7 @@
 관리자가 특정 사용자의 대여 건을 대신 수정합니다.
 
 ## **ENDPOINT:** `PUT /api/rentals/admin/{rentalId}`
-**Description:** 관리자가 대여 기간 또는 품목 수량을 대신 수정합니다. **모든 상태의 대여 건 수정 가능** (사용자는 RESERVED만 가능). 이력에 "관리자 대리 예약 수정"으로 기록됩니다.
+**Description:** 관리자가 대여 기간 또는 품목 수량을 대신 수정합니다. **모든 제약 조건(과거 날짜, 휴무일, 최대 기간 등)을 우회하여 수정 가능**합니다. 이력에 "관리자 대리 예약 수정"으로 기록됩니다.
 **Required Permissions:** Admin Only
 
 ---
@@ -1780,10 +1782,10 @@
 ---
 # 대여 상태 변경 (Update Rental Status)
 
-`FR-20` 요구사항에 따라, 관리자가 대여 건의 상태를 변경합니다.
+`FR-20` 요구사항에 따라, 관리자가 대여 건 또는 개별 물품의 상태를 변경합니다.
 
 ## **ENDPOINT:** `PUT /api/rentals/{rentalId}/status`
-**Description:** 관리자가 물품 수령/반납 등에 따라 대여 상태를 직접 변경합니다.
+**Description:** 관리자가 물품 수령/반납 등에 따라 상태를 직접 변경합니다. 특정 물품만 변경하거나 전체를 일괄 변경할 수 있습니다.
 **Required Permissions:** Admin Only
 
 ---
@@ -1800,12 +1802,14 @@
 
 ```json
 {
+  "rentalItemId": 1,
   "status": "RENTED",
   "memo": "사용자에게 정상 지급 완료"
 }
 ```
-* `status`: (string, required) 변경할 상태. (`RENTED`, `RETURNED`, `CANCELED`, `DEFECTIVE`, `OVERDUE` 중 하나. `DEFECTIVE`는 불량 반납 시 사용)
-* `memo`: (string, optional) 상태 변경에 대한 비고. (예: 불량 반납 시 내용, 관리자 취소 사유)
+* `rentalItemId`: (integer, optional) 특정 물품만 상태를 변경할 경우 해당 `RentalItem`의 ID. 생략 시 해당 대여 건의 모든 물품 상태가 일괄 변경됩니다.
+* `status`: (string, optional) 변경할 상태. (`RENTED`, `RETURNED`, `CANCELED`, `DEFECTIVE`, `OVERDUE` 중 하나)
+* `memo`: (string, optional) 상태 변경에 대한 비고. (예: 불량 내용, 관리자 취소 사유) - `status` 없이 `memo`만 전달 시 메모만 업데이트됩니다.
 
 ---
 
@@ -1819,7 +1823,7 @@
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
 | `400 Bad Request` | `INVALID_STATUS_TRANSITION` | 유효하지 않은 상태 변경일 때 |
-| `400 Bad Request` | `MEMO_REQUIRED` | 특정 상태 변경 시(예: 불량, 관리자 취소) `memo`가 누락되었을 때 |
+| `404 Not Found` | `ITEM_NOT_FOUND` | 지정한 `rentalItemId`가 해당 대여 건에 없을 때 |
 | (이 외 Get Rental Details의 Error 참조) | | |
 
 
@@ -2476,6 +2480,127 @@
 | (이 외 Admin API의 Error Responses 참조) | | |
 
 ---
+
+# 감사 로그 조회 (Get Audit Logs)
+
+## **ENDPOINT:** `GET /api/admin/audit-logs`
+**Description:** 시스템에 기록된 전체 감사 로그를 페이지네이션하여 반환합니다. 유저명, 대상 ID, 액션으로 필터링 가능합니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Query Parameters**
+
+| Parameter | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `page` | `integer` | Optional | 페이지 번호 (기본값: 1) |
+| `pageSize` | `integer` | Optional | 페이지당 항목 수 (기본값: 20) |
+| `search` | `string` | Optional | 유저명 또는 대상 ID 검색 |
+| `action` | `string` | Optional | 특정 액션 필터 (예: `CREATE`, `UPDATE`, `DELETE`) |
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "pagination": {
+    "page": 1,
+    "pageSize": 20,
+    "totalItems": 150,
+    "totalPages": 8
+  },
+  "logs": [
+    {
+      "id": "1",
+      "userId": "user-uuid",
+      "action": "CREATE",
+      "targetType": "RENTAL",
+      "targetId": "rental-uuid",
+      "details": {},
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-01T09:00:00.000Z",
+      "user": {
+        "name": "홍길동",
+        "username": "honggd"
+      }
+    }
+  ]
+}
+```
+
+---
+
+# DB 관리 현황 조회 (Get DB Maintenance Status)
+
+## **ENDPOINT:** `GET /api/admin/maintenance/status`
+**Description:** 주요 테이블별 전체 레코드 수 및 소프트 삭제된 레코드 수, 테스트 계정 수를 반환합니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "tableStatus": {
+    "user": { "total": 120, "deleted": 5 },
+    "item": { "total": 37, "deleted": 0 },
+    "rental": { "total": 300, "deleted": 10 }
+  },
+  "testUserCount": 3
+}
+```
+
+---
+
+# DB 데이터 정밀 청소 (Cleanup Database)
+
+## **ENDPOINT:** `POST /api/admin/maintenance/cleanup`
+**Description:** 소프트 삭제된 데이터 영구 삭제, 테스트 계정 삭제, 물품 대여 횟수 초기화 등을 선택적으로 수행합니다. 모든 작업은 감사 로그(`DB_MAINTENANCE_CLEANUP`)에 자동 기록됩니다.
+**Required Permissions:** Admin Only
+
+> ⚠️ 이 작업은 되돌릴 수 없습니다. 신중하게 사용하십시오.
+
+---
+
+#### **Request Body**
+
+```json
+{
+  "purgeSoftDeleted": true,
+  "deleteTestUsers": false,
+  "resetRentalCounts": false
+}
+```
+
+| Field | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `purgeSoftDeleted` | `boolean` | Optional | 소프트 삭제된 대여, 플로터 주문, 물품을 영구 삭제 |
+| `deleteTestUsers` | `boolean` | Optional | `testuser_`, `lock_` 접두사 테스트 계정 및 관련 데이터 하드 삭제 |
+| `resetRentalCounts` | `boolean` | Optional | 모든 물품의 대여 횟수(`rentalCount`)를 0으로 초기화 |
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "message": "데이터베이스 정리가 완료되었습니다.",
+  "results": [
+    "영구 삭제 완료: 대여(10), 플로터(2), 물품(0)"
+  ]
+}
+```
+
+---
+
 ### **8. 장바구니 (Cart)**
 
 # 내 장바구니 조회 (Get My Cart)

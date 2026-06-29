@@ -1,4 +1,4 @@
-### **RentalWeb API 명세 목록**
+### **RentalWeb API 명세 목록 (v1.1)**
 
 **1. 인증 (Auth)**
 *   `POST /api/auth/request-signup-verification` (회원가입 인증번호 요청)
@@ -46,7 +46,7 @@
 *   `PUT /api/rentals/{rentalId}` (대여 정보 수정 - 날짜/수량)
 *   `PUT /api/rentals/admin/{rentalId}` (대여 정보 수정 대리 - **Admin**)
 *   `DELETE /api/rentals/{rentalId}` (대여 예약 취소)
-*   `PUT /api/rentals/{rentalId}/status` (대여 상태 변경 - **Admin**)
+*   `PUT /api/rentals/{rentalId}/status` (대여 물품별/일괄 상태 변경 - **Admin**)
 
 **5. 플로터 (Plotter)**
 *   `POST /api/plotter/calculate-price` (플로터 실시간 예상 가격 계산 - **Auth**)
@@ -54,6 +54,7 @@
 *   `GET /api/plotter/orders` (플로터 예약 목록 조회 - 내역 또는 전체-**Admin**)
 *   `DELETE /api/plotter/orders/{id}` (플로터 예약 취소 - 소프트 삭제)
 *   `PUT /api/plotter/orders/{id}/status` (플로터 예약 상태 변경 - **Admin**)
+*   `POST /api/plotter/orders/admin` (플로터 주문 대리 신청 - **Admin**)
 
 **6. 관리 (Admin)**
 *   `POST /api/admin/upload-image` (물품 이미지 업로드 - **Admin** 전용, 5MB 제한, png/jpeg/jpg/webp, `items` 버킷)
@@ -64,6 +65,9 @@
 *   `DELETE /api/admin/holidays/{id}` (휴무일 삭제 - **Admin**)
 *   `GET /api/admin/configurations` (시스템 설정 목록 조회 - **Admin**)
 *   `PUT /api/admin/configurations` (시스템 설정 수정 - **Admin**)
+*   `GET /api/admin/audit-logs` (감사 로그 조회 - **Admin**, 페이지네이션/검색/필터)
+*   `GET /api/admin/maintenance/status` (DB 관리 현황 조회 - **Admin**)
+*   `POST /api/admin/maintenance/cleanup` (DB 데이터 정밀 청소 - **Admin**)
 
 **7. 공통 (Common)**
 *   `GET /api/common/health` (시스템 헬스체크 및 서비스 진단 - FR-37)

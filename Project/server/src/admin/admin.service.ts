@@ -21,17 +21,28 @@ export class AdminService {
     ] = await Promise.all([
       this.prisma.user.count({ where: { deletedAt: null } }),
       this.prisma.rental.count({ where: { deletedAt: null } }),
-      this.prisma.rental.count({ where: { status: RentalStatus.RENTED, deletedAt: null } }),
       this.prisma.rental.count({
         where: {
-          status: RentalStatus.RENTED,
+          rentalItems: { some: { status: RentalStatus.RENTED } },
+          deletedAt: null,
+        },
+      }),
+      this.prisma.rental.count({
+        where: {
+          rentalItems: { some: { status: RentalStatus.RENTED } },
           endDate: { lt: today },
           deletedAt: null,
         },
       }),
-      this.prisma.plotterOrder.count({ where: { status: PlotterStatus.PENDING, deletedAt: null } }),
-      this.prisma.plotterOrder.count({ where: { status: PlotterStatus.CONFIRMED, deletedAt: null } }),
-      this.prisma.plotterOrder.count({ where: { status: PlotterStatus.PRINTED, deletedAt: null } }),
+      this.prisma.plotterOrder.count({
+        where: { status: PlotterStatus.PENDING, deletedAt: null },
+      }),
+      this.prisma.plotterOrder.count({
+        where: { status: PlotterStatus.CONFIRMED, deletedAt: null },
+      }),
+      this.prisma.plotterOrder.count({
+        where: { status: PlotterStatus.PRINTED, deletedAt: null },
+      }),
     ]);
 
     const mostRentedItems = await this.prisma.item.findMany({
