@@ -140,6 +140,13 @@ export class ItemsService {
           },
           select: { quantity: true },
         },
+        _count: {
+          select: {
+            itemInstances: {
+              where: { status: { not: 'BROKEN' }, deletedAt: null },
+            },
+          },
+        },
       },
     });
 
@@ -148,10 +155,15 @@ export class ItemsService {
         (sum: number, ri: any) => sum + ri.quantity,
         0,
       );
-      const { rentalItems: _rentalItems, ...itemData } = item;
+      // INDIVIDUAL: BROKEN 제외 인스턴스 수 기준 / BULK: totalQuantity 기준
+      const effectiveTotal =
+        item.managementType === 'INDIVIDUAL'
+          ? item._count.itemInstances
+          : (item.totalQuantity || 0);
+      const { rentalItems: _rentalItems, _count, ...itemData } = item;
       return {
         ...itemData,
-        currentStock: (item.totalQuantity || 0) - reservedQty,
+        currentStock: Math.max(0, effectiveTotal - reservedQty),
       };
     });
   }
@@ -302,7 +314,13 @@ export class ItemsService {
     });
     if (!item) throw new NotFoundException('물품을 찾을 수 없습니다.');
 
-    const totalQty = item.totalQuantity || 0;
+    // INDIVIDUAL: BROKEN 제외 인스턴스 수 기준 / BULK: totalQuantity 기준
+    const totalQty =
+      item.managementType === 'INDIVIDUAL'
+        ? await this.prisma.itemInstance.count({
+            where: { itemId, status: { not: 'BROKEN' }, deletedAt: null },
+          })
+        : (item.totalQuantity || 0);
     const availability: any[] = [];
 
     const toLocalDateStr = (date: Date) => {

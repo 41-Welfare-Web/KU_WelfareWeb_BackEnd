@@ -528,12 +528,24 @@ export class RentalsService {
           });
         }
 
-        // DEFECTIVE 처리 시 실물 상태 변경
-        if (newStatus === RentalStatus.DEFECTIVE && targetItem.instanceId) {
-          await tx.itemInstance.update({
-            where: { id: targetItem.instanceId },
-            data: { status: 'BROKEN' },
-          });
+        // DEFECTIVE 처리 시 실물/수량 반영
+        if (newStatus === RentalStatus.DEFECTIVE) {
+          if (targetItem.instanceId) {
+            // INDIVIDUAL: 인스턴스 BROKEN 처리
+            await tx.itemInstance.update({
+              where: { id: targetItem.instanceId },
+              data: { status: 'BROKEN' },
+            });
+          } else {
+            // BULK: totalQuantity 차감
+            const item = await tx.item.findUnique({ where: { id: targetItem.itemId } });
+            if (item && item.totalQuantity !== null) {
+              await tx.item.update({
+                where: { id: targetItem.itemId },
+                data: { totalQuantity: Math.max(0, item.totalQuantity - targetItem.quantity) },
+              });
+            }
+          }
         }
 
         // 품목 상태 업데이트
@@ -568,12 +580,24 @@ export class RentalsService {
 
         if (newStatus) {
           for (const ri of rental.rentalItems) {
-            // DEFECTIVE 처리 시 실물 상태 변경
-            if (newStatus === RentalStatus.DEFECTIVE && ri.instanceId) {
-              await tx.itemInstance.update({
-                where: { id: ri.instanceId },
-                data: { status: 'BROKEN' },
-              });
+            // DEFECTIVE 처리 시 실물/수량 반영
+            if (newStatus === RentalStatus.DEFECTIVE) {
+              if (ri.instanceId) {
+                // INDIVIDUAL: 인스턴스 BROKEN 처리
+                await tx.itemInstance.update({
+                  where: { id: ri.instanceId },
+                  data: { status: 'BROKEN' },
+                });
+              } else {
+                // BULK: totalQuantity 차감
+                const item = await tx.item.findUnique({ where: { id: ri.itemId } });
+                if (item && item.totalQuantity !== null) {
+                  await tx.item.update({
+                    where: { id: ri.itemId },
+                    data: { totalQuantity: Math.max(0, item.totalQuantity - ri.quantity) },
+                  });
+                }
+              }
             }
 
             await tx.rentalItem.update({
