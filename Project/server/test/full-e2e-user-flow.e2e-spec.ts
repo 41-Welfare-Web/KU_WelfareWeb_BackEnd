@@ -399,7 +399,146 @@ describe('Production-Ready Full E2E Flow', () => {
     });
   });
 
-  describe('6. Safety & Security Rules', () => {
+  describe('6. Popup CRUD', () => {
+    let createdPopupId: number;
+
+    it('should allow admin to create a popup', async () => {
+      const today = new Date();
+      const startDate = today.toISOString().split('T')[0];
+      const endDate = new Date(today.setDate(today.getDate() + 7)).toISOString().split('T')[0];
+
+      const response = await request(app.getHttpServer())
+        .post('/api/popups/admin')
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .send({
+          title: 'E2E 테스트 팝업',
+          content: '테스트 공지 내용입니다.',
+          startDate,
+          endDate,
+          isActive: true,
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body.title).toBe('E2E 테스트 팝업');
+      expect(response.body.isActive).toBe(true);
+      createdPopupId = response.body.id;
+    });
+
+    it('should return active popups for all users', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/popups');
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
+      const popup = response.body.find((p: any) => p.id === createdPopupId);
+      expect(popup).toBeDefined();
+    });
+
+    it('should return all popups for admin', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/popups/admin')
+        .set('Authorization', `Bearer ${adminAccessToken}`);
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.some((p: any) => p.id === createdPopupId)).toBe(true);
+    });
+
+    it('should block non-admin from accessing admin popup list', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/popups/admin')
+        .set('Authorization', `Bearer ${userAccessToken}`);
+
+      expect(response.status).toBe(403);
+    });
+
+    it('should allow admin to update a popup', async () => {
+      const response = await request(app.getHttpServer())
+        .put(`/api/popups/admin/${createdPopupId}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .send({ title: '수정된 팝업 제목', isActive: false });
+
+      expect(response.status).toBe(200);
+      expect(response.body.title).toBe('수정된 팝업 제목');
+      expect(response.body.isActive).toBe(false);
+    });
+
+    it('should not return inactive popup in active list', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/popups');
+
+      expect(response.status).toBe(200);
+      const popup = response.body.find((p: any) => p.id === createdPopupId);
+      expect(popup).toBeUndefined();
+    });
+
+    it('should allow admin to delete a popup', async () => {
+      const response = await request(app.getHttpServer())
+        .delete(`/api/popups/admin/${createdPopupId}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`);
+
+      expect(response.status).toBe(200);
+    });
+
+    it('should return 404 for deleted popup update', async () => {
+      const response = await request(app.getHttpServer())
+        .put(`/api/popups/admin/${createdPopupId}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .send({ title: '삭제된 팝업 수정 시도' });
+
+      expect(response.status).toBe(404);
+    });
+  });
+
+  describe('7. Admin Notifications', () => {
+    it('should return notifications after since parameter', async () => {
+      const since = new Date(Date.now() - 60 * 1000).toISOString(); // 1분 전
+
+      const response = await request(app.getHttpServer())
+        .get(`/api/admin/notifications?since=${since}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('count');
+      expect(response.body).toHaveProperty('notifications');
+      expect(Array.isArray(response.body.notifications)).toBe(true);
+    });
+
+    it('should include rental and plotter types in notifications', async () => {
+      const since = new Date(Date.now() - 60 * 60 * 1000).toISOString(); // 1시간 전
+
+      const response = await request(app.getHttpServer())
+        .get(`/api/admin/notifications?since=${since}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`);
+
+      expect(response.status).toBe(200);
+      const types = response.body.notifications.map((n: any) => n.type);
+      // 이 E2E 흐름에서 대여와 플로터 주문을 생성했으므로 둘 다 있어야 함
+      expect(types).toContain('RENTAL');
+      expect(types).toContain('PLOTTER');
+    });
+
+    it('should return empty when since is in the future', async () => {
+      const future = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
+      const response = await request(app.getHttpServer())
+        .get(`/api/admin/notifications?since=${future}`)
+        .set('Authorization', `Bearer ${adminAccessToken}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.count).toBe(0);
+    });
+
+    it('should block non-admin from accessing notifications', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/admin/notifications')
+        .set('Authorization', `Bearer ${userAccessToken}`);
+
+      expect(response.status).toBe(403);
+    });
+  });
+
+  describe('8. Safety & Security Rules', () => {
     it('should block admin from self-withdrawal', async () => {
       const response = await request(app.getHttpServer())
         .delete('/api/users/me')

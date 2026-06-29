@@ -41,6 +41,8 @@ describe('RentalsService', () => {
     $transaction: jest.fn((cb) => cb(mockPrisma)),
     item: {
       findFirst: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
     },
     rental: {
       create: jest.fn(),
@@ -63,13 +65,7 @@ describe('RentalsService', () => {
       update: jest.fn(),
     },
     user: {
-      findFirst: jest.fn().mockResolvedValue({
-        id: 'user-uuid',
-        name: '테스터',
-        phoneNumber: '01012341234',
-        departmentType: '학과',
-        departmentName: '컴퓨터공학과',
-      }),
+      findFirst: jest.fn(),
     },
     cartItem: {
       deleteMany: jest.fn(),
@@ -87,7 +83,15 @@ describe('RentalsService', () => {
   };
 
   beforeEach(async () => {
-    mockHolidaysService.isHoliday.mockReset().mockResolvedValue(false);
+    jest.clearAllMocks();
+    mockHolidaysService.isHoliday.mockResolvedValue(false);
+    mockPrisma.user.findFirst.mockResolvedValue({
+      id: 'user-uuid',
+      name: '테스터',
+      phoneNumber: '01012341234',
+      departmentType: '학과',
+      departmentName: '컴퓨터공학과',
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -364,6 +368,111 @@ describe('RentalsService', () => {
         where: { id: 50 },
         data: { status: 'BROKEN' },
       }),
+    );
+  });
+
+  it('[DEFECTIVE] BULK 물품 DEFECTIVE 처리 시 totalQuantity가 차감됨', async () => {
+    const rental = {
+      id: 11,
+      userId: 'user-uuid',
+      rentalItems: [
+        {
+          id: 2,
+          itemId: 10,
+          quantity: 2,
+          item: { name: '의자' },
+          status: RentalStatus.RENTED,
+          instanceId: null, // BULK → instanceId 없음
+        },
+      ],
+      user: { phoneNumber: '01012341234', name: '테스터', departmentType: '학과', departmentName: null, id: 'user-uuid', username: 'tester', studentId: '20200001', role: 'USER', createdAt: new Date() },
+    };
+
+    mockPrisma.rental.findFirst.mockResolvedValue(rental);
+    mockPrisma.item.findUnique.mockResolvedValue({ id: 10, totalQuantity: 10, managementType: 'BULK' });
+    mockPrisma.item.update.mockResolvedValue({ id: 10, totalQuantity: 8 });
+    mockPrisma.rentalItem.update.mockResolvedValue({ id: 2, status: RentalStatus.DEFECTIVE });
+    mockPrisma.rentalHistory.create.mockResolvedValue({});
+
+    await service.updateStatus(11, 'admin-uuid', {
+      status: RentalStatus.DEFECTIVE,
+      rentalItemId: 2,
+    });
+
+    // totalQuantity가 10 - 2 = 8로 차감되었는지 검증
+    expect(mockPrisma.item.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 10 },
+        data: { totalQuantity: 8 },
+      }),
+    );
+
+    // itemInstance.update는 호출되지 않아야 함 (BULK이므로)
+    expect(mockPrisma.itemInstance.update).not.toHaveBeenCalled();
+  });
+
+  it('[DEFECTIVE] INDIVIDUAL 품목 DEFECTIVE 시 instanceId가 없는 경우 totalQuantity 차감 안 됨', async () => {
+    const rental = {
+      id: 12,
+      userId: 'user-uuid',
+      rentalItems: [
+        {
+          id: 3,
+          itemId: 20,
+          quantity: 1,
+          item: { name: '마이크' },
+          status: RentalStatus.RENTED,
+          instanceId: 99,
+        },
+      ],
+      user: { phoneNumber: '01012341234', name: '테스터', departmentType: '학과', departmentName: null, id: 'user-uuid', username: 'tester', studentId: '20200001', role: 'USER', createdAt: new Date() },
+    };
+
+    mockPrisma.rental.findFirst.mockResolvedValue(rental);
+    mockPrisma.itemInstance.update.mockResolvedValue({});
+    mockPrisma.rentalItem.update.mockResolvedValue({ id: 3, status: RentalStatus.DEFECTIVE });
+    mockPrisma.rentalHistory.create.mockResolvedValue({});
+
+    await service.updateStatus(12, 'admin-uuid', {
+      status: RentalStatus.DEFECTIVE,
+      rentalItemId: 3,
+    });
+
+    // instanceId가 있으므로 itemInstance.update(BROKEN)만 호출
+    expect(mockPrisma.itemInstance.update).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: 99 }, data: { status: 'BROKEN' } }),
+    );
+    // item.update(totalQuantity)는 호출되지 않아야 함
+    expect(mockPrisma.item.update).not.toHaveBeenCalled();
+  });
+
+  it('[개별 품목 RETURNED] 특정 rentalItem만 RETURNED 처리 시 나머지는 유지됨', async () => {
+    const rental = {
+      id: 13,
+      userId: 'user-uuid',
+      rentalItems: [
+        { id: 7, itemId: 1, quantity: 1, item: { name: '노트북' }, status: RentalStatus.RENTED, instanceId: null },
+        { id: 8, itemId: 2, quantity: 1, item: { name: '마우스' }, status: RentalStatus.RENTED, instanceId: null },
+      ],
+      user: { phoneNumber: '01012341234', name: '테스터', departmentType: '학과', departmentName: null, id: 'user-uuid', username: 'tester', studentId: '20200001', role: 'USER', createdAt: new Date() },
+    };
+
+    mockPrisma.rental.findFirst.mockResolvedValue(rental);
+    mockPrisma.rentalItem.update.mockResolvedValue({});
+    mockPrisma.rentalHistory.create.mockResolvedValue({});
+
+    await service.updateStatus(13, 'admin-uuid', {
+      status: RentalStatus.RETURNED,
+      rentalItemId: 7,
+    });
+
+    // 7번만 RETURNED 처리
+    expect(mockPrisma.rentalItem.update).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: 7 }, data: { status: RentalStatus.RETURNED } }),
+    );
+    // 8번은 update 호출되지 않음
+    expect(mockPrisma.rentalItem.update).not.toHaveBeenCalledWith(
+      expect.objectContaining({ where: { id: 8 } }),
     );
   });
 
