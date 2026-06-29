@@ -24,7 +24,7 @@ export class UpdateRentalStatusDto {
 
   @ApiProperty({
     example: 12,
-    description: 'DEFECTIVE 처리 시 불량 처리할 RentalItem ID (DEFECTIVE 상태 전용)',
+    description: '개별 품목 상태 변경 시 대상 RentalItem ID. 지정 시 해당 품목만 변경, 생략 시 전체 일괄 변경',
     required: false,
   })
   @IsInt()
