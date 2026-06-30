@@ -60,12 +60,20 @@ export class CommonController {
     // PlotterService에서 중앙 집중화된 플로터 메타데이터를 가져옴
     const plotterMetadata = await this.plotterService.getMetadata();
 
+    // 점검 모드 여부 (기본값: false)
+    const inspectionModeStr = await this.configService.getValue(
+      'inspection_mode',
+      'false',
+    );
+    const inspectionMode = inspectionModeStr === 'true';
+
     return {
       departments: plotterMetadata.departments,
       purposes: plotterMetadata.purposes,
       freePurposes: plotterMetadata.freePurposes,
       freeDepartments: plotterMetadata.freeDepartments,
       prices: plotterMetadata.prices,
+      inspectionMode,
     };
   }
 
