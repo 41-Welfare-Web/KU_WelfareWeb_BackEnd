@@ -857,7 +857,7 @@ export class RentalsService {
           }
         }
 
-        await tx.rentalItem.deleteMany({ where: { rentalId: id } });
+        await tx.rentalItem.deleteMany({ where: { rentalId: id, status: RentalStatus.RESERVED } });
         await tx.rental.update({
           where: { id },
           data: {
