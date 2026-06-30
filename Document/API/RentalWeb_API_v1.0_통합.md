@@ -1788,6 +1788,12 @@
 **Description:** 관리자가 물품 수령/반납 등에 따라 상태를 직접 변경합니다. 특정 물품만 변경하거나 전체를 일괄 변경할 수 있습니다.
 **Required Permissions:** Admin Only
 
+> **상태 관리 구조 (v1.1)**
+> - `rental_items.status` — 품목별 개별 상태. **Source of Truth** (모든 UI 표시 기준)
+> - `rentals.status` — 대여 건 전체 대표 상태. 상태 변경 시 `rental_items.status`를 기준으로 자동 재계산되어 동기화됩니다.
+>   - 전체 일괄 변경: `rentals.status` = `newStatus`
+>   - 개별 품목 변경: 남은 모든 `rental_items.status`를 재계산 (`OVERDUE` > `RENTED` > `RESERVED` > `DEFECTIVE` > `RETURNED` > `CANCELED`)
+
 ---
 
 #### **Path Parameters**

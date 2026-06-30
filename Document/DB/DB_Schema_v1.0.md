@@ -1,6 +1,6 @@
 ### **RentalWeb 데이터베이스 스키마 (v1.0.3)**
 
-최종 수정일: 2026-05-31 (RentalItem 단위 상태 관리 및 보안 로깅 반영)
+최종 수정일: 2026-07-01 (rentals.status 필드 재추가 및 rental_items.status 표준화)
 
 ---
 
@@ -88,11 +88,15 @@
 | `user_id` | `uuid` | 사용자 ID | Foreign Key (`users.id`) |
 | `start_date` | `date` | 대여 시작일 | Not Null |
 | `end_date` | `date` | 반납 예정일 | Not Null |
+| `status` | `enum(RentalStatus)` | 대여 건 전체 대표 상태 (`rental_items.status` 기준 자동 동기화) | Default: `RESERVED` |
 | `department_type` | `varchar(30)` | 신청 당시 소속 유형 | Not Null |
 | `department_name` | `varchar(50)` | 신청 당시 소속 단위명 | |
 | `memo` | `text` | 관리자 비고 | |
 | `deleted_at` | `timestampz` | 소프트 삭제 시간 | |
 | `created_at` | `timestampz` | 생성일 | Default: `now()` |
+
+> **상태 관리 구조**: `rental_items.status`가 **표준(Source of Truth)**입니다. `rentals.status`는 해당 대여 건 전체의 대표 상태를 나타내며, 상태 변경 API 호출 시 `rental_items.status`를 기준으로 자동 재계산됩니다.
+> 우선순위: `OVERDUE` > `RENTED` > `RESERVED` > `DEFECTIVE` > `RETURNED` > `CANCELED`
 
 #### **6. `rental_items` (대여 품목)**
 
@@ -102,7 +106,7 @@
 | `rental_id` | `integer` | 대여 ID | Foreign Key (`rentals.id`) |
 | `item_id` | `integer` | 물품 ID | Foreign Key (`items.id`) |
 | `quantity` | `integer` | 대여 수량 | Default: 1 |
-| `status` | `enum(RentalStatus)` | 품목별 대여 상태 (Source of Truth) | Default: `RESERVED` |
+| `status` | `enum(RentalStatus)` | **품목별 대여 상태 (Source of Truth)** — 모든 상태 판단의 기준 | Default: `RESERVED` |
 | `instance_id` | `integer` | 개별 실물 ID (INDIVIDUAL 물품) | Foreign Key (`item_instances.id`), Nullable |
 
 #### **7. `rental_history` (대여 상태 변경 이력)**

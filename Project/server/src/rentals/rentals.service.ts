@@ -17,6 +17,19 @@ import { CartService } from '../cart/cart.service';
 import { Cron } from '@nestjs/schedule';
 import { getStartOfDayKst, parseDateOnlyKst } from '../common/utils/date.util';
 
+/**
+ * 개별 rentalItem 상태들을 보고 rental 전체 대표 상태를 결정합니다.
+ * 우선순위: OVERDUE > RENTED > RESERVED > DEFECTIVE > RETURNED > CANCELED
+ */
+function deriveRentalStatus(statuses: RentalStatus[]): RentalStatus {
+  if (statuses.some((s) => s === RentalStatus.OVERDUE)) return RentalStatus.OVERDUE;
+  if (statuses.some((s) => s === RentalStatus.RENTED)) return RentalStatus.RENTED;
+  if (statuses.some((s) => s === RentalStatus.RESERVED)) return RentalStatus.RESERVED;
+  if (statuses.some((s) => s === RentalStatus.DEFECTIVE)) return RentalStatus.DEFECTIVE;
+  if (statuses.every((s) => s === RentalStatus.CANCELED)) return RentalStatus.CANCELED;
+  return RentalStatus.RETURNED;
+}
+
 @Injectable()
 export class RentalsService {
   constructor(
@@ -565,6 +578,14 @@ export class RentalsService {
             memo: memo || `품목 상태 변경: ${targetItem.item.name} (${newStatus || '유지'})`,
           },
         });
+
+        // rentals.status 재계산 (개별 변경 후 남은 rentalItem들 상태 기준)
+        if (newStatus) {
+          const allItems = await tx.rentalItem.findMany({ where: { rentalId: id } });
+          const statuses = allItems.map((ri) => ri.status);
+          const derivedStatus = deriveRentalStatus(statuses);
+          await tx.rental.update({ where: { id }, data: { status: derivedStatus } });
+        }
       });
     }
     // 2. 전체 품목 상태를 일괄 변경하는 경우 (또는 메모만 변경)
@@ -605,6 +626,9 @@ export class RentalsService {
               data: { status: newStatus },
             });
           }
+
+          // rentals.status 동기화 (전체 일괄 변경)
+          await tx.rental.update({ where: { id }, data: { status: newStatus } });
 
           // 전체 변경 히스토리 기록
           await tx.rentalHistory.create({

@@ -1,4 +1,6 @@
-### **RentalWeb API 명세 목록 (v1.1)**
+### **RentalWeb API 명세 목록 (v1.2)**
+
+> **상태 관리 표준 (v1.2)**: `rental_items.status`가 Source of Truth입니다. `rentals.status`는 전체 대표 상태로 자동 동기화됩니다.
 
 **1. 인증 (Auth)**
 *   `POST /api/auth/request-signup-verification` (회원가입 인증번호 요청)
@@ -46,7 +48,7 @@
 *   `PUT /api/rentals/{rentalId}` (대여 정보 수정 - 날짜/수량)
 *   `PUT /api/rentals/admin/{rentalId}` (대여 정보 수정 대리 - **Admin**)
 *   `DELETE /api/rentals/{rentalId}` (대여 예약 취소)
-*   `PUT /api/rentals/{rentalId}/status` (대여 물품별/일괄 상태 변경 - **Admin**)
+*   `PUT /api/rentals/{rentalId}/status` (대여 물품별/일괄 상태 변경 - **Admin**, `rental_items.status` + `rentals.status` 동시 업데이트)
 
 **5. 플로터 (Plotter)**
 *   `POST /api/plotter/calculate-price` (플로터 실시간 예상 가격 계산 - **Auth**)

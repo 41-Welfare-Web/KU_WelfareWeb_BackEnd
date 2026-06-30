@@ -1,0 +1,362 @@
+[
+  {
+    "id": 203,
+    "orderId": 60,
+    "changedBy": "7f4fe302-bb71-406e-9ab0-86a99b5de553",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-06-29T07:38:15.156Z"
+  },
+  {
+    "id": 34,
+    "orderId": 14,
+    "changedBy": "2fe3048c-6d57-44fd-bdec-df374a00e866",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-23T06:51:21.264Z"
+  },
+  {
+    "id": 35,
+    "orderId": 15,
+    "changedBy": "3c60f4e9-731b-4b55-b2a5-e5229413aa7d",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-23T09:01:44.487Z"
+  },
+  {
+    "id": 38,
+    "orderId": 15,
+    "changedBy": "3c60f4e9-731b-4b55-b2a5-e5229413aa7d",
+    "oldStatus": "PENDING",
+    "newStatus": "CANCELED",
+    "memo": "사용자 직접 취소 (주문 시 소속: 중앙자치기구 / 학생복지위원회)",
+    "changedAt": "2026-03-23T10:36:25.727Z"
+  },
+  {
+    "id": 46,
+    "orderId": 19,
+    "changedBy": "4073d94f-be30-42e2-b483-46e4fcccedc5",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-24T06:25:57.052Z"
+  },
+  {
+    "id": 52,
+    "orderId": 20,
+    "changedBy": "47791983-5b33-4b90-8af3-e0fe50d07c99",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-24T22:20:43.937Z"
+  },
+  {
+    "id": 55,
+    "orderId": 21,
+    "changedBy": "89e54170-32b1-4a23-b9ba-cd0232996afc",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-25T08:59:09.475Z"
+  },
+  {
+    "id": 63,
+    "orderId": 22,
+    "changedBy": "834ae078-cf24-4b35-ad96-3d6224c4c5dc",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-29T07:04:04.772Z"
+  },
+  {
+    "id": 64,
+    "orderId": 23,
+    "changedBy": "834ae078-cf24-4b35-ad96-3d6224c4c5dc",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-29T07:04:47.014Z"
+  },
+  {
+    "id": 65,
+    "orderId": 22,
+    "changedBy": "834ae078-cf24-4b35-ad96-3d6224c4c5dc",
+    "oldStatus": "PENDING",
+    "newStatus": "CANCELED",
+    "memo": "사용자 직접 취소 (주문 시 소속: 중앙자치기구 / 총학생회)",
+    "changedAt": "2026-03-29T07:07:01.516Z"
+  },
+  {
+    "id": 66,
+    "orderId": 23,
+    "changedBy": "834ae078-cf24-4b35-ad96-3d6224c4c5dc",
+    "oldStatus": "PENDING",
+    "newStatus": "CANCELED",
+    "memo": "사용자 직접 취소 (주문 시 소속: 중앙자치기구 / 총학생회)",
+    "changedAt": "2026-03-29T07:07:05.126Z"
+  },
+  {
+    "id": 67,
+    "orderId": 24,
+    "changedBy": "834ae078-cf24-4b35-ad96-3d6224c4c5dc",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-29T07:07:40.383Z"
+  },
+  {
+    "id": 68,
+    "orderId": 25,
+    "changedBy": "834ae078-cf24-4b35-ad96-3d6224c4c5dc",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-29T07:08:01.314Z"
+  },
+  {
+    "id": 69,
+    "orderId": 26,
+    "changedBy": "3c60f4e9-731b-4b55-b2a5-e5229413aa7d",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-03-30T04:28:13.098Z"
+  },
+  {
+    "id": 81,
+    "orderId": 27,
+    "changedBy": "72feacf5-26d8-4cec-82ff-f35715030bdd",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-06T00:35:40.648Z"
+  },
+  {
+    "id": 82,
+    "orderId": 28,
+    "changedBy": "72feacf5-26d8-4cec-82ff-f35715030bdd",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-06T00:36:06.606Z"
+  },
+  {
+    "id": 83,
+    "orderId": 29,
+    "changedBy": "95dee4fc-9537-4dff-b9be-ac198c4eeb46",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-06T02:04:37.743Z"
+  },
+  {
+    "id": 88,
+    "orderId": 30,
+    "changedBy": "e651b074-8db7-46f0-af20-088cd923882d",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-06T10:04:04.452Z"
+  },
+  {
+    "id": 89,
+    "orderId": 31,
+    "changedBy": "e651b074-8db7-46f0-af20-088cd923882d",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-06T10:04:23.041Z"
+  },
+  {
+    "id": 90,
+    "orderId": 32,
+    "changedBy": "35ba0c32-897c-47b9-b984-6ec79d97beb7",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-06T10:05:20.927Z"
+  },
+  {
+    "id": 91,
+    "orderId": 33,
+    "changedBy": "3a4db788-506d-4431-bec1-98190d56d5f8",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-07T01:34:07.867Z"
+  },
+  {
+    "id": 92,
+    "orderId": 34,
+    "changedBy": "c9f800fd-efd0-4dcf-9ae2-7248cfcc7f73",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-07T04:48:10.082Z"
+  },
+  {
+    "id": 124,
+    "orderId": 36,
+    "changedBy": "3bea07ff-9b66-4e2d-b2cc-e5552a2f7188",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-09T11:49:13.366Z"
+  },
+  {
+    "id": 125,
+    "orderId": 37,
+    "changedBy": "3bea07ff-9b66-4e2d-b2cc-e5552a2f7188",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-09T11:49:51.946Z"
+  },
+  {
+    "id": 136,
+    "orderId": 38,
+    "changedBy": "6e05180e-65e6-4039-ad47-d082b997149d",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-30T11:05:37.263Z"
+  },
+  {
+    "id": 137,
+    "orderId": 39,
+    "changedBy": "6a7aae5d-b00e-42b9-b400-948d849366ca",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-30T13:15:38.456Z"
+  },
+  {
+    "id": 138,
+    "orderId": 38,
+    "changedBy": "6e05180e-65e6-4039-ad47-d082b997149d",
+    "oldStatus": "PENDING",
+    "newStatus": "CANCELED",
+    "memo": "사용자 직접 취소 (주문 시 소속: 학과 학생회 / 의생명공학과 학생회)",
+    "changedAt": "2026-04-30T13:18:50.506Z"
+  },
+  {
+    "id": 139,
+    "orderId": 39,
+    "changedBy": "6a7aae5d-b00e-42b9-b400-948d849366ca",
+    "oldStatus": "PENDING",
+    "newStatus": "CANCELED",
+    "memo": "사용자 직접 취소 (주문 시 소속: 학과 학생회 / 의생명공학과 학생회)",
+    "changedAt": "2026-04-30T13:23:58.626Z"
+  },
+  {
+    "id": 140,
+    "orderId": 40,
+    "changedBy": "6a7aae5d-b00e-42b9-b400-948d849366ca",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-30T13:24:30.359Z"
+  },
+  {
+    "id": 141,
+    "orderId": 40,
+    "changedBy": "6a7aae5d-b00e-42b9-b400-948d849366ca",
+    "oldStatus": "PENDING",
+    "newStatus": "CANCELED",
+    "memo": "사용자 직접 취소 (주문 시 소속: 학과 학생회 / 의생명공학과 학생회)",
+    "changedAt": "2026-04-30T14:39:58.933Z"
+  },
+  {
+    "id": 142,
+    "orderId": 41,
+    "changedBy": "6a7aae5d-b00e-42b9-b400-948d849366ca",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-04-30T14:40:24.210Z"
+  },
+  {
+    "id": 147,
+    "orderId": 42,
+    "changedBy": "a2f68ecb-60ae-482f-90f2-5361f29c5236",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-05-11T10:31:23.033Z"
+  },
+  {
+    "id": 148,
+    "orderId": 42,
+    "changedBy": "a2f68ecb-60ae-482f-90f2-5361f29c5236",
+    "oldStatus": "PENDING",
+    "newStatus": "CANCELED",
+    "memo": "사용자 직접 취소 (주문 시 소속: 학과 학생회 / 산림조경학과 학생회)",
+    "changedAt": "2026-05-11T10:31:52.270Z"
+  },
+  {
+    "id": 149,
+    "orderId": 43,
+    "changedBy": "a2f68ecb-60ae-482f-90f2-5361f29c5236",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-05-11T10:32:20.684Z"
+  },
+  {
+    "id": 155,
+    "orderId": 44,
+    "changedBy": "f80ec00f-afd8-426a-afd5-fb16fdc89d72",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-05-25T10:52:46.162Z"
+  },
+  {
+    "id": 156,
+    "orderId": 45,
+    "changedBy": "f80ec00f-afd8-426a-afd5-fb16fdc89d72",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-05-25T10:54:10.569Z"
+  },
+  {
+    "id": 157,
+    "orderId": 46,
+    "changedBy": "cf9567ec-4994-4e2d-a520-b5ab5d4d3a59",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-05-26T05:24:53.855Z"
+  },
+  {
+    "id": 164,
+    "orderId": 47,
+    "changedBy": "2155631b-d901-48f6-8229-075f9aac1bc6",
+    "oldStatus": null,
+    "newStatus": "PENDING",
+    "memo": "플로터 주문 신청",
+    "changedAt": "2026-05-27T05:36:54.393Z"
+  },
+  {
+    "id": 204,
+    "orderId": 60,
+    "changedBy": "1295f272-6d5e-4546-a95c-387526d25389",
+    "oldStatus": "PENDING",
+    "newStatus": "CONFIRMED",
+    "memo": "상태 변경: CONFIRMED",
+    "changedAt": "2026-06-29T07:38:17.093Z"
+  },
+  {
+    "id": 205,
+    "orderId": 60,
+    "changedBy": "1295f272-6d5e-4546-a95c-387526d25389",
+    "oldStatus": "CONFIRMED",
+    "newStatus": "PRINTED",
+    "memo": "특수 용지 사용 완료",
+    "changedAt": "2026-06-29T07:38:19.042Z"
+  }
+]
