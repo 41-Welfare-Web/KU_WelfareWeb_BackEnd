@@ -9,7 +9,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateRentalDto, RentalItemDto } from './dto/create-rental.dto';
 import { UpdateRentalStatusDto } from './dto/update-rental-status.dto';
 import { UpdateRentalDto } from './dto/update-rental.dto';
-import { RentalStatus, Role } from '@prisma/client';
+import { Prisma, RentalStatus, Role } from '@prisma/client';
 import { ConfigurationsService } from '../configurations/configurations.service';
 import { HolidaysService } from '../holidays/holidays.service';
 import { SmsService } from '../sms/sms.service';
@@ -21,7 +21,7 @@ import { getStartOfDayKst, parseDateOnlyKst } from '../common/utils/date.util';
  * 개별 rentalItem 상태들을 보고 rental 전체 대표 상태를 결정합니다.
  * 우선순위: OVERDUE > RENTED > RESERVED > DEFECTIVE > RETURNED > CANCELED
  */
-function deriveRentalStatus(statuses: RentalStatus[]): RentalStatus {
+export function deriveRentalStatus(statuses: RentalStatus[]): RentalStatus {
   if (statuses.some((s) => s === RentalStatus.OVERDUE)) return RentalStatus.OVERDUE;
   if (statuses.some((s) => s === RentalStatus.RENTED)) return RentalStatus.RENTED;
   if (statuses.some((s) => s === RentalStatus.RESERVED)) return RentalStatus.RESERVED;
@@ -456,6 +456,7 @@ export class RentalsService {
       this.prisma.rental.update({
         where: { id },
         data: {
+          status: RentalStatus.CANCELED,
           deletedAt: new Date(),
           rentalHistories: {
             create: {
@@ -670,6 +671,55 @@ export class RentalsService {
     return updatedRental;
   }
 
+  /**
+   * 특정 물품의 [start, end] 기간 내 "다른 대여 건" 최대 점유 수량을 계산합니다.
+   * 점유 기준: rentalItem 자신의 상태가 RESERVED 또는 RENTED (반납/취소/불량 품목은 미점유)
+   */
+  private async getMaxOccupiedByOthers(
+    tx: Prisma.TransactionClient,
+    itemId: number,
+    start: Date,
+    end: Date,
+    excludeRentalId: number,
+  ): Promise<number> {
+    const overlapping = await tx.rentalItem.findMany({
+      where: {
+        itemId,
+        status: { in: [RentalStatus.RESERVED, RentalStatus.RENTED] },
+        rental: {
+          id: { not: excludeRentalId },
+          deletedAt: null,
+          startDate: { lte: end },
+          endDate: { gte: start },
+        },
+      },
+      include: {
+        rental: { select: { startDate: true, endDate: true } },
+      },
+    });
+
+    // 날짜별로 최대 점유 수량 계산
+    let maxOccupied = 0;
+    const curr = new Date(start);
+    while (curr <= end) {
+      const dateStr = curr.toISOString().split('T')[0];
+      const occupiedOnDay = overlapping.reduce((sum, r) => {
+        const rStart = new Date(r.rental.startDate).toISOString().split('T')[0];
+        const rEnd = new Date(r.rental.endDate).toISOString().split('T')[0];
+        if (dateStr >= rStart && dateStr <= rEnd) {
+          return sum + r.quantity;
+        }
+        return sum;
+      }, 0);
+
+      if (occupiedOnDay > maxOccupied) {
+        maxOccupied = occupiedOnDay;
+      }
+      curr.setDate(curr.getDate() + 1);
+    }
+    return maxOccupied;
+  }
+
   // 6. 예약 내용 수정 (날짜, 수량 변경) — 단일 rental 수정, items 각각 동일 날짜여야 함
   async update(
     id: number,
@@ -797,53 +847,29 @@ export class RentalsService {
 
           const totalQty = item.totalQuantity || 1;
 
-          const overlappingRentals = await tx.rentalItem.findMany({
-            where: {
-              itemId: reqItem.itemId,
-              rental: {
-                id: { not: id },
-                deletedAt: null,
-                rentalItems: {
-                  some: {
-                    status: { in: [RentalStatus.RESERVED, RentalStatus.RENTED] }
-                  }
-                },
-                OR: [
-                  {
-                    startDate: { lte: end },
-                    endDate: { gte: start },
-                  },
-                ],
-              },
-            },
-            include: {
-              rental: { select: { startDate: true, endDate: true } },
-            },
-          });
+          // 다른 대여 건의 점유 수량 (품목 자신의 상태가 RESERVED/RENTED인 것만)
+          const maxOtherOccupied = await this.getMaxOccupiedByOthers(
+            tx,
+            reqItem.itemId,
+            start,
+            end,
+            id,
+          );
 
-          // 날짜별로 최대 예약 수량 계산
-          let maxOtherReserved = 0;
-          const curr = new Date(start);
-          while (curr <= end) {
-            const dateStr = curr.toISOString().split('T')[0];
-            const reservedOnDay = (overlappingRentals as any[]).reduce((sum, r) => {
-              const rStart = new Date(r.rental.startDate).toISOString().split('T')[0];
-              const rEnd = new Date(r.rental.endDate).toISOString().split('T')[0];
-              if (dateStr >= rStart && dateStr <= rEnd) {
-                return sum + r.quantity;
-              }
-              return sum;
-            }, 0);
+          // 이 대여 건에 남는 RENTED 품목도 새 기간을 점유
+          // (RESERVED는 아래에서 삭제 후 재생성되므로 제외)
+          const ownRentedQty = rental.rentalItems
+            .filter(
+              (ri) =>
+                ri.itemId === reqItem.itemId &&
+                ri.status === RentalStatus.RENTED,
+            )
+            .reduce((sum, ri) => sum + ri.quantity, 0);
 
-            if (reservedOnDay > maxOtherReserved) {
-              maxOtherReserved = reservedOnDay;
-            }
-            curr.setDate(curr.getDate() + 1);
-          }
-
-          if (totalQty - maxOtherReserved < reqItem.quantity) {
+          const available = totalQty - maxOtherOccupied - ownRentedQty;
+          if (available < reqItem.quantity) {
             throw new ConflictException(
-              `'${item.name}'의 재고가 부족합니다. (가용: ${totalQty - maxOtherReserved})`,
+              `'${item.name}'의 재고가 부족합니다. (가용: ${available})`,
             );
           }
         }
@@ -876,7 +902,52 @@ export class RentalsService {
             },
           },
         });
+
+        // rentals.status 재계산 (재생성된 RESERVED + 남은 품목 기준)
+        const allItems = await tx.rentalItem.findMany({
+          where: { rentalId: id },
+        });
+        await tx.rental.update({
+          where: { id },
+          data: { status: deriveRentalStatus(allItems.map((x) => x.status)) },
+        });
       } else {
+        // 날짜 전용 수정: 이 대여 건이 점유 중인 품목들이 새 기간에도 재고 내에 들어가는지 검증
+        const occupyingByItem = new Map<number, number>();
+        for (const ri of rental.rentalItems) {
+          if (
+            ri.status === RentalStatus.RESERVED ||
+            ri.status === RentalStatus.RENTED
+          ) {
+            occupyingByItem.set(
+              ri.itemId,
+              (occupyingByItem.get(ri.itemId) ?? 0) + ri.quantity,
+            );
+          }
+        }
+
+        for (const [itemId, qty] of occupyingByItem) {
+          const item = await tx.item.findFirst({
+            where: { id: itemId, deletedAt: null },
+          });
+          if (!item) continue; // 삭제된 물품은 검증 불가 — 기간 변경만 수행
+
+          const totalQty = item.totalQuantity || 1;
+          const maxOtherOccupied = await this.getMaxOccupiedByOthers(
+            tx,
+            itemId,
+            start,
+            end,
+            id,
+          );
+
+          if (totalQty - maxOtherOccupied < qty) {
+            throw new ConflictException(
+              `'${item.name}'의 재고가 부족하여 기간을 변경할 수 없습니다. (가용: ${totalQty - maxOtherOccupied}, 필요: ${qty})`,
+            );
+          }
+        }
+
         await tx.rental.update({
           where: { id },
           data: {
@@ -931,20 +1002,32 @@ export class RentalsService {
     );
 
     for (const ri of overdueItems) {
-      await this.prisma.rentalItem.update({
-        where: { id: ri.id },
-        data: { status: RentalStatus.OVERDUE },
-      });
+      await this.prisma.$transaction(async (tx) => {
+        await tx.rentalItem.update({
+          where: { id: ri.id },
+          data: { status: RentalStatus.OVERDUE },
+        });
 
-      await this.prisma.rentalHistory.create({
-        data: {
-          rentalId: ri.rentalId,
-          rentalItemId: ri.id,
-          changedBy: ri.rental.userId,
-          oldStatus: RentalStatus.RENTED,
-          newStatus: RentalStatus.OVERDUE,
-          memo: '반납 기한 도래로 인한 시스템 자동 연체 처리',
-        },
+        await tx.rentalHistory.create({
+          data: {
+            rentalId: ri.rentalId,
+            rentalItemId: ri.id,
+            changedBy: ri.rental.userId,
+            oldStatus: RentalStatus.RENTED,
+            newStatus: RentalStatus.OVERDUE,
+            memo: '반납 기한 도래로 인한 시스템 자동 연체 처리',
+          },
+        });
+
+        // rentals.status 동기화
+        const allItems = await tx.rentalItem.findMany({
+          where: { rentalId: ri.rentalId },
+        });
+        const derived = deriveRentalStatus(allItems.map((x) => x.status));
+        await tx.rental.update({
+          where: { id: ri.rentalId },
+          data: { status: derived },
+        });
       });
 
       try {

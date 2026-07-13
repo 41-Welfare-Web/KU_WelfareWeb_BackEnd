@@ -12,6 +12,7 @@ import { DeleteUserDto } from './dto/delete-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Role, RentalStatus } from '@prisma/client';
 import { getNowKst, getStartOfDayKst } from '../common/utils/date.util';
+import { deriveRentalStatus } from '../rentals/rentals.service';
 
 @Injectable()
 export class UsersService {
@@ -269,15 +270,7 @@ export class UsersService {
       activePlotterOrdersCount: plotterOrdersCount,
       recentRentals: recentRentals.map((r: any) => {
         const statuses = r.rentalItems.map((ri: any) => ri.status);
-        let representativeStatus: RentalStatus = RentalStatus.RETURNED;
-        if (statuses.includes(RentalStatus.OVERDUE))
-          representativeStatus = RentalStatus.OVERDUE;
-        else if (statuses.includes(RentalStatus.RENTED))
-          representativeStatus = RentalStatus.RENTED;
-        else if (statuses.includes(RentalStatus.RESERVED))
-          representativeStatus = RentalStatus.RESERVED;
-        else if (statuses.includes(RentalStatus.CANCELED))
-          representativeStatus = RentalStatus.CANCELED;
+        const representativeStatus = deriveRentalStatus(statuses);
 
         return {
           id: r.id,

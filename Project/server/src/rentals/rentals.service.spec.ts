@@ -336,7 +336,7 @@ describe('RentalsService', () => {
 
   // ── RentalItem.status 개별/일괄 변경 테스트 ───────────────────────────────
 
-  it('[DEFECTIVE] 특정 RentalItem만 DEFECTIVE로 변경됨', async () => {
+  it('[DEFECTIVE] 특정 RentalItem만 DEFECTIVE로 변경됨 (재고/실물 상태는 건드리지 않음)', async () => {
     const rental = {
       id: 10,
       userId: 'user-uuid',
@@ -346,7 +346,10 @@ describe('RentalsService', () => {
 
     mockPrisma.rental.findFirst.mockResolvedValue(rental);
     mockPrisma.rentalItem.update.mockResolvedValue({ id: 1, status: RentalStatus.DEFECTIVE });
-    mockPrisma.itemInstance.update.mockResolvedValue({});
+    mockPrisma.rentalItem.findMany.mockResolvedValue([
+      { id: 1, status: RentalStatus.DEFECTIVE },
+    ]);
+    mockPrisma.rental.update.mockResolvedValue({});
     mockPrisma.rentalHistory.create.mockResolvedValue({});
 
     await service.updateStatus(10, 'admin-uuid', {
@@ -362,36 +365,30 @@ describe('RentalsService', () => {
       }),
     );
 
-    // ItemInstance.update가 BROKEN 상태로 호출되었는지 검증
-    expect(mockPrisma.itemInstance.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { id: 50 },
-        data: { status: 'BROKEN' },
-      }),
-    );
+    // 재고 차감 로직 제거(a9cdaca): 실물/재고는 건드리지 않아야 함
+    expect(mockPrisma.itemInstance.update).not.toHaveBeenCalled();
+    expect(mockPrisma.item.update).not.toHaveBeenCalled();
   });
 
-  it('[DEFECTIVE] BULK 물품 DEFECTIVE 처리 시 totalQuantity가 차감됨', async () => {
+  it('[DEFECTIVE] 개별 변경 후 rentals.status가 deriveRentalStatus로 재계산됨', async () => {
     const rental = {
       id: 11,
       userId: 'user-uuid',
       rentalItems: [
-        {
-          id: 2,
-          itemId: 10,
-          quantity: 2,
-          item: { name: '의자' },
-          status: RentalStatus.RENTED,
-          instanceId: null, // BULK → instanceId 없음
-        },
+        { id: 2, itemId: 10, quantity: 2, item: { name: '의자' }, status: RentalStatus.RENTED, instanceId: null },
+        { id: 3, itemId: 11, quantity: 1, item: { name: '천막' }, status: RentalStatus.RENTED, instanceId: null },
       ],
       user: { phoneNumber: '01012341234', name: '테스터', departmentType: '학과', departmentName: null, id: 'user-uuid', username: 'tester', studentId: '20200001', role: 'USER', createdAt: new Date() },
     };
 
     mockPrisma.rental.findFirst.mockResolvedValue(rental);
-    mockPrisma.item.findUnique.mockResolvedValue({ id: 10, totalQuantity: 10, managementType: 'BULK' });
-    mockPrisma.item.update.mockResolvedValue({ id: 10, totalQuantity: 8 });
     mockPrisma.rentalItem.update.mockResolvedValue({ id: 2, status: RentalStatus.DEFECTIVE });
+    // 변경 후 상태: DEFECTIVE 1개 + RENTED 1개 → 대표 상태는 RENTED
+    mockPrisma.rentalItem.findMany.mockResolvedValue([
+      { id: 2, status: RentalStatus.DEFECTIVE },
+      { id: 3, status: RentalStatus.RENTED },
+    ]);
+    mockPrisma.rental.update.mockResolvedValue({});
     mockPrisma.rentalHistory.create.mockResolvedValue({});
 
     await service.updateStatus(11, 'admin-uuid', {
@@ -399,51 +396,13 @@ describe('RentalsService', () => {
       rentalItemId: 2,
     });
 
-    // totalQuantity가 10 - 2 = 8로 차감되었는지 검증
-    expect(mockPrisma.item.update).toHaveBeenCalledWith(
+    // rentals.status 동기화: RENTED가 남아있으므로 대표 상태 RENTED
+    expect(mockPrisma.rental.update).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: 10 },
-        data: { totalQuantity: 8 },
+        where: { id: 11 },
+        data: { status: RentalStatus.RENTED },
       }),
     );
-
-    // itemInstance.update는 호출되지 않아야 함 (BULK이므로)
-    expect(mockPrisma.itemInstance.update).not.toHaveBeenCalled();
-  });
-
-  it('[DEFECTIVE] INDIVIDUAL 품목 DEFECTIVE 시 instanceId가 없는 경우 totalQuantity 차감 안 됨', async () => {
-    const rental = {
-      id: 12,
-      userId: 'user-uuid',
-      rentalItems: [
-        {
-          id: 3,
-          itemId: 20,
-          quantity: 1,
-          item: { name: '마이크' },
-          status: RentalStatus.RENTED,
-          instanceId: 99,
-        },
-      ],
-      user: { phoneNumber: '01012341234', name: '테스터', departmentType: '학과', departmentName: null, id: 'user-uuid', username: 'tester', studentId: '20200001', role: 'USER', createdAt: new Date() },
-    };
-
-    mockPrisma.rental.findFirst.mockResolvedValue(rental);
-    mockPrisma.itemInstance.update.mockResolvedValue({});
-    mockPrisma.rentalItem.update.mockResolvedValue({ id: 3, status: RentalStatus.DEFECTIVE });
-    mockPrisma.rentalHistory.create.mockResolvedValue({});
-
-    await service.updateStatus(12, 'admin-uuid', {
-      status: RentalStatus.DEFECTIVE,
-      rentalItemId: 3,
-    });
-
-    // instanceId가 있으므로 itemInstance.update(BROKEN)만 호출
-    expect(mockPrisma.itemInstance.update).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { id: 99 }, data: { status: 'BROKEN' } }),
-    );
-    // item.update(totalQuantity)는 호출되지 않아야 함
-    expect(mockPrisma.item.update).not.toHaveBeenCalled();
   });
 
   it('[개별 품목 RETURNED] 특정 rentalItem만 RETURNED 처리 시 나머지는 유지됨', async () => {
