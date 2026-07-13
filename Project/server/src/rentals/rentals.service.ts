@@ -725,7 +725,14 @@ export class RentalsService {
         if (firstEndDate)
           end = parseDateOnlyKst(firstEndDate);
       }
+    } else {
+      // items 없이 날짜만 수정 (RESERVED 품목이 없는 대여 건의 기간 변경 등)
+      if (updateDto.startDate) start = parseDateOnlyKst(updateDto.startDate);
+      if (updateDto.endDate) end = parseDateOnlyKst(updateDto.endDate);
     }
+
+    const startDateChanged = !!(items?.[0]?.startDate || updateDto.startDate);
+    const endDateChanged = !!(items?.[0]?.endDate || updateDto.endDate);
 
     const today = getStartOfDayKst();
     const maxMonthsStr = await this.configService.getValue(
@@ -756,18 +763,18 @@ export class RentalsService {
         throw new BadRequestException('종료일이 시작일보다 빠를 수 없습니다.');
       }
 
-      if (items?.[0]?.startDate && start < today) {
+      if (startDateChanged && start < today) {
         throw new BadRequestException('과거 날짜로 수정할 수 없습니다.');
       }
 
-      if (items?.[0]?.startDate && (await this.holidaysService.isHoliday(start))) {
+      if (startDateChanged && (await this.holidaysService.isHoliday(start))) {
         throw new BadRequestException('수정하려는 시작일이 휴무일입니다.');
       }
-      if (items?.[0]?.endDate && (await this.holidaysService.isHoliday(end))) {
+      if (endDateChanged && (await this.holidaysService.isHoliday(end))) {
         throw new BadRequestException('수정하려는 반납일이 휴무일입니다.');
       }
 
-      if (items?.[0]?.endDate && end > maxDate) {
+      if (endDateChanged && end > maxDate) {
         throw new BadRequestException(
           `최대 ${maxMonths}개월까지만 예약할 수 있습니다.`,
         );
