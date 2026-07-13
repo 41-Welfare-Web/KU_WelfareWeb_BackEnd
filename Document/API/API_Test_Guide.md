@@ -157,7 +157,7 @@ curl -X POST "$baseUrl/admin/upload-image" -H "Authorization: Bearer $token" -F 
 Invoke-RestMethod -Method Post -Uri "$baseUrl/admin/holidays" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"holidayDate":"2026-05-05","description":"어린이날"}'
 
 # 시스템 설정 수정 (Update Config)
-Invoke-RestMethod -Method Put -Uri "$baseUrl/admin/configurations" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"configKey":"loginAttemptLimit","configValue":"10"}'
+Invoke-RestMethod -Method Put -Uri "$baseUrl/admin/configurations" -Headers @{ Authorization = "Bearer $token" } -ContentType "application/json" -Body '{"configKey":"login_attempt_limit","configValue":"10"}'
 ```
 
 ---

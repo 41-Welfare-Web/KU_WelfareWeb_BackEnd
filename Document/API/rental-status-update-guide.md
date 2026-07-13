@@ -43,8 +43,9 @@ PUT /api/rentals/:id/status
 }
 // → rentalItem ID 42번만 DEFECTIVE로 변경됨
 // → 나머지 품목은 기존 상태 유지
-// → DEFECTIVE 처리된 품목이 개별 실물(instanceId)을 가지면 해당 실물 상태도 BROKEN으로 자동 변경
 ```
+
+> **DEFECTIVE(불량 반납) 처리 범위**: `rental_items.status`만 변경됩니다. 재고(totalQuantity) 차감이나 개별 실물(`item_instances`)의 BROKEN 자동 처리는 없습니다. 불량 실물에 대한 재고 조정은 관리자가 수동으로 수행합니다.
 
 ```json
 // 요청 - 전체 일괄 변경 (기존과 동일)

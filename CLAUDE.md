@@ -60,6 +60,7 @@ RentalWeb/
 │       │   ├── holidays/               # 휴무일 관리
 │       │   ├── items/                  # 물품 CRUD, 개별실물, 세트구성, 재고캘린더
 │       │   ├── plotter/                # 플로터 주문/가격계산/상태변경
+│       │   ├── popups/                 # 공지 팝업 관리 (공개 조회 + 관리자 CRUD)
 │       │   ├── prisma/                 # PrismaService
 │       │   ├── rentals/                # 대여 예약/수정/취소/상태변경, 자동연체
 │       │   ├── sms/                    # SMS 발송 (Solapi 연동)
@@ -67,7 +68,7 @@ RentalWeb/
 │       │   ├── app.module.ts           # 메인 모듈
 │       │   └── main.ts                 # NestJS 부트스트랩 (글로벌 prefix: /api)
 │       ├── prisma/
-│       │   ├── schema.prisma           # 14개 모델 정의
+│       │   ├── schema.prisma           # 15개 모델 정의
 │       │   └── seed.ts                 # DB 시딩
 │       ├── test/                       # E2E 테스트
 │       ├── package.json
@@ -100,8 +101,8 @@ RentalWeb/
 
 ### 백엔드 — **완료**
 - NestJS 기반 REST API 서버 (`Project/server/`)
-- 13개 모듈, 82개 소스 파일, 약 58개 API 엔드포인트
-- Prisma 스키마 14개 모델 — DB 스키마 완성
+- 14개 모듈, 총 70개 API 엔드포인트
+- Prisma 스키마 15개 모델 — DB 스키마 완성
 - JWT 인증, SMS 연동, 자동 연체 스케줄러, 감사로그 등 비즈니스 로직 완성
 - Swagger UI를 통한 API 문서 자동 생성
 
@@ -111,7 +112,7 @@ RentalWeb/
 
 ---
 
-## 데이터베이스 스키마 요약 (14개 모델)
+## 데이터베이스 스키마 요약 (15개 모델)
 
 | 테이블 | 설명 |
 |--------|------|
@@ -120,16 +121,17 @@ RentalWeb/
 | `items` | 물품 종류. `management_type`: `INDIVIDUAL`(개별관리) / `BULK`(수량관리). 소프트 삭제 |
 | `item_components` | 세트(번들) 구성 — 부모 물품과 구성품 물품의 관계 |
 | `item_instances` | INDIVIDUAL 물품의 개별 실물 (serial_number). 상태: AVAILABLE/RENTED/BROKEN |
-| `rentals` | 대여 마스터. 상태: `RESERVED`→`RENTED`→`RETURNED`/`CANCELED`/`OVERDUE`. 소프트 삭제 |
-| `rental_items` | 대여 품목 중간 테이블 (quantity + instance_id) |
+| `rentals` | 대여 마스터. `status`는 `rental_items.status` 기준으로 파생되는 대표 상태 (`deriveRentalStatus()`, 우선순위: `OVERDUE` > `RENTED` > `RESERVED` > `DEFECTIVE` > 전 품목 `CANCELED`일 때만 `CANCELED` > 그 외 `RETURNED`). 소프트 삭제 |
+| `rental_items` | 대여 품목 중간 테이블 (quantity + instance_id + status). **품목별 `status`가 표준(Source of Truth)** — `RESERVED`/`RENTED`/`RETURNED`/`CANCELED`/`OVERDUE`/`DEFECTIVE` |
 | `rental_history` | 대여 상태 변경 이력 (changed_by, old/new_status, memo) |
 | `plotter_orders` | 플로터 주문. 상태: `PENDING`→`CONFIRMED`→`PRINTED`→`COMPLETED`/`REJECTED`. 소프트 삭제 |
 | `plotter_order_history` | 플로터 상태 변경 이력 |
 | `holidays` | 관리자 지정 휴무일 |
-| `configurations` | 시스템 설정 key-value (login_attempt_limit, rental_max_period_months 등) |
+| `configurations` | 시스템 설정 key-value (login_attempt_limit, rental_max_period_months, rental_max_duration_days, inspection_mode, inspection_time_enabled 등 — 모두 snake_case) |
 | `verification_codes` | SMS 인증 코드 (target, code, attempts, expires_at) — Stateless 보장 |
 | `audit_log` | 시스템 활동 전체 로그 (action, target_type, target_id, details jsonb, ip_address) |
 | `cart_items` | 장바구니 (user_id + item_id Unique). 대여 확정 시 자동 초기화 |
+| `popups` | 공지 팝업 (title, content, image_url, start_date~end_date 표시 기간, is_active) |
 
 ---
 
@@ -143,7 +145,7 @@ RentalWeb/
 
 ---
 
-## API 엔드포인트 목록 (총 58개)
+## API 엔드포인트 목록 (총 70개)
 
 ### 인증 (Auth) — 10개
 - `POST /api/auth/request-signup-verification` — 회원가입 SMS 인증번호 요청 (FR-01, Throttle 3/min)
@@ -185,18 +187,20 @@ RentalWeb/
 - `PUT /api/categories/:id` — 카테고리 수정 **[Admin]**
 - `DELETE /api/categories/:id` — 카테고리 삭제 (소프트 삭제) **[Admin]**
 
-### 대여 (Rentals) — 7개
+### 대여 (Rentals) — 8개
 - `POST /api/rentals` — 예약 생성 (start_date, end_date, items[], 세트 자동 포함)
 - `POST /api/rentals/admin` — 관리자 대리 예약 생성 **[Admin]** (FR-20)
 - `GET /api/rentals` — 목록 조회 (본인 또는 전체-Admin, 페이지네이션)
 - `GET /api/rentals/:id` — 상세 조회
-- `PUT /api/rentals/:id` — 예약 수정 (RESERVED 상태만)
+- `PUT /api/rentals/:id` — 예약 수정 (RESERVED 품목 보유 시, 날짜 전용 수정 지원)
+- `PUT /api/rentals/admin/:id` — 관리자 대리 예약 수정 **[Admin]** (제약 조건 우회)
 - `DELETE /api/rentals/:id` — 예약 취소 (RESERVED 상태만)
-- `PUT /api/rentals/:id/status` — 상태 변경 **[Admin]** (memo 필수 조건 있음)
+- `PUT /api/rentals/:id/status` — 상태 변경 **[Admin]** (rentalItemId로 품목 단위 변경 가능)
 
-### 플로터 (Plotter) — 5개
+### 플로터 (Plotter) — 6개
 - `POST /api/plotter/calculate-price` — 실시간 예상 가격 계산 (purpose, paperSize, pageCount, departmentType[optional]) (FR-28)
 - `POST /api/plotter/orders` — 주문 신청 (multipart/form-data, PDF 파일 검증)
+- `POST /api/plotter/orders/admin` — 관리자 대리 주문 신청 **[Admin]**
 - `GET /api/plotter/orders` — 목록 조회 (본인 또는 전체-Admin, 페이지네이션)
 - `DELETE /api/plotter/orders/:id` — 취소 (PENDING 상태만)
 - `PUT /api/plotter/orders/:id/status` — 상태 변경 **[Admin]** (REJECTED 시 rejection_reason 필수)
@@ -207,7 +211,7 @@ RentalWeb/
 - `PUT /api/cart/:id` — 장바구니 항목 수량/날짜 수정 (FR-13, FR-14)
 - `DELETE /api/cart/:id` — 장바구니 항목 제거 (FR-13)
 
-### 관리 (Admin) — 7개
+### 관리 (Admin) — 12개
 - `POST /api/admin/upload-image` — 물품 이미지 업로드 **[Admin]** (5MB, png/jpeg/jpg/webp, `items` 버킷)
 - `GET /api/admin/stats` — 통계 데이터 **[Admin]**
 - `GET /api/admin/holidays` — 휴무일 목록 (All Users)
@@ -216,10 +220,21 @@ RentalWeb/
 - `DELETE /api/admin/holidays/:id` — 휴무일 삭제 **[Admin]**
 - `GET /api/admin/configurations` — 시스템 설정 **[Admin]**
 - `PUT /api/admin/configurations` — 설정 수정 **[Admin]**
+- `GET /api/admin/notifications` — 새 대여/플로터 주문 알림 조회 **[Admin]** (폴링용)
+- `GET /api/admin/audit-logs` — 감사 로그 조회 **[Admin]** (페이지네이션/검색/필터)
+- `GET /api/admin/maintenance/status` — DB 관리 현황 조회 **[Admin]**
+- `POST /api/admin/maintenance/cleanup` — DB 데이터 정밀 청소 **[Admin]**
+
+### 팝업 (Popups) — 5개
+- `GET /api/popups` — 현재 활성 팝업 목록 조회 (공개, 오늘 기준 표시 기간 내 + is_active)
+- `GET /api/popups/admin` — 전체 팝업 목록 조회 **[Admin]**
+- `POST /api/popups/admin` — 팝업 생성 **[Admin]**
+- `PUT /api/popups/admin/:id` — 팝업 수정 **[Admin]**
+- `DELETE /api/popups/admin/:id` — 팝업 삭제 **[Admin]**
 
 ### 공통 (Common) — 3개
 - `GET /api/common/health` — 시스템 헬스체크 (DB/SMS/Storage 상태, FR-37)
-- `GET /api/common/metadata` — 공통 메타데이터 조회 (소속 2D 배열, 인쇄 목적 목록, 무료 목적 목록, 가격표)
+- `GET /api/common/metadata` — 공통 메타데이터 조회 (departments 소속 2D 배열, purposes 인쇄 목적, freePurposes 무료 목적, freeDepartments 무료 소속, prices 가격표, inspectionMode/inspectionTimeEnabled 점검 모드 플래그)
 - `POST /api/common/upload` — 공용 이미지 업로드 (인증 필요, jpg/png/webp, `common` 버킷)
 
 ---
@@ -227,9 +242,13 @@ RentalWeb/
 ## 핵심 비즈니스 규칙
 
 ### 대여 정책
-- 예약 가능 기간: **오늘 기준 최대 2개월 이내**
+- 예약 가능 기간: **오늘 기준 최대 2개월 이내** (`rental_max_period_months`)
+- 최대 대여 기간: **`rental_max_duration_days` 설정값 (기본 15일)**
 - 운영일: **평일(월~금)** only — 주말, 공휴일, 관리자 지정 휴무일 불가
-- 사용자는 **RESERVED 상태**에서만 수정/취소 가능
+- 사용자 수정: **RESERVED 품목이 하나라도 있어야 가능** (items 없이 startDate/endDate만 보내는 날짜 전용 수정 지원). 취소는 RESERVED 상태만 가능. 관리자는 제약 우회
+- **상태 모델**: `rental_items.status`가 품목별 표준(Source of Truth). `rentals.status`는 `deriveRentalStatus()`로 파생되는 대표 상태 (우선순위: OVERDUE > RENTED > RESERVED > DEFECTIVE > 전 품목 CANCELED일 때만 CANCELED > 그 외 RETURNED). 모든 상태 변경 경로에서 자동 동기화
+- **불량 반납(DEFECTIVE)**: `rental_items.status`만 변경 — 재고(totalQuantity) 차감이나 item_instances BROKEN 자동 처리 없음. 재고 조정은 관리자 수동
+- **재고 점유 기준**: 가용성 계산 시 품목 상태가 RESERVED/RENTED인 것만 점유로 계산 (OVERDUE/DEFECTIVE/RETURNED/CANCELED는 미점유 — 연체·불량 실물 재고는 수동 관리)
 - 장바구니 기반 다중 물품 동시 예약
 - **재고 동시성**: Prisma Transaction으로 재고 확인 + 예약 생성 원자적 처리
 
@@ -248,7 +267,7 @@ RentalWeb/
 - **비밀번호 정책**: 최소 8자 이상, 영문+숫자 필수, 특수문자 `!@#$%^&*` 허용(선택) — 회원가입 및 비밀번호 재설정 시 동일 규칙 적용
 
 ### 자동화
-- **자동 연체**: 매일 오전 9시(KST) 스케줄러 → RENTED 상태 중 반납일 경과 건을 OVERDUE로 변경 + SMS 발송
+- **자동 연체**: 매일 오전 9시(KST) 스케줄러 → RENTED 품목 중 반납일(endDate) 경과 건을 OVERDUE로 변경 + rentals.status 재계산 + SMS 발송
 - **감사 로그**: 모든 CUD API 요청을 `audit_log` 테이블에 자동 기록 (인터셉터)
 
 ### SMS 알림 (FR-18)

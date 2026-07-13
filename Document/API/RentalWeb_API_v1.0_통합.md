@@ -1,8 +1,12 @@
 **[주의] 이 문서는 RentalWeb 서비스의 통합 API 명세서입니다. 분류별로 분리된 문서들은 이 문서의 내용을 기반으로 합니다.**
 
-### **RentalWeb API 명세서 (v1.1)**
+### **RentalWeb API 명세서 (v1.2)**
 
-이 문서는 RentalWeb 프론트엔드와 백엔드 간의 데이터 통신을 위한 API 엔드포인트를 정의합니다. (v1.1: 대여 상태 관리 주체 변경 반영)
+이 문서는 RentalWeb 프론트엔드와 백엔드 간의 데이터 통신을 위한 API 엔드포인트를 정의합니다.
+
+> **변경 이력**
+> - v1.1: 대여 상태 관리 주체 변경 반영 (`rental_items.status` 표준화)
+> - v1.2: metadata 응답 필드 추가 (`freeDepartments`, `inspectionMode`, `inspectionTimeEnabled`), 대여 날짜 전용 수정(`startDate`/`endDate`) 반영, 팝업(Popups) API 5개 추가, configurations 키 표기 snake_case 정정
 
 > 💡 **Tip:** 이 문서의 모든 내용은 서버 실행 후 **[Swagger UI (http://localhost:3000/api-docs)](http://localhost:3000/api-docs)**를 통해 웹 화면으로 더 편하게 확인하고 직접 테스트해 볼 수 있습니다.
 
@@ -1695,8 +1699,27 @@
 ---
 
 #### **Request Body**
+
+두 가지 수정 방식을 지원합니다.
+
+**(a) 품목 포함 수정 — `items` 배열 전달**
 *   `POST /api/rentals`의 Request Body와 동일하며, 모든 필드는 선택적입니다.
-*   **단, 수정 시 `items` 배열의 모든 품목은 동일한 `startDate`/`endDate`를 가져야 합니다.** 날짜가 다른 경우 취소 후 재신청이 필요합니다.
+*   `RESERVED` 상태 품목을 삭제 후 재생성하는 방식으로 처리됩니다.
+*   **단, `items` 배열의 모든 품목은 동일한 `startDate`/`endDate`를 가져야 합니다.** 날짜가 다른 경우 취소 후 재신청이 필요합니다.
+*   재고 검증: 다른 대여 건의 `RESERVED`/`RENTED` 품목 점유량과 자기 대여 건에 남는 `RENTED` 수량을 반영하여 검증합니다.
+
+**(b) 날짜 전용 수정 — `items` 없이 최상위 `startDate`/`endDate`만 전달**
+
+```json
+{
+  "startDate": "2026-07-20",
+  "endDate": "2026-07-24"
+}
+```
+*   `startDate` / `endDate`: (string, optional) `YYYY-MM-DD` 형식. `items` 없이 전달하면 품목 구성은 유지한 채 대여 기간만 변경됩니다.
+*   이 경우에도 점유 중(`RESERVED`/`RENTED`) 품목에 대해 새 기간의 재고 충돌을 검증합니다.
+
+> **수정 가능 조건**: 일반 사용자는 `RESERVED` 상태 품목이 하나라도 있어야 수정할 수 있습니다. 관리자(`PUT /api/rentals/admin/{rentalId}`)는 제약 조건을 우회합니다.
 
 ---
 
@@ -1709,7 +1732,7 @@
 
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
-| `403 Forbidden` | `NOT_MODIFIABLE` | '예약' 상태가 아니어서 수정할 수 없을 때 |
+| `403 Forbidden` | `NOT_MODIFIABLE` | `RESERVED` 상태 품목이 없어 수정할 수 없을 때 |
 | (이 외 Create Rental, Get Rental Details의 Error 참조) | | |
 
 ---
@@ -1792,7 +1815,8 @@
 > - `rental_items.status` — 품목별 개별 상태. **Source of Truth** (모든 UI 표시 기준)
 > - `rentals.status` — 대여 건 전체 대표 상태. 상태 변경 시 `rental_items.status`를 기준으로 자동 재계산되어 동기화됩니다.
 >   - 전체 일괄 변경: `rentals.status` = `newStatus`
->   - 개별 품목 변경: 남은 모든 `rental_items.status`를 재계산 (`OVERDUE` > `RENTED` > `RESERVED` > `DEFECTIVE` > `RETURNED` > `CANCELED`)
+>   - 개별 품목 변경: 남은 모든 `rental_items.status`를 재계산 — 우선순위: `OVERDUE` > `RENTED` > `RESERVED` > `DEFECTIVE` > 전 품목 `CANCELED`일 때만 `CANCELED` > 그 외 `RETURNED`
+> - `DEFECTIVE`(불량 반납) 처리 시 `rental_items.status`만 변경됩니다. 재고(totalQuantity) 차감이나 `item_instances` BROKEN 자동 처리는 없으며, 재고 조정은 관리자가 수동으로 수행합니다.
 
 ---
 
@@ -1814,7 +1838,7 @@
 }
 ```
 * `rentalItemId`: (integer, optional) 특정 물품만 상태를 변경할 경우 해당 `RentalItem`의 ID. 생략 시 해당 대여 건의 모든 물품 상태가 일괄 변경됩니다.
-* `status`: (string, optional) 변경할 상태. (`RENTED`, `RETURNED`, `CANCELED`, `DEFECTIVE`, `OVERDUE` 중 하나)
+* `status`: (string, optional) 변경할 상태. (`RESERVED`, `RENTED`, `RETURNED`, `CANCELED`, `OVERDUE`, `DEFECTIVE` 중 하나 — `RentalStatus` enum 전체 허용)
 * `memo`: (string, optional) 상태 변경에 대한 비고. (예: 불량 내용, 관리자 취소 사유) - `status` 없이 `memo`만 전달 시 메모만 업데이트됩니다.
 
 ---
@@ -1864,12 +1888,18 @@
   ],
   "purposes": ["회칙 명시 사항 인쇄(예산안 등)", "학과 행사 목적", "동아리 홍보물", "기타"],
   "freePurposes": ["회칙 명시 사항 인쇄(예산안 등)", "학과 행사 목적"],
+  "freeDepartments": [],
   "prices": {
     "a0": 2000,
     "a1": 1500
-  }
+  },
+  "inspectionMode": false,
+  "inspectionTimeEnabled": false
 }
 ```
+* `freeDepartments`: (string[]) 무료 인쇄 대상 소속 목록 (`plotter_free_departments` 설정 기반).
+* `inspectionMode`: (boolean) 점검 모드 여부 (`inspection_mode` 설정, 기본 `false`).
+* `inspectionTimeEnabled`: (boolean) 시간 기반 자동(야간) 점검 활성화 여부 (`inspection_time_enabled` 설정, 기본 `false`).
 
 ---
 # 이미지 업로드 (Upload Image)
@@ -2413,17 +2443,34 @@
 ```json
 [
   {
-    "configKey": "loginAttemptLimit",
+    "configKey": "login_attempt_limit",
     "configValue": "5",
     "description": "로그인 시도 횟수 제한"
   },
   {
-    "configKey": "rentalMaxPeriodMonths",
+    "configKey": "rental_max_period_months",
     "configValue": "2",
     "description": "최대 대여 가능 기간 (개월)"
+  },
+  {
+    "configKey": "rental_max_duration_days",
+    "configValue": "15",
+    "description": "1회 최대 대여 기간 (일)"
+  },
+  {
+    "configKey": "inspection_mode",
+    "configValue": "false",
+    "description": "점검 모드 여부"
+  },
+  {
+    "configKey": "inspection_time_enabled",
+    "configValue": "false",
+    "description": "시간 기반 자동 점검 활성화 여부"
   }
 ]
 ```
+
+> **참고:** 설정 키는 모두 **snake_case**입니다. 실사용 키: `login_attempt_limit`, `rental_max_period_months`, `rental_max_duration_days`(기본 15일), `inspection_mode`, `inspection_time_enabled`, `sms_notifications_enabled`, `dept_list_*` 시리즈 등.
 
 *   **Error Responses**
 
@@ -2448,7 +2495,7 @@
 
 ```json
 {
-  "configKey": "loginAttemptLimit",
+  "configKey": "login_attempt_limit",
   "configValue": "7"
 }
 ```
@@ -2465,12 +2512,12 @@
 ```json
 [
   {
-    "configKey": "loginAttemptLimit",
+    "configKey": "login_attempt_limit",
     "configValue": "7",
     "description": "로그인 시도 횟수 제한"
   },
   {
-    "configKey": "rentalMaxPeriodMonths",
+    "configKey": "rental_max_period_months",
     "configValue": "3",
     "description": "최대 대여 가능 기간 (개월)"
   }
@@ -2995,10 +3042,13 @@
   ],
   "purposes": ["회칙 명시 사항 인쇄(예산안 등)", "학과 행사 목적", "동아리 홍보물", "기타"],
   "freePurposes": ["회칙 명시 사항 인쇄(예산안 등)", "학과 행사 목적"],
+  "freeDepartments": [],
   "prices": {
     "a0": 2000,
     "a1": 1500
-  }
+  },
+  "inspectionMode": false,
+  "inspectionTimeEnabled": false
 }
 ```
 * `departments`: 소속 목록 (객체 배열).
@@ -3007,7 +3057,10 @@
     * `options`: `requiresInput`이 `false`일 때, 사용자가 선택할 수 있는 목록입니다.
 * `purposes`: 플로터 인쇄 목적 전체 리스트 (유료/무료 포함).
 * `freePurposes`: 해당 목적이면 무료 인쇄 대상인 목적 목록. `purposes` 중 이 목록에 포함되면 무료.
+* `freeDepartments`: 무료 인쇄 대상 소속 목록 (`plotter_free_departments` 설정 기반).
 * `prices`: 용지 크기별 인쇄 단가 (원).
+* `inspectionMode`: (boolean) 점검 모드 여부 (`inspection_mode` 설정, 기본 `false`).
+* `inspectionTimeEnabled`: (boolean) 시간 기반 자동(야간) 점검 활성화 여부 (`inspection_time_enabled` 설정, 기본 `false`).
 
 ---
 # 이미지 업로드 - 공용 (Upload Image)
@@ -3045,3 +3098,180 @@
 | `400 Bad Request` | `FILE_REQUIRED` | 파일이 없을 때 |
 | `400 Bad Request` | `INVALID_FILE_TYPE` | 이미지 파일(jpg, png, webp)이 아닐 때 |
 | `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
+
+---
+---
+### **팝업 (Popups)**
+
+메인 화면 등에 노출되는 공지 팝업을 관리합니다. 팝업은 `startDate` ~ `endDate` 표시 기간과 `isActive` 플래그로 노출 여부가 결정됩니다.
+
+# 활성 팝업 목록 조회 (Get Active Popups)
+
+현재 노출 대상인 팝업 목록을 조회합니다.
+
+## **ENDPOINT:** `GET /api/popups`
+**Description:** 오늘(KST) 기준 표시 기간(`startDate` ≤ 오늘 ≤ `endDate`) 내에 있고 `isActive`가 `true`인 팝업 목록을 `startDate` 오름차순으로 반환합니다. 로그인 불필요.
+**Required Permissions:** All Users
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+[
+  {
+    "id": 1,
+    "title": "5월 운영 안내",
+    "content": "5월 1일은 휴무입니다.",
+    "imageUrl": "https://.../popup.png",
+    "startDate": "2026-05-01T00:00:00.000Z",
+    "endDate": "2026-05-07T00:00:00.000Z",
+    "isActive": true,
+    "createdAt": "2026-04-28T09:00:00.000Z",
+    "updatedAt": "2026-04-28T09:00:00.000Z"
+  }
+]
+```
+
+---
+# 전체 팝업 목록 조회 (Get All Popups)
+
+관리자가 기간/활성화 여부와 무관하게 전체 팝업을 조회합니다.
+
+## **ENDPOINT:** `GET /api/popups/admin`
+**Description:** 등록된 모든 팝업을 `startDate` 내림차순으로 반환합니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+    *   `GET /api/popups`와 동일한 형식의 팝업 객체 배열을 반환합니다.
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
+
+---
+# 팝업 생성 (Create Popup)
+
+관리자가 새 팝업을 등록합니다.
+
+## **ENDPOINT:** `POST /api/popups/admin`
+**Description:** 팝업 제목, 본문/이미지, 표시 기간을 받아 팝업을 생성합니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Request Body**
+
+```json
+{
+  "title": "5월 운영 안내",
+  "content": "5월 1일은 휴무입니다.",
+  "imageUrl": "https://...",
+  "startDate": "2026-05-01",
+  "endDate": "2026-05-07",
+  "isActive": true
+}
+```
+* `title`: (string, required) 팝업 제목. 최대 100자.
+* `content`: (string, optional) 팝업 본문 텍스트.
+* `imageUrl`: (string, optional) 팝업 이미지 URL.
+* `startDate`: (string, required) 표시 시작일 (`YYYY-MM-DD`).
+* `endDate`: (string, required) 표시 종료일 (`YYYY-MM-DD`).
+* `isActive`: (boolean, optional) 활성화 여부. 기본값 `true`.
+
+---
+
+#### **Responses**
+
+*   **Success Response (`201 Created`)**
+    *   생성된 팝업 객체를 반환합니다.
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `400 Bad Request` | `INVALID_INPUT` | 종료일이 시작일보다 빠를 때 등 유효성 검증 실패 |
+| `401 Unauthorized` | `NOT_AUTHENTICATED` | 로그인이 필요할 때 |
+| `403 Forbidden` | `NO_PERMISSION` | 관리자 권한이 없을 때 |
+
+---
+# 팝업 수정 (Update Popup)
+
+관리자가 기존 팝업을 수정합니다.
+
+## **ENDPOINT:** `PUT /api/popups/admin/{id}`
+**Description:** 전달된 필드만 부분 수정합니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Path Parameters**
+
+| 파라미터 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `id` | `integer` | 수정할 팝업의 고유 ID |
+
+---
+
+#### **Request Body**
+*   `POST /api/popups/admin`의 Request Body와 동일하며, **모든 필드가 선택적**입니다.
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+    *   수정된 팝업 객체를 반환합니다.
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `400 Bad Request` | `INVALID_INPUT` | 종료일이 시작일보다 빠를 때 등 유효성 검증 실패 |
+| `404 Not Found` | `POPUP_NOT_FOUND` | 해당 `id`의 팝업이 없을 때 |
+| (이 외 팝업 생성의 Error 참조) | | |
+
+---
+# 팝업 삭제 (Delete Popup)
+
+관리자가 팝업을 삭제합니다.
+
+## **ENDPOINT:** `DELETE /api/popups/admin/{id}`
+**Description:** 해당 팝업을 삭제합니다. (하드 삭제)
+**Required Permissions:** Admin Only
+
+---
+
+#### **Path Parameters**
+
+| 파라미터 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `id` | `integer` | 삭제할 팝업의 고유 ID |
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{
+  "message": "팝업이 삭제되었습니다."
+}
+```
+
+*   **Error Responses**
+
+| HTTP Code | Error Code | 설명 |
+| :--- | :--- | :--- |
+| `404 Not Found` | `POPUP_NOT_FOUND` | 해당 `id`의 팝업이 없을 때 |
+| (이 외 팝업 생성의 Error 참조) | | |

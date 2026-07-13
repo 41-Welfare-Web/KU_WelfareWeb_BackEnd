@@ -1,6 +1,7 @@
-### **RentalWeb API 명세 목록 (v1.2)**
+### **RentalWeb API 명세 목록 (v1.3) — 총 70개**
 
 > **상태 관리 표준 (v1.2)**: `rental_items.status`가 Source of Truth입니다. `rentals.status`는 전체 대표 상태로 자동 동기화됩니다.
+> **v1.3**: 팝업 (Popups) 5개 라우트 추가.
 
 **1. 인증 (Auth)**
 *   `POST /api/auth/request-signup-verification` (회원가입 인증번호 요청)
@@ -82,3 +83,10 @@
 *   `POST /api/cart` (장바구니 물품 추가 - FR-11)
 *   `PUT /api/cart/{cartItemId}` (장바구니 항목 수정 - 수량/날짜 - FR-13, FR-14)
 *   `DELETE /api/cart/{cartItemId}` (장바구니 항목 제거 - FR-13)
+
+**9. 팝업 (Popups)**
+*   `GET /api/popups` (현재 활성 팝업 목록 조회 - 공개)
+*   `GET /api/popups/admin` (전체 팝업 목록 조회 - **Admin**)
+*   `POST /api/popups/admin` (팝업 생성 - **Admin**)
+*   `PUT /api/popups/admin/{id}` (팝업 수정 - **Admin**)
+*   `DELETE /api/popups/admin/{id}` (팝업 삭제 - **Admin**)

@@ -1,6 +1,6 @@
-### **RentalWeb 데이터베이스 스키마 (v1.0.3)**
+### **RentalWeb 데이터베이스 스키마 (v1.0.4) — 총 15개 모델**
 
-최종 수정일: 2026-07-01 (rentals.status 필드 재추가 및 rental_items.status 표준화)
+최종 수정일: 2026-07-14 (popups 테이블 추가, item_components 정식 문서화, item_instances.created_at 반영, deriveRentalStatus 우선순위 명확화)
 
 ---
 
@@ -69,6 +69,19 @@
 | `order` | `integer` | 출력 순서 | Default: 0 |
 | `created_at` | `timestampz` | 등록 시간 | Default: `now()` |
 
+#### **3-2. `item_components` (세트 구성품)**
+
+세트(번들) 물품과 그 구성품 물품의 관계를 정의합니다.
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `id` | `serial` | ID | **Primary Key** |
+| `parent_id` | `integer` | 세트 물품 ID | Foreign Key (`items.id`) |
+| `component_id` | `integer` | 구성품 물품 ID | Foreign Key (`items.id`) |
+| `quantity` | `integer` | 구성품 수량 | Default: 1 |
+
+> **Unique Constraint**: (`parent_id`, `component_id`)
+
 #### **4. `item_instances` (개별 재고)**
 
 | 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
@@ -79,6 +92,7 @@
 | `status` | `enum(InstanceStatus)` | 상태 | Default: `AVAILABLE` |
 | `image_url` | `text` | 개별 이미지 URL | |
 | `deleted_at` | `timestampz` | 소프트 삭제 시간 | |
+| `created_at` | `timestampz` | 생성일 | Default: `now()` |
 
 #### **5. `rentals` (대여 예약)**
 
@@ -95,8 +109,8 @@
 | `deleted_at` | `timestampz` | 소프트 삭제 시간 | |
 | `created_at` | `timestampz` | 생성일 | Default: `now()` |
 
-> **상태 관리 구조**: `rental_items.status`가 **표준(Source of Truth)**입니다. `rentals.status`는 해당 대여 건 전체의 대표 상태를 나타내며, 상태 변경 API 호출 시 `rental_items.status`를 기준으로 자동 재계산됩니다.
-> 우선순위: `OVERDUE` > `RENTED` > `RESERVED` > `DEFECTIVE` > `RETURNED` > `CANCELED`
+> **상태 관리 구조**: `rental_items.status`가 **표준(Source of Truth)**입니다. `rentals.status`는 해당 대여 건 전체의 대표 상태를 나타내며, 모든 상태 변경 경로(개별/전체 상태 변경, 사용자 취소, 예약 수정, 자동 연체 스케줄러)에서 `rental_items.status`를 기준으로 자동 재계산(`deriveRentalStatus()`)됩니다.
+> 우선순위: `OVERDUE` > `RENTED` > `RESERVED` > `DEFECTIVE` > **전 품목이 `CANCELED`일 때만** `CANCELED` > 그 외 `RETURNED`
 
 #### **6. `rental_items` (대여 품목)**
 
@@ -192,38 +206,39 @@
 | 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
 | :--- | :--- | :--- | :--- |
 | `id` | `bigserial` | ID | **Primary Key** |
-| `user_id" | `uuid` | 요청한 사용자 ID | Foreign Key (`users.id`), Nullable |
+| `user_id` | `uuid` | 요청한 사용자 ID | Foreign Key (`users.id`), Nullable |
 | `action` | `varchar(50)` | 수행된 액션 (예: `CREATE`, `UPDATE`, `DELETE`) | Not Null |
 | `target_type` | `varchar(50)` | 대상 리소스 타입 (예: `rental`, `item`) | Nullable |
 | `target_id` | `text` | 대상 리소스 ID | Nullable |
 | `details` | `jsonb` | 변경 상세 내용 (비밀번호 등 민감 정보는 `[MASKED]` 처리됨) | Nullable |
-| `ip_address" | `varchar(45)` | 요청 IP (IPv6 포함) | Nullable |
-| `created_at" | `timestampz` | 기록 시각 | Default: `now()` |
+| `ip_address` | `varchar(45)` | 요청 IP (IPv6 포함) | Nullable |
+| `created_at` | `timestampz` | 기록 시각 | Default: `now()` |
 
-#### **14. `cart_items" (장바구니)**
+#### **14. `cart_items` (장바구니)**
 
 | 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
 | :--- | :--- | :--- | :--- |
 | `id` | `serial` | ID | **Primary Key** |
-| `user_id" | `uuid` | 사용자 ID | Foreign Key (`users.id`) |
-| `item_id" | `integer` | 물품 ID | Foreign Key (`items.id`) |
-| `quantity` | `integer" | 수량 | Default: 1 |
-| `start_date" | `date` | 대여 시작일 | Nullable |
-| `end_date" | `date` | 반납 예정일 | Nullable |
-| `created_at" | `timestampz` | 생성일 | Default: `now()` |
-| `updated_at" | `timestampz` | 수정일 | Auto-updated |
+| `user_id` | `uuid` | 사용자 ID | Foreign Key (`users.id`) |
+| `item_id` | `integer` | 물품 ID | Foreign Key (`items.id`) |
+| `quantity` | `integer` | 수량 | Default: 1 |
+| `start_date` | `date` | 대여 시작일 | Nullable |
+| `end_date` | `date` | 반납 예정일 | Nullable |
+| `created_at` | `timestampz` | 생성일 | Default: `now()` |
+| `updated_at` | `timestampz` | 수정일 | Auto-updated |
 
 > **Unique Constraint**: (`user_id`, `item_id`) — 동일 사용자가 동일 물품을 장바구니에 중복 추가 불가
 
-#### **누락 테이블 (문서화 보류)**
-
-`item_components` 테이블은 아래와 같습니다.
+#### **15. `popups` (공지 팝업)**
 
 | 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
 | :--- | :--- | :--- | :--- |
 | `id` | `serial` | ID | **Primary Key** |
-| `parent_id" | `integer` | 세트 물품 ID | Foreign Key (`items.id`) |
-| `component_id" | `integer` | 구성품 물품 ID | Foreign Key (`items.id`) |
-| `quantity` | `integer" | 구성품 수량 | Default: 1 |
-
-> **Unique Constraint**: (`parent_id`, `component_id`)
+| `title` | `varchar(100)` | 팝업 제목 | Not Null |
+| `content` | `text` | 팝업 본문 텍스트 | Nullable |
+| `image_url` | `text` | 팝업 이미지 URL | Nullable |
+| `start_date` | `date` | 표시 시작일 | Not Null |
+| `end_date` | `date` | 표시 종료일 | Not Null |
+| `is_active` | `boolean` | 활성화 여부 | Default: `true` |
+| `created_at` | `timestampz` | 생성일 | Default: `now()` |
+| `updated_at` | `timestampz` | 수정일 | Auto-updated |
