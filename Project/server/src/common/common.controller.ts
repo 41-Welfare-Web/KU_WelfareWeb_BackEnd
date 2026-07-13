@@ -67,6 +67,13 @@ export class CommonController {
     );
     const inspectionMode = inspectionModeStr === 'true';
 
+    // 시간 기반 자동 점검 활성화 여부 (기본값: false)
+    const inspectionTimeEnabledStr = await this.configService.getValue(
+      'inspection_time_enabled',
+      'false',
+    );
+    const inspectionTimeEnabled = inspectionTimeEnabledStr === 'true';
+
     return {
       departments: plotterMetadata.departments,
       purposes: plotterMetadata.purposes,
@@ -74,6 +81,7 @@ export class CommonController {
       freeDepartments: plotterMetadata.freeDepartments,
       prices: plotterMetadata.prices,
       inspectionMode,
+      inspectionTimeEnabled,
     };
   }
 
