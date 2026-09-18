@@ -120,11 +120,13 @@ model ItemInstance {
   serialNumber String         @unique @map("serial_number") @db.VarChar(50)
   status       InstanceStatus @default(AVAILABLE)
   imageUrl     String?        @map("image_url") @db.Text
+  note         String?        @db.Text
   deletedAt    DateTime?      @map("deleted_at") @db.Timestamptz
   createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz
 
   item        Item         @relation(fields: [itemId], references: [id])
   rentalItems RentalItem[]
+  assignments RentalItemInstance[]
 
   @@map("item_instances")
 }
@@ -177,8 +179,25 @@ model RentalItem {
   item            Item            @relation(fields: [itemId], references: [id])
   itemInstance    ItemInstance?   @relation(fields: [instanceId], references: [id])
   rentalHistories RentalHistory[]
+  assignments     RentalItemInstance[]
 
   @@map("rental_items")
+}
+
+// 6-1. Rental Item Instances (출고된 개별 실물 배정)
+// 대여 품목 1건에 개별 실물 N개를 배정. 반납 후에도 행을 남겨 대여 이력으로 사용
+model RentalItemInstance {
+  id           Int      @id @default(autoincrement())
+  rentalItemId Int      @map("rental_item_id")
+  instanceId   Int      @map("instance_id")
+  assignedAt   DateTime @default(now()) @map("assigned_at") @db.Timestamptz
+
+  rentalItem   RentalItem   @relation(fields: [rentalItemId], references: [id], onDelete: Cascade)
+  itemInstance ItemInstance @relation(fields: [instanceId], references: [id])
+
+  @@unique([rentalItemId, instanceId])
+  @@index([instanceId])
+  @@map("rental_item_instances")
 }
 
 // 7. Rental History
@@ -310,7 +329,7 @@ model Popup {
   endDate   DateTime @map("end_date") @db.Date
   isActive  Boolean  @default(true) @map("is_active")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @default(now()) @map("updated_at") @db.Timestamptz
 
   @@map("popups")
 }

@@ -28,4 +28,13 @@ export class CreateItemInstanceDto {
   @IsString()
   @IsOptional()
   imageUrl?: string;
+
+  @ApiProperty({
+    example: '지지대 1개 휘어짐',
+    description: '관리자용 비고',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  note?: string;
 }

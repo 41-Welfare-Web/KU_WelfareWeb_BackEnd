@@ -1,7 +1,8 @@
-### **RentalWeb API 명세 목록 (v1.3) — 총 70개**
+### **RentalWeb API 명세 목록 (v1.4) — 총 70개**
 
 > **상태 관리 표준 (v1.2)**: `rental_items.status`가 Source of Truth입니다. `rentals.status`는 전체 대표 상태로 자동 동기화됩니다.
 > **v1.3**: 팝업 (Popups) 5개 라우트 추가.
+> **v1.4**: 개별 실물 배정 지원 (라우트 수 변동 없음). `PUT /api/rentals/{rentalId}/status`에 `instanceIds` 추가, `PUT /api/items/instances/{instanceId}`에 `note` 추가, `GET /api/items/{itemId}/instances` 응답에 대여 이력 포함.
 
 **1. 인증 (Auth)**
 *   `POST /api/auth/request-signup-verification` (회원가입 인증번호 요청)
@@ -30,9 +31,9 @@
 *   `POST /api/items` (물품 생성 - **Admin**)
 *   `PUT /api/items/{itemId}` (물품 수정 - **Admin**)
 *   `DELETE /api/items/{itemId}` (물품 삭제 - 소프트 삭제 - **Admin**)
-*   `GET /api/items/{itemId}/instances` (개별 실물 목록 조회 - **Admin**, FR-34)
+*   `GET /api/items/{itemId}/instances` (개별 실물 목록 조회 + 실물별 대여 이력 - **Admin**, FR-34)
 *   `POST /api/items/{itemId}/instances` (개별 실물 등록 - **Admin**, FR-34)
-*   `PUT /api/items/instances/{instanceId}` (개별 실물 상태 수정 - **Admin**, FR-34)
+*   `PUT /api/items/instances/{instanceId}` (개별 실물 상태/비고 수정 - **Admin**, FR-34)
 *   `DELETE /api/items/instances/{instanceId}` (개별 실물 삭제 - 소프트 삭제 - **Admin**, FR-34)
 *   `POST /api/items/{itemId}/components` (세트 구성품 추가 - **Admin**, FR-36)
 *   `DELETE /api/items/{itemId}/components/{componentId}` (세트 구성품 삭제 - **Admin**, FR-36)

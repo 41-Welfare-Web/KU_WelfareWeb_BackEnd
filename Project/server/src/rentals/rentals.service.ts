@@ -22,11 +22,16 @@ import { getStartOfDayKst, parseDateOnlyKst } from '../common/utils/date.util';
  * 우선순위: OVERDUE > RENTED > RESERVED > DEFECTIVE > RETURNED > CANCELED
  */
 export function deriveRentalStatus(statuses: RentalStatus[]): RentalStatus {
-  if (statuses.some((s) => s === RentalStatus.OVERDUE)) return RentalStatus.OVERDUE;
-  if (statuses.some((s) => s === RentalStatus.RENTED)) return RentalStatus.RENTED;
-  if (statuses.some((s) => s === RentalStatus.RESERVED)) return RentalStatus.RESERVED;
-  if (statuses.some((s) => s === RentalStatus.DEFECTIVE)) return RentalStatus.DEFECTIVE;
-  if (statuses.every((s) => s === RentalStatus.CANCELED)) return RentalStatus.CANCELED;
+  if (statuses.some((s) => s === RentalStatus.OVERDUE))
+    return RentalStatus.OVERDUE;
+  if (statuses.some((s) => s === RentalStatus.RENTED))
+    return RentalStatus.RENTED;
+  if (statuses.some((s) => s === RentalStatus.RESERVED))
+    return RentalStatus.RESERVED;
+  if (statuses.some((s) => s === RentalStatus.DEFECTIVE))
+    return RentalStatus.DEFECTIVE;
+  if (statuses.every((s) => s === RentalStatus.CANCELED))
+    return RentalStatus.CANCELED;
   return RentalStatus.RETURNED;
 }
 
@@ -212,14 +217,21 @@ export class RentalsService {
           const curr = new Date(start);
           while (curr <= end) {
             const dateStr = curr.toISOString().split('T')[0];
-            const reservedOnDay = (overlappingRentals as any[]).reduce((sum, r) => {
-              const rStart = new Date(r.rental.startDate).toISOString().split('T')[0];
-              const rEnd = new Date(r.rental.endDate).toISOString().split('T')[0];
-              if (dateStr >= rStart && dateStr <= rEnd) {
-                return sum + r.quantity;
-              }
-              return sum;
-            }, 0);
+            const reservedOnDay = (overlappingRentals as any[]).reduce(
+              (sum, r) => {
+                const rStart = new Date(r.rental.startDate)
+                  .toISOString()
+                  .split('T')[0];
+                const rEnd = new Date(r.rental.endDate)
+                  .toISOString()
+                  .split('T')[0];
+                if (dateStr >= rStart && dateStr <= rEnd) {
+                  return sum + r.quantity;
+                }
+                return sum;
+              },
+              0,
+            );
 
             if (reservedOnDay > maxReservedInPeriod) {
               maxReservedInPeriod = reservedOnDay;
@@ -354,7 +366,16 @@ export class RentalsService {
               createdAt: true,
             },
           },
-          rentalItems: { include: { item: { select: { name: true } } } },
+          rentalItems: {
+            include: {
+              item: { select: { name: true } },
+              assignments: {
+                include: {
+                  itemInstance: { select: { id: true, serialNumber: true } },
+                },
+              },
+            },
+          },
         },
       }),
       this.prisma.rental.count({ where }),
@@ -395,7 +416,16 @@ export class RentalsService {
             createdAt: true,
           },
         },
-        rentalItems: { include: { item: true } },
+        rentalItems: {
+          include: {
+            item: true,
+            assignments: {
+              include: {
+                itemInstance: { select: { id: true, serialNumber: true } },
+              },
+            },
+          },
+        },
         rentalHistories: {
           orderBy: { changedAt: 'desc' },
           include: { user: { select: { name: true } } },
@@ -499,7 +529,24 @@ export class RentalsService {
     userId: string,
     updateDto: UpdateRentalStatusDto,
   ) {
-    const { status: newStatus, memo, rentalItemId } = updateDto;
+    const { status: newStatus, memo, rentalItemId, instanceIds } = updateDto;
+
+    // 실물 배정 요청 사전 검증
+    if (instanceIds !== undefined) {
+      if (!rentalItemId) {
+        throw new BadRequestException(
+          'instanceIds는 rentalItemId와 함께 보내야 합니다. (어느 품목을 출고할지 지정 필요)',
+        );
+      }
+      if (newStatus !== RentalStatus.RENTED) {
+        throw new BadRequestException(
+          'instanceIds는 대여중(RENTED)으로 변경할 때만 사용할 수 있습니다.',
+        );
+      }
+      if (instanceIds.length === 0) {
+        throw new BadRequestException('출고할 실물을 1개 이상 선택해주세요.');
+      }
+    }
 
     const rental = await this.prisma.rental.findFirst({
       where: { id, deletedAt: null },
@@ -524,7 +571,9 @@ export class RentalsService {
 
     // 1. 특정 품목만 상태 변경하는 경우
     if (rentalItemId) {
-      const targetItem = rental.rentalItems.find((ri) => ri.id === rentalItemId);
+      const targetItem = rental.rentalItems.find(
+        (ri) => ri.id === rentalItemId,
+      );
       if (!targetItem) {
         throw new NotFoundException(
           '해당 대여 건에서 지정한 품목을 찾을 수 없습니다.',
@@ -534,6 +583,13 @@ export class RentalsService {
       const oldStatus = targetItem.status;
 
       await this.prisma.$transaction(async (tx) => {
+        // 실물 배정 (부분 출고면 수량도 함께 조정)
+        let assigned: { quantity: number; serialNumbers: string[] } | undefined;
+        if (instanceIds) {
+          assigned = await this.assignInstances(tx, targetItem, instanceIds);
+        }
+        const assignedQuantity = assigned?.quantity;
+
         // 메모 업데이트
         if (memo !== undefined) {
           await tx.rental.update({
@@ -542,11 +598,24 @@ export class RentalsService {
           });
         }
 
-        // 품목 상태 업데이트
+        // 품목 상태 업데이트 (부분 출고 시 수량도 같은 트랜잭션에서 조정)
         await tx.rentalItem.update({
           where: { id: rentalItemId },
-          data: { status: newStatus || oldStatus },
+          data: {
+            status: newStatus || oldStatus,
+            ...(assignedQuantity !== undefined
+              ? { quantity: assignedQuantity }
+              : {}),
+          },
         });
+
+        // 출고 취소로 되돌리면 배정도 해제 (반납/연체/불량은 이력으로 남김)
+        if (
+          newStatus === RentalStatus.RESERVED ||
+          newStatus === RentalStatus.CANCELED
+        ) {
+          await tx.rentalItemInstance.deleteMany({ where: { rentalItemId } });
+        }
 
         // 히스토리 기록
         await tx.rentalHistory.create({
@@ -556,16 +625,30 @@ export class RentalsService {
             changedBy: userId,
             oldStatus: oldStatus,
             newStatus: newStatus || oldStatus,
-            memo: memo || `품목 상태 변경: ${targetItem.item.name} (${newStatus || '유지'})`,
+            memo: [
+              memo ||
+                `품목 상태 변경: ${targetItem.item.name} (${newStatus || '유지'})`,
+              assigned ? `출고 실물: ${assigned.serialNumbers.join(', ')}` : '',
+              assigned && assigned.quantity !== targetItem.quantity
+                ? `수량 조정: ${targetItem.quantity} -> ${assigned.quantity}`
+                : '',
+            ]
+              .filter(Boolean)
+              .join(' | '),
           },
         });
 
         // rentals.status 재계산 (개별 변경 후 남은 rentalItem들 상태 기준)
         if (newStatus) {
-          const allItems = await tx.rentalItem.findMany({ where: { rentalId: id } });
+          const allItems = await tx.rentalItem.findMany({
+            where: { rentalId: id },
+          });
           const statuses = allItems.map((ri) => ri.status);
           const derivedStatus = deriveRentalStatus(statuses);
-          await tx.rental.update({ where: { id }, data: { status: derivedStatus } });
+          await tx.rental.update({
+            where: { id },
+            data: { status: derivedStatus },
+          });
         }
       });
     }
@@ -589,7 +672,10 @@ export class RentalsService {
           }
 
           // rentals.status 동기화 (전체 일괄 변경)
-          await tx.rental.update({ where: { id }, data: { status: newStatus } });
+          await tx.rental.update({
+            where: { id },
+            data: { status: newStatus },
+          });
 
           // 전체 변경 히스토리 기록
           await tx.rentalHistory.create({
@@ -633,7 +719,16 @@ export class RentalsService {
             createdAt: true,
           },
         },
-        rentalItems: { include: { item: true } },
+        rentalItems: {
+          include: {
+            item: true,
+            assignments: {
+              include: {
+                itemInstance: { select: { id: true, serialNumber: true } },
+              },
+            },
+          },
+        },
         rentalHistories: {
           orderBy: { changedAt: 'desc' },
           include: { user: { select: { name: true } } },
@@ -645,13 +740,17 @@ export class RentalsService {
     // SMS 알림 (상태가 실제로 변경된 경우)
     if (newStatus && updatedRental) {
       const itemSummary = rentalItemId
-        ? rental.rentalItems.find((ri) => ri.id === rentalItemId)?.item.name || '물품'
+        ? rental.rentalItems.find((ri) => ri.id === rentalItemId)?.item.name ||
+          '물품'
         : rental.rentalItems.length > 0
           ? `${rental.rentalItems[0].item.name} 외 ${rental.rentalItems.length - 1}건`
           : '물품 없음';
 
       try {
-        const smsEnabled = await this.configService.getValue('sms_notifications_enabled', 'true');
+        const smsEnabled = await this.configService.getValue(
+          'sms_notifications_enabled',
+          'true',
+        );
         if (smsEnabled === 'true') {
           await this.smsService.sendRentalStatusNotice(
             updatedRental.user.phoneNumber,
@@ -669,6 +768,96 @@ export class RentalsService {
     }
 
     return updatedRental;
+  }
+
+  /**
+   * 대여 품목에 개별 실물(ItemInstance)을 배정합니다.
+   *
+   * 중복 차단 기준은 '출고 점유' — 다른 대여 건이 이미 RENTED/OVERDUE로 들고 나간 실물은 배정할 수 없습니다.
+   * 예약은 수량 단위라 실물을 특정하지 않으므로 기간 겹침은 따지지 않습니다.
+   *
+   * 동시에 같은 실물을 배정하려는 요청은 아래 FOR UPDATE 행 잠금으로 직렬화됩니다.
+   * (잠금 없이 조회만 하면 두 트랜잭션이 서로의 배정을 못 보고 둘 다 통과합니다)
+   *
+   * @returns 실제 출고 수량(부분 출고면 줄어든 값)과 출고한 실물의 시리얼 번호
+   */
+  private async assignInstances(
+    tx: Prisma.TransactionClient,
+    rentalItem: { id: number; itemId: number; quantity: number },
+    instanceIds: number[],
+  ): Promise<{ quantity: number; serialNumbers: string[] }> {
+    if (instanceIds.length > rentalItem.quantity) {
+      throw new BadRequestException(
+        `신청 수량(${rentalItem.quantity}개)보다 많은 실물을 출고할 수 없습니다.`,
+      );
+    }
+
+    // 동시 배정 차단을 위한 행 잠금 (반드시 조회보다 먼저)
+    await tx.$queryRaw`SELECT id FROM item_instances WHERE id IN (${Prisma.join(instanceIds)}) FOR UPDATE`;
+
+    const instances = await tx.itemInstance.findMany({
+      where: { id: { in: instanceIds }, deletedAt: null },
+    });
+    if (instances.length !== instanceIds.length) {
+      throw new NotFoundException(
+        '존재하지 않거나 삭제된 실물이 포함되어 있습니다.',
+      );
+    }
+
+    const wrongItem = instances.filter((i) => i.itemId !== rentalItem.itemId);
+    if (wrongItem.length > 0) {
+      throw new BadRequestException(
+        `이 물품의 실물이 아닙니다: ${wrongItem.map((i) => i.serialNumber).join(', ')}`,
+      );
+    }
+
+    const broken = instances.filter((i) => i.status === 'BROKEN');
+    if (broken.length > 0) {
+      throw new BadRequestException(
+        `파손된 실물은 출고할 수 없습니다: ${broken.map((i) => i.serialNumber).join(', ')}`,
+      );
+    }
+
+    const occupied = await tx.rentalItemInstance.findMany({
+      where: {
+        instanceId: { in: instanceIds },
+        rentalItemId: { not: rentalItem.id },
+        rentalItem: {
+          status: { in: [RentalStatus.RENTED, RentalStatus.OVERDUE] },
+          rental: { deletedAt: null },
+        },
+      },
+      include: {
+        itemInstance: { select: { serialNumber: true } },
+        rentalItem: { select: { rentalId: true } },
+      },
+    });
+    if (occupied.length > 0) {
+      throw new ConflictException(
+        `다른 대여 건이 이미 사용 중인 실물입니다: ${occupied
+          .map(
+            (o) => `${o.itemInstance.serialNumber}(R-${o.rentalItem.rentalId})`,
+          )
+          .join(', ')}`,
+      );
+    }
+
+    // 재배정을 지원하기 위해 기존 배정을 지우고 다시 기록
+    await tx.rentalItemInstance.deleteMany({
+      where: { rentalItemId: rentalItem.id },
+    });
+    await tx.rentalItemInstance.createMany({
+      data: instanceIds.map((instanceId) => ({
+        rentalItemId: rentalItem.id,
+        instanceId,
+      })),
+    });
+
+    const orderMap = new Map(instances.map((i) => [i.id, i.serialNumber]));
+    return {
+      quantity: instanceIds.length,
+      serialNumbers: instanceIds.map((id) => orderMap.get(id) as string),
+    };
   }
 
   /**
@@ -746,7 +935,9 @@ export class RentalsService {
       (ri) => ri.status === RentalStatus.RESERVED,
     );
     if (!isAdmin && !hasReservedItems) {
-      throw new BadRequestException('예약 상태의 물품이 없어 수정할 수 없습니다.');
+      throw new BadRequestException(
+        '예약 상태의 물품이 없어 수정할 수 없습니다.',
+      );
     }
 
     // items가 있을 경우 날짜 추출 및 단일 그룹 검증
@@ -770,10 +961,8 @@ export class RentalsService {
           }
         }
 
-        if (firstStartDate)
-          start = parseDateOnlyKst(firstStartDate);
-        if (firstEndDate)
-          end = parseDateOnlyKst(firstEndDate);
+        if (firstStartDate) start = parseDateOnlyKst(firstStartDate);
+        if (firstEndDate) end = parseDateOnlyKst(firstEndDate);
       }
     } else {
       // items 없이 날짜만 수정 (RESERVED 품목이 없는 대여 건의 기간 변경 등)
@@ -874,7 +1063,9 @@ export class RentalsService {
           }
         }
 
-        await tx.rentalItem.deleteMany({ where: { rentalId: id, status: RentalStatus.RESERVED } });
+        await tx.rentalItem.deleteMany({
+          where: { rentalId: id, status: RentalStatus.RESERVED },
+        });
         await tx.rental.update({
           where: { id },
           data: {
@@ -897,7 +1088,9 @@ export class RentalsService {
                 changedBy: actorId || userId,
                 oldStatus: 'MIXED',
                 newStatus: 'DATE_UPDATED',
-                memo: actorId ? '관리자 대리 예약 수정' : '예약 내용(날짜/수량) 수정',
+                memo: actorId
+                  ? '관리자 대리 예약 수정'
+                  : '예약 내용(날짜/수량) 수정',
               },
             },
           },

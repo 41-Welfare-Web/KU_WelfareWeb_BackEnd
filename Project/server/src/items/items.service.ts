@@ -21,7 +21,11 @@ export class ItemsService {
     private filesService: FilesService,
   ) {}
 
-  async create(createItemDto: CreateItemDto, image?: Express.Multer.File, actorId?: string) {
+  async create(
+    createItemDto: CreateItemDto,
+    image?: Express.Multer.File,
+    actorId?: string,
+  ) {
     const {
       categoryId,
       itemCode,
@@ -46,7 +50,9 @@ export class ItemsService {
 
     let uniqueNum = 1;
     if (existingItems.length > 0) {
-      const maxCode = Math.max(...existingItems.map((i) => parseInt(i.itemCode) || 0));
+      const maxCode = Math.max(
+        ...existingItems.map((i) => parseInt(i.itemCode) || 0),
+      );
       uniqueNum = (maxCode % 100) + 1;
     }
     const finalItemCode = `${Number(categoryId)}${String(uniqueNum).padStart(2, '0')}`;
@@ -159,7 +165,7 @@ export class ItemsService {
       const effectiveTotal =
         item.managementType === 'INDIVIDUAL'
           ? item._count.itemInstances
-          : (item.totalQuantity || 0);
+          : item.totalQuantity || 0;
       const { rentalItems: _rentalItems, _count, ...itemData } = item;
       return {
         ...itemData,
@@ -291,9 +297,9 @@ export class ItemsService {
       this.prisma.itemImage.deleteMany({
         where: { itemId: id },
       }),
-      ]);
+    ]);
 
-      if (actorId) {
+    if (actorId) {
       await this.prisma.auditLog.create({
         data: {
           userId: actorId,
@@ -303,7 +309,7 @@ export class ItemsService {
           details: item as any,
         },
       });
-      }
+    }
 
     return { message: '물품과 관련 실물 데이터가 삭제되었습니다.' };
   }
@@ -320,7 +326,7 @@ export class ItemsService {
         ? await this.prisma.itemInstance.count({
             where: { itemId, status: { not: 'BROKEN' }, deletedAt: null },
           })
-        : (item.totalQuantity || 0);
+        : item.totalQuantity || 0;
     const availability: any[] = [];
 
     const toLocalDateStr = (date: Date) => {
@@ -374,13 +380,58 @@ export class ItemsService {
   }
 
   async findInstances(itemId: number) {
-    return this.prisma.itemInstance.findMany({
+    const instances = await this.prisma.itemInstance.findMany({
       where: { itemId, deletedAt: null },
       orderBy: { serialNumber: 'asc' },
+      include: {
+        assignments: {
+          where: { rentalItem: { rental: { deletedAt: null } } },
+          orderBy: { assignedAt: 'desc' },
+          include: {
+            rentalItem: {
+              select: {
+                id: true,
+                status: true,
+                rental: {
+                  select: {
+                    id: true,
+                    startDate: true,
+                    endDate: true,
+                    departmentType: true,
+                    departmentName: true,
+                    user: { select: { name: true } },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
+
+    // 기존 응답 필드는 그대로 두고, 배정 이력만 rentals로 평탄화해서 추가
+    return instances.map(({ assignments, ...instance }) => ({
+      ...instance,
+      rentals: assignments.map((a) => ({
+        rentalId: a.rentalItem.rental.id,
+        rentalItemId: a.rentalItem.id,
+        status: a.rentalItem.status,
+        startDate: a.rentalItem.rental.startDate,
+        endDate: a.rentalItem.rental.endDate,
+        renterName: a.rentalItem.rental.user.name,
+        departmentName:
+          a.rentalItem.rental.departmentName ||
+          a.rentalItem.rental.departmentType,
+        assignedAt: a.assignedAt,
+      })),
+    }));
   }
 
-  async createInstance(itemId: number, dto: CreateItemInstanceDto, actorId?: string) {
+  async createInstance(
+    itemId: number,
+    dto: CreateItemInstanceDto,
+    actorId?: string,
+  ) {
     const item = await this.prisma.item.findFirst({
       where: { id: itemId, deletedAt: null },
     });
@@ -414,7 +465,11 @@ export class ItemsService {
     return instance;
   }
 
-  async updateInstance(instanceId: number, dto: UpdateItemInstanceDto, actorId?: string) {
+  async updateInstance(
+    instanceId: number,
+    dto: UpdateItemInstanceDto,
+    actorId?: string,
+  ) {
     const instance = await this.prisma.itemInstance.findFirst({
       where: { id: instanceId, deletedAt: null },
     });

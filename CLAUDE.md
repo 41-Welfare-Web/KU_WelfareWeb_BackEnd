@@ -102,7 +102,7 @@ RentalWeb/
 ### 백엔드 — **완료**
 - NestJS 기반 REST API 서버 (`Project/server/`)
 - 14개 모듈, 총 70개 API 엔드포인트
-- Prisma 스키마 15개 모델 — DB 스키마 완성
+- Prisma 스키마 16개 모델 — DB 스키마 완성
 - JWT 인증, SMS 연동, 자동 연체 스케줄러, 감사로그 등 비즈니스 로직 완성
 - Swagger UI를 통한 API 문서 자동 생성
 
@@ -112,7 +112,7 @@ RentalWeb/
 
 ---
 
-## 데이터베이스 스키마 요약 (15개 모델)
+## 데이터베이스 스키마 요약 (16개 모델)
 
 | 테이블 | 설명 |
 |--------|------|
@@ -120,9 +120,10 @@ RentalWeb/
 | `categories` | 카테고리 (행사/체육/기타 — seed 있음). 소프트 삭제 |
 | `items` | 물품 종류. `management_type`: `INDIVIDUAL`(개별관리) / `BULK`(수량관리). 소프트 삭제 |
 | `item_components` | 세트(번들) 구성 — 부모 물품과 구성품 물품의 관계 |
-| `item_instances` | INDIVIDUAL 물품의 개별 실물 (serial_number). 상태: AVAILABLE/RENTED/BROKEN |
+| `item_instances` | 개별 실물 (serial_number, note). 상태: AVAILABLE/RENTED/BROKEN. BULK 물품에도 실물 등록 가능 (예: 천막) |
 | `rentals` | 대여 마스터. `status`는 `rental_items.status` 기준으로 파생되는 대표 상태 (`deriveRentalStatus()`, 우선순위: `OVERDUE` > `RENTED` > `RESERVED` > `DEFECTIVE` > 전 품목 `CANCELED`일 때만 `CANCELED` > 그 외 `RETURNED`). 소프트 삭제 |
 | `rental_items` | 대여 품목 중간 테이블 (quantity + instance_id + status). **품목별 `status`가 표준(Source of Truth)** — `RESERVED`/`RENTED`/`RETURNED`/`CANCELED`/`OVERDUE`/`DEFECTIVE` |
+| `rental_item_instances` | **출고 실물 배정** — 대여 품목 1건 ↔ 개별 실물 N개. 출고(RENTED 전환) 시점에만 생성. 반납 후에도 행을 남겨 실물별 대여 이력으로 사용 |
 | `rental_history` | 대여 상태 변경 이력 (changed_by, old/new_status, memo) |
 | `plotter_orders` | 플로터 주문. 상태: `PENDING`→`CONFIRMED`→`PRINTED`→`COMPLETED`/`REJECTED`. 소프트 삭제 |
 | `plotter_order_history` | 플로터 상태 변경 이력 |
@@ -251,6 +252,12 @@ RentalWeb/
 - **재고 점유 기준**: 가용성 계산 시 품목 상태가 RESERVED/RENTED인 것만 점유로 계산 (OVERDUE/DEFECTIVE/RETURNED/CANCELED는 미점유 — 연체·불량 실물 재고는 수동 관리)
 - 장바구니 기반 다중 물품 동시 예약
 - **재고 동시성**: Prisma Transaction으로 재고 확인 + 예약 생성 원자적 처리
+- **개별 실물 배정 (출고)**: `PUT /api/rentals/:id/status`에 `instanceIds`를 함께 보내면 어떤 실물이 나갔는지 `rental_item_instances`에 기록. `rentalItemId` 필수, `status: RENTED`일 때만 사용
+  - **점유 기준**: 연결된 `rental_items.status`가 `RENTED`/`OVERDUE`면 점유. 반납 시 자동 해제 (별도 처리 없음)
+  - **중복 차단**: 다른 대여 건이 점유 중인 실물은 409. 동시 요청은 `SELECT ... FOR UPDATE` 행 잠금으로 직렬화
+  - **부분 출고**: 신청 수량보다 적게 보내면 `rental_items.quantity`가 같은 트랜잭션에서 함께 조정됨
+  - **배정 해제**: `RESERVED`/`CANCELED`로 되돌릴 때만 삭제. `RETURNED`/`DEFECTIVE`/`OVERDUE`는 이력으로 보존
+  - 재고 계산은 **관리 타입 기준 그대로** — 실물 BROKEN 표시는 BULK 물품의 예약 가용 재고에 반영되지 않음 (수동 관리)
 
 ### 플로터 정책
 - 수령일: **신청일 기준 근무일 2일 뒤** 자동 계산

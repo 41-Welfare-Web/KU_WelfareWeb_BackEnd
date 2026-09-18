@@ -1,10 +1,11 @@
 **[주의] 이 문서는 RentalWeb 서비스의 통합 API 명세서입니다. 분류별로 분리된 문서들은 이 문서의 내용을 기반으로 합니다.**
 
-### **RentalWeb API 명세서 (v1.2)**
+### **RentalWeb API 명세서 (v1.3)**
 
 이 문서는 RentalWeb 프론트엔드와 백엔드 간의 데이터 통신을 위한 API 엔드포인트를 정의합니다.
 
 > **변경 이력**
+> - v1.3: 개별 실물 배정 기능 추가 (`instanceIds` 출고 지정, 부분 출고, 실물 비고, 실물별 대여 이력)
 > - v1.1: 대여 상태 관리 주체 변경 반영 (`rental_items.status` 표준화)
 > - v1.2: metadata 응답 필드 추가 (`freeDepartments`, `inspectionMode`, `inspectionTimeEnabled`), 대여 날짜 전용 수정(`startDate`/`endDate`) 반영, 팝업(Popups) API 5개 추가, configurations 키 표기 snake_case 정정
 
@@ -1078,7 +1079,7 @@
 `INDIVIDUAL` 관리 방식 물품의 개별 실물(인스턴스) 목록을 조회합니다.
 
 ## **ENDPOINT:** `GET /api/items/{itemId}/instances`
-**Description:** 해당 물품의 모든 개별 실물을 `serialNumber` 오름차순으로 반환합니다.
+**Description:** 해당 물품의 모든 개별 실물을 `serialNumber` 오름차순으로 반환합니다. 각 실물이 나갔던 대여 이력(`rentals`)을 함께 포함합니다.
 **Required Permissions:** Admin Only
 
 ---
@@ -1100,21 +1101,40 @@
   {
     "id": 1,
     "itemId": 1,
-    "serialNumber": "CAM-001-01",
+    "serialNumber": "천막 1",
     "status": "AVAILABLE",
     "imageUrl": null,
-    "createdAt": "2024-01-10T10:00:00Z"
+    "note": "지지대 1개 휘어짐",
+    "createdAt": "2024-01-10T10:00:00Z",
+    "rentals": []
   },
   {
     "id": 2,
     "itemId": 1,
-    "serialNumber": "CAM-001-02",
-    "status": "RENTED",
-    "imageUrl": "https://example.com/images/cam02.jpg",
-    "createdAt": "2024-01-10T10:00:00Z"
+    "serialNumber": "천막 2",
+    "status": "AVAILABLE",
+    "imageUrl": null,
+    "note": null,
+    "createdAt": "2024-01-10T10:00:00Z",
+    "rentals": [
+      {
+        "rentalId": 496,
+        "rentalItemId": 1199,
+        "status": "RENTED",
+        "startDate": "2026-09-18",
+        "endDate": "2026-09-21",
+        "renterName": "김민서",
+        "departmentName": "총학생회",
+        "assignedAt": "2026-09-18T02:10:00Z"
+      }
+    ]
   }
 ]
 ```
+
+* `note`: (string, nullable) 관리자용 비고.
+* `rentals`: 이 실물이 출고됐던 대여 이력 (최신 배정순). `status`는 해당 **대여 품목**의 상태이므로, `RENTED`/`OVERDUE`면 지금 나가 있는 것이고 `RETURNED`/`DEFECTIVE`면 반납된 과거 이력입니다.
+* `departmentName`: 대여 단위. 대여 건의 `departmentName`이 없으면 `departmentType`이 들어갑니다.
 
 *   **Error Responses**
 
@@ -1176,7 +1196,7 @@
 등록된 개별 실물의 정보를 수정합니다.
 
 ## **ENDPOINT:** `PUT /api/items/instances/{instanceId}`
-**Description:** 실물의 상태, 시리얼 번호, 이미지를 수정합니다.
+**Description:** 실물의 상태, 시리얼 번호, 이미지, 비고를 수정합니다.
 **Required Permissions:** Admin Only
 
 ---
@@ -1196,9 +1216,11 @@
 {
   "serialNumber": "CAM-001-03",
   "status": "BROKEN",
-  "imageUrl": "https://example.com/images/cam03_new.jpg"
+  "imageUrl": "https://example.com/images/cam03_new.jpg",
+  "note": "지지대 휘어서 수리 필요"
 }
 ```
+* `note`: (string, optional) 관리자용 비고. 빈 문자열을 보내면 비고가 지워집니다.
 
 ---
 
@@ -1834,12 +1856,23 @@
 {
   "rentalItemId": 1,
   "status": "RENTED",
-  "memo": "사용자에게 정상 지급 완료"
+  "memo": "사용자에게 정상 지급 완료",
+  "instanceIds": [2, 5]
 }
 ```
 * `rentalItemId`: (integer, optional) 특정 물품만 상태를 변경할 경우 해당 `RentalItem`의 ID. 생략 시 해당 대여 건의 모든 물품 상태가 일괄 변경됩니다.
 * `status`: (string, optional) 변경할 상태. (`RESERVED`, `RENTED`, `RETURNED`, `CANCELED`, `OVERDUE`, `DEFECTIVE` 중 하나 — `RentalStatus` enum 전체 허용)
 * `memo`: (string, optional) 상태 변경에 대한 비고. (예: 불량 내용, 관리자 취소 사유) - `status` 없이 `memo`만 전달 시 메모만 업데이트됩니다.
+* `instanceIds`: (number[], optional) **출고할 개별 실물(ItemInstance) ID 목록.** 천막처럼 어느 실물이 나갔는지 기록해야 하는 물품에 사용합니다.
+
+> **`instanceIds` 사용 규칙**
+> - `rentalItemId`와 **반드시 함께** 보내야 합니다. (어느 품목을 출고하는지 지정 필요)
+> - `status`가 `RENTED`일 때만 사용할 수 있습니다. 예약 단계는 수량 단위라 실물을 특정하지 않습니다.
+> - **부분 출고**: 신청 수량보다 적게 보내면 해당 품목의 `quantity`가 보낸 개수로 **같은 트랜잭션에서 함께 조정**됩니다. (예: 3동 신청 건에 2개만 보내면 수량이 2로 변경) 신청 수량보다 많이 보내면 `400`입니다.
+> - **중복 차단**: 다른 대여 건이 이미 `RENTED`/`OVERDUE`로 들고 나간 실물은 배정할 수 없습니다(`409`). 동시에 같은 실물을 배정하려는 요청은 DB 행 잠금으로 직렬화되어 한쪽만 성공합니다.
+> - **재배정**: 이미 배정된 품목에 다시 보내면 기존 배정을 지우고 새 목록으로 교체합니다.
+> - **배정 해제**: `RESERVED`(출고 취소) 또는 `CANCELED`로 되돌리면 배정이 해제됩니다. `RETURNED`/`DEFECTIVE`/`OVERDUE`는 실물별 대여 이력으로 남깁니다.
+> - 배정 결과는 응답의 `rentalItems[].assignments[]`와 `GET /api/items/{itemId}/instances`의 `rentals`에서 확인할 수 있습니다.
 
 ---
 
@@ -1853,7 +1886,10 @@
 | HTTP Code | Error Code | 설명 |
 | :--- | :--- | :--- |
 | `400 Bad Request` | `INVALID_STATUS_TRANSITION` | 유효하지 않은 상태 변경일 때 |
+| `400 Bad Request` | `INVALID_INSTANCE_ASSIGN` | `instanceIds`를 `rentalItemId` 없이 보냈거나, `RENTED`가 아닌 상태 변경에 사용했거나, 신청 수량을 초과했거나, 파손/타 물품 실물을 보냈을 때 |
 | `404 Not Found` | `ITEM_NOT_FOUND` | 지정한 `rentalItemId`가 해당 대여 건에 없을 때 |
+| `404 Not Found` | `INSTANCE_NOT_FOUND` | `instanceIds`에 존재하지 않거나 삭제된 실물이 있을 때 |
+| `409 Conflict` | `INSTANCE_ALREADY_ASSIGNED` | 다른 대여 건이 이미 들고 나간 실물을 배정하려 할 때 |
 | (이 외 Get Rental Details의 Error 참조) | | |
 
 

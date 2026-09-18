@@ -1,6 +1,6 @@
 ### **RentalWeb 데이터베이스 스키마 (v1.0.4) — 총 15개 모델**
 
-최종 수정일: 2026-07-14 (popups 테이블 추가, item_components 정식 문서화, item_instances.created_at 반영, deriveRentalStatus 우선순위 명확화)
+최종 수정일: 2026-09-18 (rental_item_instances 테이블 추가, item_instances.note 추가)
 
 ---
 
@@ -91,6 +91,7 @@
 | `serial_number` | `varchar(50)` | 시리얼 번호 | **Unique**, Not Null |
 | `status` | `enum(InstanceStatus)` | 상태 | Default: `AVAILABLE` |
 | `image_url` | `text` | 개별 이미지 URL | |
+| `note` | `text` | 관리자용 비고 (실물별 메모) | Nullable |
 | `deleted_at` | `timestampz` | 소프트 삭제 시간 | |
 | `created_at` | `timestampz` | 생성일 | Default: `now()` |
 
@@ -122,6 +123,25 @@
 | `quantity` | `integer` | 대여 수량 | Default: 1 |
 | `status` | `enum(RentalStatus)` | **품목별 대여 상태 (Source of Truth)** — 모든 상태 판단의 기준 | Default: `RESERVED` |
 | `instance_id` | `integer` | 개별 실물 ID (INDIVIDUAL 물품) | Foreign Key (`item_instances.id`), Nullable |
+
+#### **6-1. `rental_item_instances` (출고 실물 배정)**
+
+대여 품목 1건에 개별 실물 N개를 연결합니다. 예약은 수량 단위로 이뤄지고, **출고(대여중 전환) 시점에만** 어떤 실물이 나갔는지 확정됩니다.
+반납·연체·불량 이후에도 행을 삭제하지 않고 남겨 **실물별 대여 이력**으로 사용합니다.
+
+| 컬럼명 | 데이터 타입 | 설명 | 제약 조건 |
+| :--- | :--- | :--- | :--- |
+| `id` | `serial` | ID | **Primary Key** |
+| `rental_item_id` | `integer` | 대여 품목 ID | Foreign Key (`rental_items.id`), **On Delete Cascade** |
+| `instance_id` | `integer` | 개별 실물 ID | Foreign Key (`item_instances.id`) |
+| `assigned_at` | `timestampz` | 배정 시각 | Default: `now()` |
+
+*   **Unique:** (`rental_item_id`, `instance_id`) — 같은 품목에 같은 실물 중복 배정 방지
+*   **Index:** `instance_id` — 실물 기준 이력 조회용
+
+> **점유 판정**: 어떤 실물이 지금 나가 있는지는 이 테이블의 행 존재 여부가 아니라, 연결된 `rental_items.status`가 `RENTED` 또는 `OVERDUE`인지로 판단합니다. 그래서 반납되면 별도 해제 처리 없이 자동으로 점유가 풀립니다.
+> **배정 해제**: `RESERVED`(출고 취소) 또는 `CANCELED`로 되돌릴 때만 행을 삭제합니다.
+> **참고**: `rental_items.instance_id`(단일 FK)는 현재 어떤 코드에서도 사용하지 않는 레거시 컬럼입니다. 실물 배정은 이 테이블을 사용합니다.
 
 #### **7. `rental_history` (대여 상태 변경 이력)**
 

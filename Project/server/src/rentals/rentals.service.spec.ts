@@ -39,6 +39,12 @@ describe('RentalsService', () => {
 
   const mockPrisma = {
     $transaction: jest.fn((cb) => cb(mockPrisma)),
+    $queryRaw: jest.fn().mockResolvedValue([]),
+    rentalItemInstance: {
+      findMany: jest.fn(),
+      deleteMany: jest.fn(),
+      createMany: jest.fn(),
+    },
     item: {
       findFirst: jest.fn(),
       findUnique: jest.fn(),
@@ -63,6 +69,7 @@ describe('RentalsService', () => {
     },
     itemInstance: {
       update: jest.fn(),
+      findMany: jest.fn(),
     },
     user: {
       findFirst: jest.fn(),
@@ -101,9 +108,10 @@ describe('RentalsService', () => {
           provide: ConfigurationsService,
           useValue: {
             getValue: jest.fn().mockImplementation((key, defaultVal) => {
-              if (key === 'rental_max_duration_days') return Promise.resolve('15');
+              if (key === 'rental_max_duration_days')
+                return Promise.resolve('15');
               return Promise.resolve(defaultVal || '2');
-            })
+            }),
           },
         },
         { provide: HolidaysService, useValue: mockHolidaysService },
@@ -220,14 +228,19 @@ describe('RentalsService', () => {
         return Promise.resolve([
           {
             quantity: 1,
-            rental: { startDate: getFutureWeekday(5), endDate: getFutureWeekday(7) },
+            rental: {
+              startDate: getFutureWeekday(5),
+              endDate: getFutureWeekday(7),
+            },
           },
         ]);
       }
       return Promise.resolve([]);
     });
 
-    await expect(service.create(userId, dto, userId, Role.USER)).rejects.toThrow(
+    await expect(
+      service.create(userId, dto, userId, Role.USER),
+    ).rejects.toThrow(
       new ConflictException("'삼각대'의 재고가 부족합니다. (가용 재고: 0)"),
     );
   });
@@ -242,7 +255,10 @@ describe('RentalsService', () => {
     const end = getPastWeekdayStr(3);
 
     mockPrisma.item.findFirst.mockResolvedValue({
-      id: 1, name: '테스트물품', totalQuantity: 5, components: [],
+      id: 1,
+      name: '테스트물품',
+      totalQuantity: 5,
+      components: [],
     });
     mockPrisma.rentalItem.findMany.mockResolvedValue([]);
     mockPrisma.rental.create.mockResolvedValue({
@@ -252,7 +268,15 @@ describe('RentalsService', () => {
     });
 
     await expect(
-      service.create(userId, { departmentType: '학과', items: [{ itemId: 1, quantity: 1, startDate: start, endDate: end }] }, adminId, Role.ADMIN),
+      service.create(
+        userId,
+        {
+          departmentType: '학과',
+          items: [{ itemId: 1, quantity: 1, startDate: start, endDate: end }],
+        },
+        adminId,
+        Role.ADMIN,
+      ),
     ).resolves.toBeDefined();
     expect(mockPrisma.rental.create).toHaveBeenCalled();
   });
@@ -263,7 +287,15 @@ describe('RentalsService', () => {
     const end = getPastWeekdayStr(3);
 
     await expect(
-      service.create(userId, { departmentType: '학과', items: [{ itemId: 1, quantity: 1, startDate: start, endDate: end }] }, userId, Role.USER),
+      service.create(
+        userId,
+        {
+          departmentType: '학과',
+          items: [{ itemId: 1, quantity: 1, startDate: start, endDate: end }],
+        },
+        userId,
+        Role.USER,
+      ),
     ).rejects.toThrow(BadRequestException);
   });
 
@@ -277,7 +309,10 @@ describe('RentalsService', () => {
     const end = toDateStr(getFutureWeekday(7));
 
     mockPrisma.item.findFirst.mockResolvedValue({
-      id: 1, name: '테스트물품', totalQuantity: 5, components: [],
+      id: 1,
+      name: '테스트물품',
+      totalQuantity: 5,
+      components: [],
     });
     mockPrisma.rentalItem.findMany.mockResolvedValue([]);
     mockPrisma.rental.create.mockResolvedValue({
@@ -287,7 +322,15 @@ describe('RentalsService', () => {
     });
 
     await expect(
-      service.create(userId, { departmentType: '학과', items: [{ itemId: 1, quantity: 1, startDate: start, endDate: end }] }, adminId, Role.ADMIN),
+      service.create(
+        userId,
+        {
+          departmentType: '학과',
+          items: [{ itemId: 1, quantity: 1, startDate: start, endDate: end }],
+        },
+        adminId,
+        Role.ADMIN,
+      ),
     ).resolves.toBeDefined();
   });
 
@@ -299,7 +342,15 @@ describe('RentalsService', () => {
     const end = toDateStr(getFutureWeekday(7));
 
     await expect(
-      service.create(userId, { departmentType: '학과', items: [{ itemId: 1, quantity: 1, startDate: start, endDate: end }] }, userId, Role.USER),
+      service.create(
+        userId,
+        {
+          departmentType: '학과',
+          items: [{ itemId: 1, quantity: 1, startDate: start, endDate: end }],
+        },
+        userId,
+        Role.USER,
+      ),
     ).rejects.toThrow(BadRequestException);
   });
 
@@ -321,14 +372,27 @@ describe('RentalsService', () => {
       rentalItems: [],
     });
     mockPrisma.item.findFirst.mockResolvedValue({
-      id: 1, name: '테스트물품', totalQuantity: 5, components: [],
+      id: 1,
+      name: '테스트물품',
+      totalQuantity: 5,
+      components: [],
     });
     mockPrisma.rentalItem.findMany.mockResolvedValue([]);
     mockPrisma.rentalItem.deleteMany.mockResolvedValue({});
     mockPrisma.rental.update.mockResolvedValue({ id: 99 });
 
     await expect(
-      service.update(99, '', { items: [{ itemId: 1, quantity: 1, startDate: newStart, endDate: newEnd }] }, adminId, Role.ADMIN),
+      service.update(
+        99,
+        '',
+        {
+          items: [
+            { itemId: 1, quantity: 1, startDate: newStart, endDate: newEnd },
+          ],
+        },
+        adminId,
+        Role.ADMIN,
+      ),
     ).resolves.toBeDefined();
   });
 
@@ -340,12 +404,32 @@ describe('RentalsService', () => {
     const rental = {
       id: 10,
       userId: 'user-uuid',
-      rentalItems: [{ id: 1, item: { name: '카메라' }, status: RentalStatus.RENTED, instanceId: 50 }],
-      user: { phoneNumber: '01012341234', name: '테스터', departmentType: '학과', departmentName: null, id: 'user-uuid', username: 'tester', studentId: '20200001', role: 'USER', createdAt: new Date() },
+      rentalItems: [
+        {
+          id: 1,
+          item: { name: '카메라' },
+          status: RentalStatus.RENTED,
+          instanceId: 50,
+        },
+      ],
+      user: {
+        phoneNumber: '01012341234',
+        name: '테스터',
+        departmentType: '학과',
+        departmentName: null,
+        id: 'user-uuid',
+        username: 'tester',
+        studentId: '20200001',
+        role: 'USER',
+        createdAt: new Date(),
+      },
     };
 
     mockPrisma.rental.findFirst.mockResolvedValue(rental);
-    mockPrisma.rentalItem.update.mockResolvedValue({ id: 1, status: RentalStatus.DEFECTIVE });
+    mockPrisma.rentalItem.update.mockResolvedValue({
+      id: 1,
+      status: RentalStatus.DEFECTIVE,
+    });
     mockPrisma.rentalItem.findMany.mockResolvedValue([
       { id: 1, status: RentalStatus.DEFECTIVE },
     ]);
@@ -375,14 +459,41 @@ describe('RentalsService', () => {
       id: 11,
       userId: 'user-uuid',
       rentalItems: [
-        { id: 2, itemId: 10, quantity: 2, item: { name: '의자' }, status: RentalStatus.RENTED, instanceId: null },
-        { id: 3, itemId: 11, quantity: 1, item: { name: '천막' }, status: RentalStatus.RENTED, instanceId: null },
+        {
+          id: 2,
+          itemId: 10,
+          quantity: 2,
+          item: { name: '의자' },
+          status: RentalStatus.RENTED,
+          instanceId: null,
+        },
+        {
+          id: 3,
+          itemId: 11,
+          quantity: 1,
+          item: { name: '천막' },
+          status: RentalStatus.RENTED,
+          instanceId: null,
+        },
       ],
-      user: { phoneNumber: '01012341234', name: '테스터', departmentType: '학과', departmentName: null, id: 'user-uuid', username: 'tester', studentId: '20200001', role: 'USER', createdAt: new Date() },
+      user: {
+        phoneNumber: '01012341234',
+        name: '테스터',
+        departmentType: '학과',
+        departmentName: null,
+        id: 'user-uuid',
+        username: 'tester',
+        studentId: '20200001',
+        role: 'USER',
+        createdAt: new Date(),
+      },
     };
 
     mockPrisma.rental.findFirst.mockResolvedValue(rental);
-    mockPrisma.rentalItem.update.mockResolvedValue({ id: 2, status: RentalStatus.DEFECTIVE });
+    mockPrisma.rentalItem.update.mockResolvedValue({
+      id: 2,
+      status: RentalStatus.DEFECTIVE,
+    });
     // 변경 후 상태: DEFECTIVE 1개 + RENTED 1개 → 대표 상태는 RENTED
     mockPrisma.rentalItem.findMany.mockResolvedValue([
       { id: 2, status: RentalStatus.DEFECTIVE },
@@ -410,10 +521,34 @@ describe('RentalsService', () => {
       id: 13,
       userId: 'user-uuid',
       rentalItems: [
-        { id: 7, itemId: 1, quantity: 1, item: { name: '노트북' }, status: RentalStatus.RENTED, instanceId: null },
-        { id: 8, itemId: 2, quantity: 1, item: { name: '마우스' }, status: RentalStatus.RENTED, instanceId: null },
+        {
+          id: 7,
+          itemId: 1,
+          quantity: 1,
+          item: { name: '노트북' },
+          status: RentalStatus.RENTED,
+          instanceId: null,
+        },
+        {
+          id: 8,
+          itemId: 2,
+          quantity: 1,
+          item: { name: '마우스' },
+          status: RentalStatus.RENTED,
+          instanceId: null,
+        },
       ],
-      user: { phoneNumber: '01012341234', name: '테스터', departmentType: '학과', departmentName: null, id: 'user-uuid', username: 'tester', studentId: '20200001', role: 'USER', createdAt: new Date() },
+      user: {
+        phoneNumber: '01012341234',
+        name: '테스터',
+        departmentType: '학과',
+        departmentName: null,
+        id: 'user-uuid',
+        username: 'tester',
+        studentId: '20200001',
+        role: 'USER',
+        createdAt: new Date(),
+      },
     };
 
     mockPrisma.rental.findFirst.mockResolvedValue(rental);
@@ -427,7 +562,10 @@ describe('RentalsService', () => {
 
     // 7번만 RETURNED 처리
     expect(mockPrisma.rentalItem.update).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { id: 7 }, data: { status: RentalStatus.RETURNED } }),
+      expect.objectContaining({
+        where: { id: 7 },
+        data: { status: RentalStatus.RETURNED },
+      }),
     );
     // 8번은 update 호출되지 않음
     expect(mockPrisma.rentalItem.update).not.toHaveBeenCalledWith(
@@ -441,16 +579,28 @@ describe('RentalsService', () => {
       userId: 'user-uuid',
       rentalItems: [
         { id: 5, item: { name: '노트북' }, status: RentalStatus.RESERVED },
-        { id: 6, item: { name: '마우스' }, status: RentalStatus.RESERVED }
+        { id: 6, item: { name: '마우스' }, status: RentalStatus.RESERVED },
       ],
-      user: { phoneNumber: '01012341234', name: '테스터', departmentType: '학과', departmentName: null, id: 'user-uuid', username: 'tester', studentId: '20200001', role: 'USER', createdAt: new Date() },
+      user: {
+        phoneNumber: '01012341234',
+        name: '테스터',
+        departmentType: '학과',
+        departmentName: null,
+        id: 'user-uuid',
+        username: 'tester',
+        studentId: '20200001',
+        role: 'USER',
+        createdAt: new Date(),
+      },
     };
 
     mockPrisma.rental.findFirst.mockResolvedValue(rental);
     mockPrisma.rentalItem.update.mockResolvedValue({});
     mockPrisma.rentalHistory.create.mockResolvedValue({});
 
-    await service.updateStatus(20, 'admin-uuid', { status: RentalStatus.RENTED });
+    await service.updateStatus(20, 'admin-uuid', {
+      status: RentalStatus.RENTED,
+    });
 
     // 각 rentalItem에 대해 update가 RENTED로 호출되었는지 검증
     expect(mockPrisma.rentalItem.update).toHaveBeenCalledWith(
@@ -505,5 +655,229 @@ describe('RentalsService', () => {
       '01011112222',
       expect.stringContaining('현재 연체 상태이오니 즉시 반납 부탁드립니다.'),
     );
+  });
+  // ===== 개별 실물 배정 (천막 출고) =====
+  describe('updateStatus - 개별 실물 배정', () => {
+    const TENT_ITEM_ID = 1;
+    const RENTAL_ID = 600;
+    const RENTAL_ITEM_ID = 61;
+
+    // 천막 3동을 신청한 예약 건
+    const buildRental = (quantity = 3, status = RentalStatus.RESERVED) => ({
+      id: RENTAL_ID,
+      deletedAt: null,
+      memo: null,
+      startDate: new Date(),
+      endDate: new Date(),
+      user: {
+        id: 'user-uuid',
+        name: '김민서',
+        phoneNumber: '01011112222',
+      },
+      rentalItems: [
+        {
+          id: RENTAL_ITEM_ID,
+          itemId: TENT_ITEM_ID,
+          quantity,
+          status,
+          item: { id: TENT_ITEM_ID, name: '천막' },
+        },
+      ],
+    });
+
+    const instance = (
+      id: number,
+      serialNumber: string,
+      status = 'AVAILABLE',
+    ) => ({
+      id,
+      itemId: TENT_ITEM_ID,
+      serialNumber,
+      status,
+      deletedAt: null,
+    });
+
+    // 실제 prisma처럼 요청한 id만 돌려주는 mock (where 조건 반영)
+    const stockInstances = (list: any[]) =>
+      mockPrisma.itemInstance.findMany.mockImplementation(({ where }: any) =>
+        Promise.resolve(list.filter((i) => where.id.in.includes(i.id))),
+      );
+
+    beforeEach(() => {
+      mockPrisma.rental.findFirst.mockResolvedValue(buildRental());
+      stockInstances([
+        instance(1, '천막 1'),
+        instance(2, '천막 2'),
+        instance(3, '천막 3'),
+      ]);
+      mockPrisma.rentalItemInstance.findMany.mockResolvedValue([]); // 점유 없음
+      mockPrisma.rentalItemInstance.deleteMany.mockResolvedValue({});
+      mockPrisma.rentalItemInstance.createMany.mockResolvedValue({});
+      mockPrisma.rentalItem.update.mockResolvedValue({});
+      mockPrisma.rentalItem.findMany.mockResolvedValue([
+        { id: RENTAL_ITEM_ID, status: RentalStatus.RENTED },
+      ]);
+      mockPrisma.rental.update.mockResolvedValue({});
+      mockPrisma.rentalHistory.create.mockResolvedValue({});
+    });
+
+    it('신청 수량만큼 출고하면 실물이 배정되고 수량은 그대로다', async () => {
+      await service.updateStatus(RENTAL_ID, 'admin-uuid', {
+        status: RentalStatus.RENTED,
+        rentalItemId: RENTAL_ITEM_ID,
+        instanceIds: [1, 2, 3],
+      });
+
+      expect(mockPrisma.rentalItemInstance.createMany).toHaveBeenCalledWith({
+        data: [
+          { rentalItemId: RENTAL_ITEM_ID, instanceId: 1 },
+          { rentalItemId: RENTAL_ITEM_ID, instanceId: 2 },
+          { rentalItemId: RENTAL_ITEM_ID, instanceId: 3 },
+        ],
+      });
+      // 출고 수량이 신청 수량과 같으므로 그대로 유지
+      expect(mockPrisma.rentalItem.update).toHaveBeenCalledWith({
+        where: { id: RENTAL_ITEM_ID },
+        data: { status: RentalStatus.RENTED, quantity: 3 },
+      });
+    });
+
+    it('부분 출고하면 같은 트랜잭션에서 수량도 함께 줄어든다', async () => {
+      await service.updateStatus(RENTAL_ID, 'admin-uuid', {
+        status: RentalStatus.RENTED,
+        rentalItemId: RENTAL_ITEM_ID,
+        instanceIds: [1, 2],
+      });
+
+      expect(mockPrisma.rentalItem.update).toHaveBeenCalledWith({
+        where: { id: RENTAL_ITEM_ID },
+        data: { status: RentalStatus.RENTED, quantity: 2 },
+      });
+      expect(mockPrisma.$transaction).toHaveBeenCalled();
+    });
+
+    it('동시 배정을 막기 위해 실물 행을 잠근다 (FOR UPDATE)', async () => {
+      await service.updateStatus(RENTAL_ID, 'admin-uuid', {
+        status: RentalStatus.RENTED,
+        rentalItemId: RENTAL_ITEM_ID,
+        instanceIds: [1],
+      });
+
+      expect(mockPrisma.$queryRaw).toHaveBeenCalled();
+      const sql = mockPrisma.$queryRaw.mock.calls[0][0].join('');
+      expect(sql).toContain('FOR UPDATE');
+    });
+
+    it('다른 대여 건이 이미 들고 나간 실물이면 409로 막는다', async () => {
+      mockPrisma.rentalItemInstance.findMany.mockResolvedValue([
+        {
+          instanceId: 2,
+          itemInstance: { serialNumber: '천막 2' },
+          rentalItem: { rentalId: 555 },
+        },
+      ]);
+
+      await expect(
+        service.updateStatus(RENTAL_ID, 'admin-uuid', {
+          status: RentalStatus.RENTED,
+          rentalItemId: RENTAL_ITEM_ID,
+          instanceIds: [1, 2],
+        }),
+      ).rejects.toThrow(ConflictException);
+
+      expect(mockPrisma.rentalItemInstance.createMany).not.toHaveBeenCalled();
+    });
+
+    it('파손된 실물은 출고할 수 없다', async () => {
+      stockInstances([instance(1, '천막 1'), instance(2, '천막 2', 'BROKEN')]);
+
+      await expect(
+        service.updateStatus(RENTAL_ID, 'admin-uuid', {
+          status: RentalStatus.RENTED,
+          rentalItemId: RENTAL_ITEM_ID,
+          instanceIds: [1, 2],
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('다른 물품의 실물은 배정할 수 없다', async () => {
+      stockInstances([
+        instance(1, '천막 1'),
+        {
+          id: 99,
+          itemId: 42,
+          serialNumber: '의자 1',
+          status: 'AVAILABLE',
+          deletedAt: null,
+        },
+      ]);
+
+      await expect(
+        service.updateStatus(RENTAL_ID, 'admin-uuid', {
+          status: RentalStatus.RENTED,
+          rentalItemId: RENTAL_ITEM_ID,
+          instanceIds: [1, 99],
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('신청 수량보다 많이 출고할 수 없다', async () => {
+      mockPrisma.rental.findFirst.mockResolvedValue(buildRental(2));
+
+      await expect(
+        service.updateStatus(RENTAL_ID, 'admin-uuid', {
+          status: RentalStatus.RENTED,
+          rentalItemId: RENTAL_ITEM_ID,
+          instanceIds: [1, 2, 3],
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('rentalItemId 없이 instanceIds만 보내면 거부한다', async () => {
+      await expect(
+        service.updateStatus(RENTAL_ID, 'admin-uuid', {
+          status: RentalStatus.RENTED,
+          instanceIds: [1],
+        } as any),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('대여중(RENTED)이 아닌 상태 변경에는 instanceIds를 쓸 수 없다', async () => {
+      await expect(
+        service.updateStatus(RENTAL_ID, 'admin-uuid', {
+          status: RentalStatus.RETURNED,
+          rentalItemId: RENTAL_ITEM_ID,
+          instanceIds: [1],
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('예약으로 되돌리면 배정이 해제된다', async () => {
+      mockPrisma.rental.findFirst.mockResolvedValue(
+        buildRental(3, RentalStatus.RENTED),
+      );
+
+      await service.updateStatus(RENTAL_ID, 'admin-uuid', {
+        status: RentalStatus.RESERVED,
+        rentalItemId: RENTAL_ITEM_ID,
+      });
+
+      expect(mockPrisma.rentalItemInstance.deleteMany).toHaveBeenCalledWith({
+        where: { rentalItemId: RENTAL_ITEM_ID },
+      });
+    });
+
+    it('반납 처리 시에는 배정 이력을 남겨둔다', async () => {
+      mockPrisma.rental.findFirst.mockResolvedValue(
+        buildRental(3, RentalStatus.RENTED),
+      );
+
+      await service.updateStatus(RENTAL_ID, 'admin-uuid', {
+        status: RentalStatus.RETURNED,
+        rentalItemId: RENTAL_ITEM_ID,
+      });
+
+      expect(mockPrisma.rentalItemInstance.deleteMany).not.toHaveBeenCalled();
+    });
   });
 });
