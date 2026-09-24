@@ -7,9 +7,10 @@
 
 BASE_URL="https://rentalweb-production.up.railway.app/api"
 
-# 관리자 계정
-ADMIN_USERNAME="admin"
-ADMIN_PASSWORD="admin123!"
+# 관리자 계정 (비밀번호는 커밋하지 않도록 환경변수로 받음)
+#   실행 예: ADMIN_PASSWORD='...' bash test_api_full.sh
+ADMIN_USERNAME="${ADMIN_USERNAME:-admin}"
+ADMIN_PASSWORD="${ADMIN_PASSWORD:?ADMIN_PASSWORD 환경변수를 설정하세요 (예: ADMIN_PASSWORD='...' bash test_api_full.sh)}"
 
 # 색상
 RED='\033[0;31m'
@@ -222,6 +223,10 @@ if [ "$STATUS" = "200" ]; then
   ADMIN_USER_ID=$(echo "$BODY" | grep -o '"id":"[^"]*"' | head -1 | sed 's/"id":"//' | sed 's/"$//')
   echo "    → Token: ${ACCESS_TOKEN:0:20}..."
   echo "    → User ID: $ADMIN_USER_ID"
+else
+  echo -e "  ${RED}관리자 로그인 실패 — 이후 관리자 테스트가 모두 401로 연쇄 실패하므로 중단합니다.${NC}"
+  echo -e "  ${YELLOW}ADMIN_USERNAME / ADMIN_PASSWORD 환경변수를 확인하세요.${NC}"
+  exit 1
 fi
 
 # 1-2. 잘못된 비밀번호
@@ -810,6 +815,147 @@ http_get "$BASE_URL/items/$RENTAL_TEST_ITEM_ID/availability?startDate=$FUTURE_ST
 assert_status "6-15" "재고 복구 확인 (취소 후)" 200
 
 ###############################################################################
+# 6B. 실물 배정 (출고 실물 지정 / 중복 차단 / 부분 출고)
+###############################################################################
+log_section "6B. Instance Assignment (실물 배정)"
+
+# 준비: 실물 3개를 가진 BULK 물품 (천막과 같은 구조)
+ASSIGN_ITEM_ID=""
+F=$(mktemp)
+cat > "$F" <<EOF
+{"categoryId":1,"name":"_E2E실물배정물품_","itemCode":"E2E-ASGN-$TS","managementType":"BULK","totalQuantity":3}
+EOF
+http_post "$BASE_URL/items" "$F" "$ACCESS_TOKEN"; rm -f "$F"
+[ "$STATUS" = "201" ] && ASSIGN_ITEM_ID=$(jnum "id") && echo "    → 배정 테스트 물품 ID: $ASSIGN_ITEM_ID"
+
+A1=""; A2=""; A3=""
+if [ -n "$ASSIGN_ITEM_ID" ]; then
+  for n in 1 2 3; do
+    F=$(mktemp)
+    echo "{\"serialNumber\":\"E2E-ASGN-$TS-$n\"}" > "$F"
+    http_post "$BASE_URL/items/$ASSIGN_ITEM_ID/instances" "$F" "$ACCESS_TOKEN"; rm -f "$F"
+    [ "$STATUS" = "201" ] && eval "A$n=$(jnum "id")"
+  done
+  echo "    → 실물 ID: $A1, $A2, $A3"
+fi
+
+# 대여 품목 ID 추출 (GET /rentals/:id 응답의 첫 rentalItem)
+rental_item_id() {
+  http_get "$BASE_URL/rentals/$1" "$ACCESS_TOKEN"
+  echo "$BODY" | grep -o '"rentalItems":\[{"id":[0-9]*' | head -1 | grep -o '[0-9]*$'
+}
+
+# 관리자 대리 예약 생성 → 대여 ID
+make_rental() {
+  local qty="$1" F
+  F=$(mktemp)
+  cat > "$F" <<EOF
+{"targetUserId":"$ADMIN_USER_ID","departmentType":"중앙자치기구","departmentName":"E2E실물배정","items":[{"itemId":$ASSIGN_ITEM_ID,"quantity":$qty,"startDate":"$FUTURE_START","endDate":"$FUTURE_END"}]}
+EOF
+  http_post "$BASE_URL/rentals/admin" "$F" "$ACCESS_TOKEN"; rm -f "$F"
+  [ "$STATUS" = "201" ] && jnum "id"
+}
+
+put_status() {
+  local rid="$1" body="$2" F
+  F=$(mktemp); echo "$body" > "$F"
+  http_put "$BASE_URL/rentals/$rid/status" "$F" "$ACCESS_TOKEN"; rm -f "$F"
+}
+
+if [ -n "$A1" ] && [ -n "$A2" ] && [ -n "$A3" ]; then
+  # 6B-1. 실물 비고 저장
+  F=$(mktemp); echo '{"note":"E2E 비고 - 지지대 휘어짐"}' > "$F"
+  http_put "$BASE_URL/items/instances/$A1" "$F" "$ACCESS_TOKEN"; rm -f "$F"
+  assert_body_contains "6B-1" "실물 비고(note) 저장" 200 "지지대 휘어짐"
+
+  # 6B-1b. 부위 상태(천/다리) 저장
+  F=$(mktemp); echo '{"fabricCondition":"MEDIUM","frameCondition":"HIGH"}' > "$F"
+  http_put "$BASE_URL/items/instances/$A1" "$F" "$ACCESS_TOKEN"; rm -f "$F"
+  assert_body_contains "6B-1b" "부위 상태(천/다리) 저장" 200 '"fabricCondition":"MEDIUM"'
+
+  # 6B-1c. 잘못된 등급 거부
+  F=$(mktemp); echo '{"fabricCondition":"BROKEN"}' > "$F"
+  http_put "$BASE_URL/items/instances/$A1" "$F" "$ACCESS_TOKEN"; rm -f "$F"
+  assert_status "6B-1c" "잘못된 부위 등급 거부" 400
+
+  # 6B-2. 실물 목록에 비고 + 대여 이력(rentals) 필드
+  http_get "$BASE_URL/items/$ASSIGN_ITEM_ID/instances" "$ACCESS_TOKEN"
+  assert_body_contains "6B-2" "실물 목록에 rentals 이력 필드 포함" 200 '"rentals"'
+
+  # 6B-2b. 실물 목록에 부위 상태 포함
+  assert_body_contains "6B-2b" "실물 목록에 부위 상태 포함" 200 '"frameCondition":"HIGH"'
+
+  R1=$(make_rental 3); RI1=""
+  [ -n "$R1" ] && RI1=$(rental_item_id "$R1")
+  echo "    → 대여 R-$R1 (3개 예약), 품목 ID: $RI1"
+
+  if [ -n "$RI1" ]; then
+    # 6B-3. rentalItemId 없이 instanceIds → 400
+    put_status "$R1" "{\"status\":\"RENTED\",\"instanceIds\":[$A1]}"
+    assert_status "6B-3" "rentalItemId 없는 instanceIds 거부" 400
+
+    # 6B-4. RENTED가 아닌 상태에 instanceIds → 400
+    put_status "$R1" "{\"status\":\"RETURNED\",\"rentalItemId\":$RI1,\"instanceIds\":[$A1]}"
+    assert_status "6B-4" "RENTED 외 상태에서 instanceIds 거부" 400
+
+    # 6B-5. 신청 수량 초과 → 400
+    put_status "$R1" "{\"status\":\"RENTED\",\"rentalItemId\":$RI1,\"instanceIds\":[$A1,$A2,$A3,999999]}"
+    assert_status_oneof "6B-5" "신청 수량 초과 출고 거부" 400 404
+
+    # 6B-6. 부분 출고: 3개 신청 → 2개 출고
+    put_status "$R1" "{\"status\":\"RENTED\",\"rentalItemId\":$RI1,\"memo\":\"E2E 부분 출고\",\"instanceIds\":[$A1,$A2]}"
+    assert_body_contains "6B-6" "부분 출고 (3개 신청 → 2개 출고)" 200 "E2E-ASGN-$TS-1"
+
+    # 6B-7. 수량이 2로 조정되고 품목 ID는 그대로
+    http_get "$BASE_URL/rentals/$R1" "$ACCESS_TOKEN"
+    assert_body_contains "6B-7" "부분 출고 후 수량 2로 조정" 200 "\"id\":$RI1,\"rentalId\":$R1,\"itemId\":$ASSIGN_ITEM_ID,\"quantity\":2"
+
+    # 6B-8. 실물 이력에 대여 건 기록
+    http_get "$BASE_URL/items/$ASSIGN_ITEM_ID/instances" "$ACCESS_TOKEN"
+    assert_body_contains "6B-8" "실물 이력에 출고 대여 건 기록" 200 "\"rentalId\":$R1"
+
+    R2=$(make_rental 1); RI2=""
+    [ -n "$R2" ] && RI2=$(rental_item_id "$R2")
+    echo "    → 대여 R-$R2 (1개 예약), 품목 ID: $RI2"
+
+    if [ -n "$RI2" ]; then
+      # 6B-9. 다른 대여가 들고 나간 실물 → 409
+      put_status "$R2" "{\"status\":\"RENTED\",\"rentalItemId\":$RI2,\"instanceIds\":[$A1]}"
+      assert_status "6B-9" "이미 출고된 실물 중복 배정 차단" 409
+
+      # 6B-10. 파손 실물 → 400
+      F=$(mktemp); echo '{"status":"BROKEN"}' > "$F"
+      http_put "$BASE_URL/items/instances/$A3" "$F" "$ACCESS_TOKEN"; rm -f "$F"
+      put_status "$R2" "{\"status\":\"RENTED\",\"rentalItemId\":$RI2,\"instanceIds\":[$A3]}"
+      assert_status "6B-10" "파손 실물 출고 거부" 400
+
+      # 6B-11. 첫 대여 반납
+      put_status "$R1" "{\"status\":\"RETURNED\",\"rentalItemId\":$RI1,\"memo\":\"E2E 반납\"}"
+      assert_status "6B-11" "출고 건 반납" 200
+
+      # 6B-12. 반납된 실물은 다시 배정 가능
+      put_status "$R2" "{\"status\":\"RENTED\",\"rentalItemId\":$RI2,\"instanceIds\":[$A1]}"
+      assert_status "6B-12" "반납된 실물 재배정" 200
+
+      # 6B-13. 반납 후에도 이력 보존 (A1은 R1, R2 두 건)
+      http_get "$BASE_URL/items/$ASSIGN_ITEM_ID/instances" "$ACCESS_TOKEN"
+      assert_body_contains "6B-13" "반납 후에도 실물 이력 보존" 200 "\"rentalId\":$R1"
+
+      put_status "$R2" "{\"status\":\"RETURNED\",\"rentalItemId\":$RI2,\"memo\":\"E2E 반납\"}"
+    else
+      for t in 9 10 11 12 13; do skip_test "6B-$t" "실물 배정" "두 번째 대여 생성 실패"; done
+    fi
+  else
+    for t in 3 4 5 6 7 8 9 10 11 12 13; do skip_test "6B-$t" "실물 배정" "대여 생성 실패"; done
+  fi
+
+  # 정리: 실물 소프트 삭제
+  for id in $A1 $A2 $A3; do http_delete "$BASE_URL/items/instances/$id" "$ACCESS_TOKEN"; done
+else
+  for t in 1 2 3 4 5 6 7 8 9 10 11 12 13; do skip_test "6B-$t" "실물 배정" "준비 실패 (물품/실물 생성)"; done
+fi
+
+###############################################################################
 # 7. Plotter
 ###############################################################################
 log_section "7. Plotter (플로터)"
@@ -1047,6 +1193,11 @@ fi
 if [ -n "$RENTAL_TEST_ITEM_ID" ] && [ "$RENTAL_TEST_ITEM_ID" != "$FIRST_ITEM_ID" ]; then
   http_delete "$BASE_URL/items/$RENTAL_TEST_ITEM_ID" "$ACCESS_TOKEN"
   echo "  → 대여 테스트 물품 삭제: HTTP $STATUS"
+fi
+
+if [ -n "$ASSIGN_ITEM_ID" ]; then
+  http_delete "$BASE_URL/items/$ASSIGN_ITEM_ID" "$ACCESS_TOKEN"
+  echo "  → 실물 배정 테스트 물품 삭제: HTTP $STATUS"
 fi
 
 echo "  → 정리 완료"

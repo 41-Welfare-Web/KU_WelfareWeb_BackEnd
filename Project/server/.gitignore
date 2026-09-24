@@ -29,6 +29,7 @@ lerna-debug.log*
 
 # Prisma
 .env
+.env.e2e
 
 # Nest
 .netlify
