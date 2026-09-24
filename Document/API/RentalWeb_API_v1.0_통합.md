@@ -1,10 +1,11 @@
 **[주의] 이 문서는 RentalWeb 서비스의 통합 API 명세서입니다. 분류별로 분리된 문서들은 이 문서의 내용을 기반으로 합니다.**
 
-### **RentalWeb API 명세서 (v1.3)**
+### **RentalWeb API 명세서 (v1.4)**
 
 이 문서는 RentalWeb 프론트엔드와 백엔드 간의 데이터 통신을 위한 API 엔드포인트를 정의합니다.
 
 > **변경 이력**
+> - v1.4: 개별 실물 부위 상태(천/다리) 기록 추가 — `fabricCondition` / `frameCondition`
 > - v1.3: 개별 실물 배정 기능 추가 (`instanceIds` 출고 지정, 부분 출고, 실물 비고, 실물별 대여 이력)
 > - v1.1: 대여 상태 관리 주체 변경 반영 (`rental_items.status` 표준화)
 > - v1.2: metadata 응답 필드 추가 (`freeDepartments`, `inspectionMode`, `inspectionTimeEnabled`), 대여 날짜 전용 수정(`startDate`/`endDate`) 반영, 팝업(Popups) API 5개 추가, configurations 키 표기 snake_case 정정
@@ -1105,6 +1106,8 @@
     "status": "AVAILABLE",
     "imageUrl": null,
     "note": "지지대 1개 휘어짐",
+    "fabricCondition": "NORMAL",
+    "frameCondition": "MEDIUM",
     "createdAt": "2024-01-10T10:00:00Z",
     "rentals": []
   },
@@ -1133,6 +1136,7 @@
 ```
 
 * `note`: (string, nullable) 관리자용 비고.
+* `fabricCondition` / `frameCondition`: 천(원단)·다리(프레임) 부위 상태. `NORMAL`(정상) / `LOW`(파손 하) / `MEDIUM`(파손 중) / `HIGH`(파손 상). **기록·표시용이며 대여 가능 여부에는 영향을 주지 않습니다.**
 * `rentals`: 이 실물이 출고됐던 대여 이력 (최신 배정순). `status`는 해당 **대여 품목**의 상태이므로, `RENTED`/`OVERDUE`면 지금 나가 있는 것이고 `RETURNED`/`DEFECTIVE`면 반납된 과거 이력입니다.
 * `departmentName`: 대여 단위. 대여 건의 `departmentName`이 없으면 `departmentType`이 들어갑니다.
 
@@ -1196,7 +1200,7 @@
 등록된 개별 실물의 정보를 수정합니다.
 
 ## **ENDPOINT:** `PUT /api/items/instances/{instanceId}`
-**Description:** 실물의 상태, 시리얼 번호, 이미지, 비고를 수정합니다.
+**Description:** 실물의 상태, 시리얼 번호, 이미지, 비고, 부위 상태(천/다리)를 수정합니다.
 **Required Permissions:** Admin Only
 
 ---
@@ -1217,10 +1221,13 @@
   "serialNumber": "CAM-001-03",
   "status": "BROKEN",
   "imageUrl": "https://example.com/images/cam03_new.jpg",
-  "note": "지지대 휘어서 수리 필요"
+  "note": "지지대 휘어서 수리 필요",
+  "fabricCondition": "MEDIUM",
+  "frameCondition": "NORMAL"
 }
 ```
 * `note`: (string, optional) 관리자용 비고. 빈 문자열을 보내면 비고가 지워집니다.
+* `fabricCondition` / `frameCondition`: (string, optional) 부위 상태. `NORMAL` / `LOW` / `MEDIUM` / `HIGH`. 출고 차단은 `status: BROKEN`으로만 결정되며 이 값은 무관합니다.
 
 ---
 

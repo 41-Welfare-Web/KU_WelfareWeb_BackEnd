@@ -1,6 +1,6 @@
 ### **RentalWeb 데이터베이스 스키마 (v1.0.4) — 총 15개 모델**
 
-최종 수정일: 2026-09-18 (rental_item_instances 테이블 추가, item_instances.note 추가)
+최종 수정일: 2026-09-24 (item_instances 부위 상태 fabric_condition/frame_condition 추가)
 
 ---
 
@@ -92,8 +92,14 @@
 | `status` | `enum(InstanceStatus)` | 상태 | Default: `AVAILABLE` |
 | `image_url` | `text` | 개별 이미지 URL | |
 | `note` | `text` | 관리자용 비고 (실물별 메모) | Nullable |
+| `fabric_condition` | `enum(PartCondition)` | 천(원단) 상태 | Default: `NORMAL` |
+| `frame_condition` | `enum(PartCondition)` | 다리(프레임) 상태 | Default: `NORMAL` |
 | `deleted_at` | `timestampz` | 소프트 삭제 시간 | |
 | `created_at` | `timestampz` | 생성일 | Default: `now()` |
+
+> **부위 상태(`PartCondition`)**: `NORMAL`(정상) / `LOW`(파손 하) / `MEDIUM`(파손 중) / `HIGH`(파손 상).
+> 천막처럼 부위가 나뉘는 실물의 상태를 기록·표시하기 위한 값이며, **대여 가능 여부에는 영향을 주지 않습니다**.
+> 출고 차단은 기존대로 `status = BROKEN`으로만 결정됩니다 (관리자가 직접 지정).
 
 #### **5. `rentals` (대여 예약)**
 

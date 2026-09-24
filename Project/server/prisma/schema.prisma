@@ -121,6 +121,9 @@ model ItemInstance {
   status       InstanceStatus @default(AVAILABLE)
   imageUrl     String?        @map("image_url") @db.Text
   note         String?        @db.Text
+  // 부위별 상태 (천막 등 부위가 나뉘는 실물용. 대여 차단 여부와는 무관한 기록/표시용)
+  fabricCondition PartCondition @default(NORMAL) @map("fabric_condition")
+  frameCondition  PartCondition @default(NORMAL) @map("frame_condition")
   deletedAt    DateTime?      @map("deleted_at") @db.Timestamptz
   createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz
 
@@ -135,6 +138,14 @@ enum InstanceStatus {
   AVAILABLE
   RENTED
   BROKEN
+}
+
+// 실물 부위 상태 — NORMAL(정상) / 파손 정도 LOW(하) MEDIUM(중) HIGH(상)
+enum PartCondition {
+  NORMAL
+  LOW
+  MEDIUM
+  HIGH
 }
 
 // 5. Rentals

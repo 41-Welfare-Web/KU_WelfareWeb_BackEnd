@@ -120,7 +120,7 @@ RentalWeb/
 | `categories` | 카테고리 (행사/체육/기타 — seed 있음). 소프트 삭제 |
 | `items` | 물품 종류. `management_type`: `INDIVIDUAL`(개별관리) / `BULK`(수량관리). 소프트 삭제 |
 | `item_components` | 세트(번들) 구성 — 부모 물품과 구성품 물품의 관계 |
-| `item_instances` | 개별 실물 (serial_number, note). 상태: AVAILABLE/RENTED/BROKEN. BULK 물품에도 실물 등록 가능 (예: 천막) |
+| `item_instances` | 개별 실물 (serial_number, note). 상태: AVAILABLE/RENTED/BROKEN. BULK 물품에도 실물 등록 가능 (예: 천막). 부위 상태 `fabric_condition`/`frame_condition` (천/다리 — NORMAL/LOW/MEDIUM/HIGH, 기록용) |
 | `rentals` | 대여 마스터. `status`는 `rental_items.status` 기준으로 파생되는 대표 상태 (`deriveRentalStatus()`, 우선순위: `OVERDUE` > `RENTED` > `RESERVED` > `DEFECTIVE` > 전 품목 `CANCELED`일 때만 `CANCELED` > 그 외 `RETURNED`). 소프트 삭제 |
 | `rental_items` | 대여 품목 중간 테이블 (quantity + instance_id + status). **품목별 `status`가 표준(Source of Truth)** — `RESERVED`/`RENTED`/`RETURNED`/`CANCELED`/`OVERDUE`/`DEFECTIVE` |
 | `rental_item_instances` | **출고 실물 배정** — 대여 품목 1건 ↔ 개별 실물 N개. 출고(RENTED 전환) 시점에만 생성. 반납 후에도 행을 남겨 실물별 대여 이력으로 사용 |
@@ -258,6 +258,7 @@ RentalWeb/
   - **부분 출고**: 신청 수량보다 적게 보내면 `rental_items.quantity`가 같은 트랜잭션에서 함께 조정됨
   - **배정 해제**: `RESERVED`/`CANCELED`로 되돌릴 때만 삭제. `RETURNED`/`DEFECTIVE`/`OVERDUE`는 이력으로 보존
   - 재고 계산은 **관리 타입 기준 그대로** — 실물 BROKEN 표시는 BULK 물품의 예약 가용 재고에 반영되지 않음 (수동 관리)
+- **실물 부위 상태 (천막)**: `item_instances.fabric_condition`(천) / `frame_condition`(다리) — NORMAL/LOW/MEDIUM/HIGH(파손 하·중·상). **기록·표시 전용으로 출고 차단과 무관**하며, 출고 차단은 관리자가 지정하는 `status = BROKEN`으로만 결정 (2026-09-24 사용자 결정)
 
 ### 플로터 정책
 - 수령일: **신청일 기준 근무일 2일 뒤** 자동 계산

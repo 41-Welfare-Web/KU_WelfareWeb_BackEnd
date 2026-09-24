@@ -1,5 +1,5 @@
 import { IsOptional, IsString, IsEnum } from 'class-validator';
-import { InstanceStatus } from '@prisma/client';
+import { InstanceStatus, PartCondition } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateItemInstanceDto {
@@ -39,4 +39,25 @@ export class UpdateItemInstanceDto {
   @IsString()
   @IsOptional()
   note?: string;
+
+  @ApiProperty({
+    enum: PartCondition,
+    example: 'NORMAL',
+    description:
+      '천(원단) 상태. NORMAL(정상) / LOW(파손 하) / MEDIUM(파손 중) / HIGH(파손 상). 기록·표시용이며 출고 차단과는 무관',
+    required: false,
+  })
+  @IsEnum(PartCondition)
+  @IsOptional()
+  fabricCondition?: PartCondition;
+
+  @ApiProperty({
+    enum: PartCondition,
+    example: 'NORMAL',
+    description: '다리(프레임) 상태. NORMAL / LOW / MEDIUM / HIGH',
+    required: false,
+  })
+  @IsEnum(PartCondition)
+  @IsOptional()
+  frameCondition?: PartCondition;
 }
