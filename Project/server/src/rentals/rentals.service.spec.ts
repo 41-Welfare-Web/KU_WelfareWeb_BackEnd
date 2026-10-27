@@ -38,7 +38,9 @@ describe('RentalsService', () => {
   let smsService: SmsService;
 
   const mockPrisma = {
-    $transaction: jest.fn((cb) => cb(mockPrisma)),
+    $transaction: jest.fn((arg) =>
+      Array.isArray(arg) ? Promise.all(arg) : arg(mockPrisma),
+    ),
     $queryRaw: jest.fn().mockResolvedValue([]),
     rentalItemInstance: {
       findMany: jest.fn(),
@@ -878,6 +880,55 @@ describe('RentalsService', () => {
       });
 
       expect(mockPrisma.rentalItemInstance.deleteMany).not.toHaveBeenCalled();
+    });
+  });
+  // ===== 사용자 예약 취소 =====
+  describe('cancel - 사용자 예약 취소', () => {
+    const RENTAL_ID = 700;
+    const USER_ID = 'user-uuid';
+
+    const buildRental = (itemStatus = RentalStatus.RESERVED) => ({
+      id: RENTAL_ID,
+      userId: USER_ID,
+      deletedAt: null,
+      user: { id: USER_ID, name: '허원', phoneNumber: '01011112222' },
+      rentalItems: [
+        { id: 71, itemId: 1, quantity: 1, status: itemStatus, item: { id: 1, name: '아이스박스' } },
+      ],
+    });
+
+    beforeEach(() => {
+      mockPrisma.rental.findFirst.mockResolvedValue(buildRental());
+      mockPrisma.rentalItem.updateMany.mockResolvedValue({ count: 1 });
+      mockPrisma.rental.update.mockResolvedValue({});
+    });
+
+    it('취소해도 소프트 삭제하지 않는다 (deletedAt을 찍으면 목록에서 사라짐)', async () => {
+      await service.cancel(RENTAL_ID, USER_ID);
+
+      expect(mockPrisma.rental.update).toHaveBeenCalledTimes(1);
+      const data = mockPrisma.rental.update.mock.calls[0][0].data;
+      expect(data.status).toBe(RentalStatus.CANCELED);
+      expect(data).not.toHaveProperty('deletedAt');
+    });
+
+    it('품목 상태도 모두 CANCELED로 바꾼다', async () => {
+      await service.cancel(RENTAL_ID, USER_ID);
+      expect(mockPrisma.rentalItem.updateMany).toHaveBeenCalledWith({
+        where: { rentalId: RENTAL_ID },
+        data: { status: RentalStatus.CANCELED },
+      });
+    });
+
+    it('예약 상태가 아닌 품목이 있으면 취소를 거부한다', async () => {
+      mockPrisma.rental.findFirst.mockResolvedValue(buildRental(RentalStatus.RENTED));
+      await expect(service.cancel(RENTAL_ID, USER_ID)).rejects.toThrow(BadRequestException);
+      expect(mockPrisma.rental.update).not.toHaveBeenCalled();
+    });
+
+    it('남의 예약은 취소할 수 없다', async () => {
+      await expect(service.cancel(RENTAL_ID, 'other-user')).rejects.toThrow();
+      expect(mockPrisma.rental.update).not.toHaveBeenCalled();
     });
   });
 });

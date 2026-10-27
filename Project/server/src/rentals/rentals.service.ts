@@ -486,8 +486,10 @@ export class RentalsService {
       this.prisma.rental.update({
         where: { id },
         data: {
+          // 취소는 소프트 삭제가 아니다. deletedAt을 찍으면 조회 API가 모두
+          // deletedAt: null로 걸러 관리자 목록·마이페이지에서 통째로 사라진다.
+          // (관리자 취소 경로 updateStatus와 동일하게 상태만 바꾼다)
           status: RentalStatus.CANCELED,
-          deletedAt: new Date(),
           rentalHistories: {
             create: {
               changedBy: userId,
