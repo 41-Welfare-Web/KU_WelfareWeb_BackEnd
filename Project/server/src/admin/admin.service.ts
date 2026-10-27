@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RentalStatus, PlotterStatus } from '@prisma/client';
 import { getStartOfDayKst, getNowKst } from '../common/utils/date.util';
+import {
+  CleanupDatabaseDto,
+  DEFAULT_RETENTION_DAYS,
+} from './dto/cleanup-database.dto';
 
 @Injectable()
 export class AdminService {
@@ -177,33 +181,65 @@ export class AdminService {
       }
     });
 
-    return { tableStatus: status, testUserCount: testUsers };
+    // 지금 정밀 청소를 돌리면 실제로 지워질 건수 (기본 보존 기간 기준)
+    const cutoff = new Date(
+      getNowKst().getTime() - DEFAULT_RETENTION_DAYS * 86400000,
+    );
+    const [purgeRentals, purgeOrders, purgeItems] = await Promise.all([
+      this.prisma.rental.count({ where: { deletedAt: { not: null, lt: cutoff } } }),
+      this.prisma.plotterOrder.count({ where: { deletedAt: { not: null, lt: cutoff } } }),
+      this.prisma.item.count({ where: { deletedAt: { not: null, lt: cutoff } } }),
+    ]);
+
+    return {
+      tableStatus: status,
+      testUserCount: testUsers,
+      purgeEligible: {
+        retentionDays: DEFAULT_RETENTION_DAYS,
+        cutoff: cutoff.toISOString(),
+        rentals: purgeRentals,
+        plotterOrders: purgeOrders,
+        items: purgeItems,
+      },
+    };
   }
 
   // 2. 정밀 데이터 청소
-  async cleanupDatabase(options: { 
-    purgeSoftDeleted?: boolean, 
-    deleteTestUsers?: boolean, 
-    clearAuditLogs?: boolean,
-    resetRentalCounts?: boolean 
-  }, actorId: string) {
-    const results: string[] = [];
+  /**
+   * DB 정밀 청소.
+   *
+   * 영구 삭제는 되돌릴 수 없으므로 **기본값이 미리보기(dryRun)** 입니다.
+   * 실제로 지우려면 `dryRun: false`를 명시해야 하고, 소프트 삭제 데이터는
+   * 보존 기간(`olderThanDays`)이 지난 것만 대상으로 합니다.
+   *
+   * 예전에는 소프트 삭제된 대여를 기간 제한 없이 전부 지웠는데,
+   * 사용자가 취소한 예약이 소프트 삭제로 쌓이던 시절에는 이 버튼 한 번으로
+   * 취소 이력이 통째로 사라질 수 있었습니다. (대여 취소는 2026-10-27부터 소프트 삭제하지 않음)
+   */
+  async cleanupDatabase(dto: CleanupDatabaseDto, actorId: string) {
+    const dryRun = dto.dryRun !== false; // 명시적으로 false를 보내야 실제 삭제
+    const retentionDays = dto.olderThanDays ?? DEFAULT_RETENTION_DAYS;
+    const cutoff = new Date(getNowKst().getTime() - retentionDays * 86400000);
 
-    // A. 테스트 유저 및 관련 데이터 삭제 (Hard Delete)
-    if (options.deleteTestUsers) {
+    const results: string[] = [];
+    const planned: Record<string, number> = {};
+
+    // A. 테스트 계정 및 관련 데이터 (Hard Delete)
+    if (dto.deleteTestUsers) {
       const testUsers = await this.prisma.user.findMany({
         where: {
           OR: [
             { username: { startsWith: 'testuser_' } },
             { username: { startsWith: 'lock_' } },
-            { username: 'e2eusertest' }
-          ]
+            { username: 'e2eusertest' },
+          ],
         },
-        select: { id: true }
+        select: { id: true },
       });
-      const ids = testUsers.map(u => u.id);
+      const ids = testUsers.map((u) => u.id);
+      planned.testUsers = ids.length;
 
-      if (ids.length > 0) {
+      if (ids.length > 0 && !dryRun) {
         // 하위 데이터부터 순차 삭제
         await this.prisma.rentalHistory.deleteMany({ where: { rental: { userId: { in: ids } } } });
         await this.prisma.rentalItem.deleteMany({ where: { rental: { userId: { in: ids } } } });
@@ -213,41 +249,120 @@ export class AdminService {
         await this.prisma.cartItem.deleteMany({ where: { userId: { in: ids } } });
         await this.prisma.auditLog.deleteMany({ where: { userId: { in: ids } } });
         await this.prisma.user.deleteMany({ where: { id: { in: ids } } });
-        results.push(`${ids.length}명의 테스트 유저와 관련 데이터가 영구 삭제되었습니다.`);
+        results.push(`테스트 계정 ${ids.length}명과 관련 데이터를 영구 삭제했습니다.`);
+      } else {
+        results.push(`[미리보기] 테스트 계정 ${ids.length}명이 삭제 대상입니다.`);
       }
     }
 
-    // B. 소프트 삭제된 데이터 영구 삭제
-    if (options.purgeSoftDeleted) {
-      await this.prisma.rentalHistory.deleteMany({ where: { rental: { NOT: { deletedAt: null } } } });
-      await this.prisma.rentalItem.deleteMany({ where: { rental: { NOT: { deletedAt: null } } } });
-      const r = await this.prisma.rental.deleteMany({ where: { NOT: { deletedAt: null } } });
-      
-      await this.prisma.plotterOrderHistory.deleteMany({ where: { order: { NOT: { deletedAt: null } } } });
-      const p = await this.prisma.plotterOrder.deleteMany({ where: { NOT: { deletedAt: null } } });
-      
-      const i = await this.prisma.item.deleteMany({ where: { NOT: { deletedAt: null } } });
-      
-      results.push(`영구 삭제 완료: 대여(${r.count}), 플로터(${p.count}), 물품(${i.count})`);
+    // B. 소프트 삭제된 데이터 영구 삭제 (보존 기간이 지난 것만)
+    if (dto.purgeSoftDeleted) {
+      const rentalWhere = { deletedAt: { not: null, lt: cutoff } };
+      const rentals = await this.prisma.rental.findMany({
+        where: rentalWhere,
+        select: { id: true },
+      });
+      const rentalIds = rentals.map((r) => r.id);
+
+      const orders = await this.prisma.plotterOrder.findMany({
+        where: { deletedAt: { not: null, lt: cutoff } },
+        select: { id: true },
+      });
+      const orderIds = orders.map((o) => o.id);
+
+      // 물품은 다른 기록이 참조 중이면 FK 제약으로 삭제할 수 없다 → 건너뛴다
+      const softItems = await this.prisma.item.findMany({
+        where: { deletedAt: { not: null, lt: cutoff } },
+        select: {
+          id: true,
+          name: true,
+          _count: {
+            select: {
+              rentalItems: true,
+              cartItems: true,
+              itemInstances: true,
+              itemImages: true,
+              components: true,
+              isPartOf: true,
+            },
+          },
+        },
+      });
+      const freeItems = softItems.filter((i) =>
+        Object.values(i._count).every((c) => c === 0),
+      );
+      const blockedItems = softItems.filter((i) =>
+        Object.values(i._count).some((c) => c > 0),
+      );
+
+      planned.rentals = rentalIds.length;
+      planned.plotterOrders = orderIds.length;
+      planned.items = freeItems.length;
+      planned.itemsBlocked = blockedItems.length;
+
+      if (!dryRun) {
+        if (rentalIds.length > 0) {
+          await this.prisma.rentalHistory.deleteMany({ where: { rentalId: { in: rentalIds } } });
+          await this.prisma.rentalItem.deleteMany({ where: { rentalId: { in: rentalIds } } });
+          await this.prisma.rental.deleteMany({ where: { id: { in: rentalIds } } });
+        }
+        if (orderIds.length > 0) {
+          await this.prisma.plotterOrderHistory.deleteMany({ where: { orderId: { in: orderIds } } });
+          await this.prisma.plotterOrder.deleteMany({ where: { id: { in: orderIds } } });
+        }
+        if (freeItems.length > 0) {
+          await this.prisma.item.deleteMany({ where: { id: { in: freeItems.map((i) => i.id) } } });
+        }
+        results.push(
+          `영구 삭제 완료 (${retentionDays}일 이전 소프트 삭제분): 대여 ${rentalIds.length}건, 플로터 ${orderIds.length}건, 물품 ${freeItems.length}개`,
+        );
+      } else {
+        results.push(
+          `[미리보기] ${retentionDays}일 이전 소프트 삭제분 — 대여 ${rentalIds.length}건, 플로터 ${orderIds.length}건, 물품 ${freeItems.length}개가 삭제 대상입니다.`,
+        );
+      }
+
+      if (blockedItems.length > 0) {
+        results.push(
+          `참조 기록이 남아 있어 건너뛴 물품 ${blockedItems.length}개: ${blockedItems.map((i) => i.name).join(', ')}`,
+        );
+      }
     }
 
     // C. 물품 대여 횟수 초기화
-    if (options.resetRentalCounts) {
-      await this.prisma.item.updateMany({ data: { rentalCount: 0 } });
-      results.push('모든 물품의 대여 횟수가 0으로 초기화되었습니다.');
+    if (dto.resetRentalCounts) {
+      if (!dryRun) {
+        await this.prisma.item.updateMany({ data: { rentalCount: 0 } });
+        results.push('모든 물품의 대여 횟수를 0으로 초기화했습니다.');
+      } else {
+        results.push('[미리보기] 모든 물품의 대여 횟수가 0으로 초기화됩니다.');
+      }
     }
 
-    // 감사 로그 기록
+    if (results.length === 0) {
+      results.push('선택된 작업이 없습니다.');
+    }
+
+    // 감사 로그 (미리보기도 남겨 추적 가능하게)
     await this.prisma.auditLog.create({
       data: {
         userId: actorId,
-        action: 'DB_MAINTENANCE_CLEANUP',
+        action: dryRun ? 'DB_MAINTENANCE_PREVIEW' : 'DB_MAINTENANCE_CLEANUP',
         targetType: 'SYSTEM',
-        details: { options, results }
-      }
+        details: { options: { ...dto, dryRun, olderThanDays: retentionDays }, planned, results },
+      },
     });
 
-    return { message: '데이터베이스 정리가 완료되었습니다.', results };
+    return {
+      message: dryRun
+        ? '미리보기입니다. 실제로 삭제하려면 dryRun: false로 다시 요청하세요.'
+        : '데이터베이스 정리가 완료되었습니다.',
+      dryRun,
+      retentionDays,
+      cutoff: cutoff.toISOString(),
+      planned,
+      results,
+    };
   }
 
   async getAuditLogs(page: number = 1, pageSize: number = 20, search?: string, action?: string) {

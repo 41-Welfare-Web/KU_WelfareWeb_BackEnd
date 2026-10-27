@@ -73,7 +73,7 @@
 *   `GET /api/admin/notifications` (새 대여/플로터 주문 알림 조회 - **Admin**, 폴링용)
 *   `GET /api/admin/audit-logs` (감사 로그 조회 - **Admin**, 페이지네이션/검색/필터)
 *   `GET /api/admin/maintenance/status` (DB 관리 현황 조회 - **Admin**)
-*   `POST /api/admin/maintenance/cleanup` (DB 데이터 정밀 청소 - **Admin**)
+*   `POST /api/admin/maintenance/cleanup` (DB 데이터 정밀 청소 - **Admin**, 기본 미리보기 `dryRun`, 보존 기간 경과분만 삭제)
 
 **7. 공통 (Common)**
 *   `GET /api/common/health` (시스템 헬스체크 및 서비스 진단 - FR-37)

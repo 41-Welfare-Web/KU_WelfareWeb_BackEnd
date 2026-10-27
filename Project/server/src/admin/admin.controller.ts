@@ -12,6 +12,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
+import { CleanupDatabaseDto } from './dto/cleanup-database.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -101,21 +102,15 @@ export class AdminController {
   }
 
   @Post('maintenance/cleanup')
-  @ApiOperation({ summary: 'DB 데이터 정밀 청소' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        purgeSoftDeleted: { type: 'boolean', description: '소프트 삭제된 데이터 영구 삭제' },
-        deleteTestUsers: { type: 'boolean', description: '테스트 계정 및 관련 기록 삭제' },
-        resetRentalCounts: { type: 'boolean', description: '물품 대여 횟수 초기화' },
-      }
-    }
+  @ApiOperation({
+    summary: 'DB 데이터 정밀 청소',
+    description:
+      '되돌릴 수 없는 영구 삭제이므로 기본값이 미리보기(dryRun: true)입니다. ' +
+      '실제로 삭제하려면 dryRun: false를 명시해야 하며, 소프트 삭제 데이터는 ' +
+      'olderThanDays(기본 90일, 최소 30일)가 지난 것만 삭제됩니다.',
   })
-  cleanup(
-    @GetUser() user: any,
-    @Body() options: { purgeSoftDeleted?: boolean, deleteTestUsers?: boolean, resetRentalCounts?: boolean }
-  ) {
-    return this.adminService.cleanupDatabase(options, user.userId);
+  @ApiBody({ type: CleanupDatabaseDto })
+  cleanup(@GetUser() user: any, @Body() dto: CleanupDatabaseDto) {
+    return this.adminService.cleanupDatabase(dto, user.userId);
   }
 }

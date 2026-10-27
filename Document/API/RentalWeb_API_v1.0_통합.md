@@ -2714,10 +2714,12 @@
 # DB 데이터 정밀 청소 (Cleanup Database)
 
 ## **ENDPOINT:** `POST /api/admin/maintenance/cleanup`
-**Description:** 소프트 삭제된 데이터 영구 삭제, 테스트 계정 삭제, 물품 대여 횟수 초기화 등을 선택적으로 수행합니다. 모든 작업은 감사 로그(`DB_MAINTENANCE_CLEANUP`)에 자동 기록됩니다.
+**Description:** 소프트 삭제된 데이터 영구 삭제, 테스트 계정 삭제, 물품 대여 횟수 초기화 등을 선택적으로 수행합니다. 감사 로그에 자동 기록됩니다 (미리보기는 `DB_MAINTENANCE_PREVIEW`, 실제 삭제는 `DB_MAINTENANCE_CLEANUP`).
 **Required Permissions:** Admin Only
 
-> ⚠️ 이 작업은 되돌릴 수 없습니다. 신중하게 사용하십시오.
+> ⚠️ 영구 삭제는 되돌릴 수 없어 **기본값이 미리보기(`dryRun: true`)** 입니다. 실제로 지우려면 `dryRun: false`를 명시해야 합니다.
+> - 소프트 삭제 데이터는 **`olderThanDays`(기본 90일, 최소 30일)가 지난 것만** 삭제됩니다.
+> - 대여 이력·장바구니·개별 실물 등이 **참조 중인 물품은 건너뜁니다** (FK 제약). 건너뛴 물품은 응답에 사유와 함께 표시됩니다.
 
 ---
 
@@ -2725,7 +2727,9 @@
 
 ```json
 {
+  "dryRun": false,
   "purgeSoftDeleted": true,
+  "olderThanDays": 90,
   "deleteTestUsers": false,
   "resetRentalCounts": false
 }
@@ -2733,8 +2737,10 @@
 
 | Field | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
-| `purgeSoftDeleted` | `boolean` | Optional | 소프트 삭제된 대여, 플로터 주문, 물품을 영구 삭제 |
-| `deleteTestUsers` | `boolean` | Optional | `testuser_`, `lock_` 접두사 테스트 계정 및 관련 데이터 하드 삭제 |
+| `dryRun` | `boolean` | Optional | **기본 `true`.** 아무것도 삭제하지 않고 삭제 대상 건수만 반환. 실제 삭제는 `false` 명시 필요 |
+| `purgeSoftDeleted` | `boolean` | Optional | 소프트 삭제된 대여, 플로터 주문, 물품을 영구 삭제 (보존 기간 경과분만) |
+| `olderThanDays` | `number` | Optional | 보존 기간(일). 기본 90, 최소 30. 이보다 오래된 소프트 삭제분만 대상 |
+| `deleteTestUsers` | `boolean` | Optional | `testuser_`, `lock_`, `e2eusertest` 테스트 계정 및 관련 데이터 하드 삭제 |
 | `resetRentalCounts` | `boolean` | Optional | 모든 물품의 대여 횟수(`rentalCount`)를 0으로 초기화 |
 
 ---
@@ -2745,12 +2751,20 @@
 
 ```json
 {
-  "message": "데이터베이스 정리가 완료되었습니다.",
+  "message": "미리보기입니다. 실제로 삭제하려면 dryRun: false로 다시 요청하세요.",
+  "dryRun": true,
+  "retentionDays": 90,
+  "cutoff": "2026-07-29T00:00:00.000Z",
+  "planned": { "rentals": 3, "plotterOrders": 0, "items": 2, "itemsBlocked": 3 },
   "results": [
-    "영구 삭제 완료: 대여(10), 플로터(2), 물품(0)"
+    "[미리보기] 90일 이전 소프트 삭제분 — 대여 3건, 플로터 0건, 물품 2개가 삭제 대상입니다.",
+    "참조 기록이 남아 있어 건너뛴 물품 3개: 천막, 중복, _E2E대여테스트물품_"
   ]
 }
 ```
+
+* `planned`: 삭제 대상 건수. `itemsBlocked`는 참조 때문에 건너뛴 물품 수입니다.
+* `cutoff`: 이 시각 이전에 소프트 삭제된 데이터만 대상입니다.
 
 ---
 
