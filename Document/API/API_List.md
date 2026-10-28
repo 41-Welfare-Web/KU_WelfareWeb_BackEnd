@@ -3,6 +3,7 @@
 > **상태 관리 표준 (v1.2)**: `rental_items.status`가 Source of Truth입니다. `rentals.status`는 전체 대표 상태로 자동 동기화됩니다.
 > **v1.3**: 팝업 (Popups) 5개 라우트 추가.
 > **v1.5**: 개별 실물 부위 상태(천/다리) 기록 추가 — `fabricCondition`/`frameCondition` (라우트 변동 없음).
+> **v1.5**: 휴무일 기간 일괄 등록/삭제 2개 추가 (관리자 휴무일 관리 화면용).
 > **v1.4**: 개별 실물 배정 지원 (라우트 수 변동 없음). `PUT /api/rentals/{rentalId}/status`에 `instanceIds` 추가, `PUT /api/items/instances/{instanceId}`에 `note` 추가, `GET /api/items/{itemId}/instances` 응답에 대여 이력 포함.
 
 **1. 인증 (Auth)**
@@ -67,6 +68,8 @@
 *   `GET /api/admin/holidays` (휴무일 목록 조회 - **All**)
 *   `GET /api/admin/holidays/calendar` (월별 휴무일 캘린더 조회 - **All**, 주말+등록휴무일 합산)
 *   `POST /api/admin/holidays` (휴무일 추가 - **Admin**)
+*   `POST /api/admin/holidays/range` (휴무일 기간 일괄 등록 - **Admin**, 평일만/주말 자동 제외)
+*   `DELETE /api/admin/holidays/range` (휴무일 기간 일괄 삭제 - **Admin**)
 *   `DELETE /api/admin/holidays/{id}` (휴무일 삭제 - **Admin**)
 *   `GET /api/admin/configurations` (시스템 설정 목록 조회 - **Admin**)
 *   `PUT /api/admin/configurations` (시스템 설정 수정 - **Admin**)

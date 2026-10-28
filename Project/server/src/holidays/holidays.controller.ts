@@ -11,6 +11,10 @@ import {
 } from '@nestjs/common';
 import { HolidaysService } from './holidays.service';
 import { CreateHolidayDto } from './dto/create-holiday.dto';
+import {
+  CreateHolidayRangeDto,
+  DeleteHolidayRangeDto,
+} from './dto/bulk-holiday.dto';
 import { HolidayCalendarQueryDto } from './dto/holiday-calendar-query.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
@@ -36,6 +40,32 @@ export class HolidaysController {
   @ApiOperation({ summary: '휴무일 등록 [Admin]' })
   create(@Body() createHolidayDto: CreateHolidayDto) {
     return this.holidaysService.create(createHolidayDto);
+  }
+
+  @Post('range')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: '휴무일 기간 일괄 등록 [Admin]',
+    description:
+      '시작일~종료일 사이 평일을 한 번에 등록합니다. 주말은 자동 휴무라 기본적으로 제외하며, ' +
+      '이미 등록된 날짜는 기존 사유를 지키기 위해 건너뜁니다.',
+  })
+  createRange(@Body() dto: CreateHolidayRangeDto) {
+    return this.holidaysService.createRange(dto);
+  }
+
+  @Delete('range')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: '휴무일 기간 일괄 삭제 [Admin]',
+    description: '시작일~종료일 사이에 등록된 휴무일을 모두 삭제합니다.',
+  })
+  removeRange(@Query() dto: DeleteHolidayRangeDto) {
+    return this.holidaysService.removeRange(dto);
   }
 
   @Get()

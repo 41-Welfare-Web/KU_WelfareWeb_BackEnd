@@ -1,10 +1,16 @@
 import {
   Injectable,
+  BadRequestException,
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateHolidayDto } from './dto/create-holiday.dto';
+import {
+  CreateHolidayRangeDto,
+  DeleteHolidayRangeDto,
+  MAX_BULK_RANGE_DAYS,
+} from './dto/bulk-holiday.dto';
 import { parseDateOnlyKst } from '../common/utils/date.util';
 
 @Injectable()
@@ -26,6 +32,79 @@ export class HolidaysService {
         description,
       },
     });
+  }
+
+  /** 시작일~종료일 범위를 날짜 배열로 (UTC 자정 기준, 양끝 포함) */
+  private expandRange(startDate: string, endDate: string): Date[] {
+    const start = parseDateOnlyKst(startDate);
+    const end = parseDateOnlyKst(endDate);
+
+    if (end < start) {
+      throw new BadRequestException('종료일이 시작일보다 빠릅니다.');
+    }
+    const days = Math.round((+end - +start) / 86400000) + 1;
+    if (days > MAX_BULK_RANGE_DAYS) {
+      throw new BadRequestException(
+        `한 번에 처리할 수 있는 기간은 최대 ${MAX_BULK_RANGE_DAYS}일입니다. (요청: ${days}일)`,
+      );
+    }
+
+    const dates: Date[] = [];
+    for (let t = +start; t <= +end; t += 86400000) {
+      dates.push(new Date(t));
+    }
+    return dates;
+  }
+
+  /**
+   * 기간 일괄 등록.
+   *
+   * 주말은 운영일 계산에서 이미 자동 제외되므로 기본적으로 등록하지 않습니다.
+   * 이미 등록된 날짜는 기존 사유를 보존하기 위해 건드리지 않고 건너뜁니다.
+   */
+  async createRange(dto: CreateHolidayRangeDto) {
+    const { description, includeWeekends } = dto;
+    const all = this.expandRange(dto.startDate, dto.endDate);
+
+    const targets = includeWeekends
+      ? all
+      : all.filter((d) => d.getUTCDay() !== 0 && d.getUTCDay() !== 6);
+    const weekendsSkipped = all.length - targets.length;
+
+    const existing = await this.prisma.holiday.findMany({
+      where: { holidayDate: { in: targets } },
+      select: { holidayDate: true },
+    });
+    const have = new Set(
+      existing.map((e) => e.holidayDate.toISOString().split('T')[0]),
+    );
+    const toCreate = targets.filter(
+      (d) => !have.has(d.toISOString().split('T')[0]),
+    );
+
+    if (toCreate.length > 0) {
+      await this.prisma.holiday.createMany({
+        data: toCreate.map((holidayDate) => ({ holidayDate, description })),
+        skipDuplicates: true,
+      });
+    }
+
+    return {
+      message: `휴무일 ${toCreate.length}일을 등록했습니다.`,
+      created: toCreate.length,
+      alreadyRegistered: have.size,
+      weekendsSkipped,
+      dates: toCreate.map((d) => d.toISOString().split('T')[0]),
+    };
+  }
+
+  /** 기간 일괄 삭제 */
+  async removeRange(dto: DeleteHolidayRangeDto) {
+    const dates = this.expandRange(dto.startDate, dto.endDate);
+    const { count } = await this.prisma.holiday.deleteMany({
+      where: { holidayDate: { in: dates } },
+    });
+    return { message: `휴무일 ${count}일을 삭제했습니다.`, deleted: count };
   }
 
   async findAll() {

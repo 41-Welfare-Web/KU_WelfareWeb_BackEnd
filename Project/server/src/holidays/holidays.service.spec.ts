@@ -28,8 +28,10 @@ describe('HolidaysService', () => {
             holiday: {
               findUnique: jest.fn(),
               create: jest.fn(),
+              createMany: jest.fn(),
               findMany: jest.fn(),
               delete: jest.fn(),
+              deleteMany: jest.fn(),
             },
           },
         },
@@ -417,6 +419,86 @@ describe('HolidaysService', () => {
         const result = await service.calculateBusinessDate(new Date('2026-10-09T00:00:00Z'), 2);
         expect(result.toISOString()).toContain('2026-10-13');
       });
+    });
+  });
+  // ===== 기간 일괄 등록/삭제 =====
+  describe('createRange / removeRange', () => {
+    const prismaMock = () => prisma as unknown as {
+      holiday: { findMany: jest.Mock; createMany: jest.Mock; deleteMany: jest.Mock };
+    };
+
+    beforeEach(() => {
+      prismaMock().holiday.findMany.mockResolvedValue([]);
+      prismaMock().holiday.createMany.mockResolvedValue({ count: 0 });
+      prismaMock().holiday.deleteMany.mockResolvedValue({ count: 0 });
+    });
+
+    it('주말은 빼고 평일만 등록한다', async () => {
+      // 2026-11-30(월) ~ 2026-12-06(일): 평일 5일 + 주말 2일
+      const res = await service.createRange({
+        startDate: '2026-11-30',
+        endDate: '2026-12-06',
+        description: '대여 휴무 기간',
+      });
+
+      expect(res.created).toBe(5);
+      expect(res.weekendsSkipped).toBe(2);
+      expect(res.dates).toEqual([
+        '2026-11-30', '2026-12-01', '2026-12-02', '2026-12-03', '2026-12-04',
+      ]);
+    });
+
+    it('includeWeekends면 주말도 등록한다', async () => {
+      const res = await service.createRange({
+        startDate: '2026-11-30',
+        endDate: '2026-12-06',
+        includeWeekends: true,
+      });
+      expect(res.created).toBe(7);
+      expect(res.weekendsSkipped).toBe(0);
+    });
+
+    it('이미 등록된 날은 건너뛰어 기존 사유를 지킨다', async () => {
+      prismaMock().holiday.findMany.mockResolvedValue([
+        { holidayDate: new Date('2026-12-25T00:00:00.000Z') },
+      ]);
+
+      const res = await service.createRange({
+        startDate: '2026-12-21',
+        endDate: '2026-12-25',
+        description: '대여 휴무 기간',
+      });
+
+      expect(res.alreadyRegistered).toBe(1);
+      expect(res.dates).not.toContain('2026-12-25');
+      const created = prismaMock().holiday.createMany.mock.calls[0][0].data;
+      expect(created.map((c: { holidayDate: Date }) => c.holidayDate.toISOString().split('T')[0]))
+        .not.toContain('2026-12-25');
+    });
+
+    it('종료일이 시작일보다 빠르면 거부한다', async () => {
+      await expect(
+        service.createRange({ startDate: '2026-12-10', endDate: '2026-12-01' }),
+      ).rejects.toThrow('종료일이 시작일보다 빠릅니다.');
+      expect(prismaMock().holiday.createMany).not.toHaveBeenCalled();
+    });
+
+    it('기간이 너무 길면 거부한다 (실수 방지)', async () => {
+      await expect(
+        service.createRange({ startDate: '2026-01-01', endDate: '2027-12-31' }),
+      ).rejects.toThrow('최대 366일');
+    });
+
+    it('기간 삭제는 해당 날짜들만 지운다', async () => {
+      prismaMock().holiday.deleteMany.mockResolvedValue({ count: 3 });
+      const res = await service.removeRange({
+        startDate: '2026-12-01',
+        endDate: '2026-12-03',
+      });
+
+      expect(res.deleted).toBe(3);
+      const where = prismaMock().holiday.deleteMany.mock.calls[0][0].where;
+      expect(where.holidayDate.in).toHaveLength(3);
     });
   });
 });

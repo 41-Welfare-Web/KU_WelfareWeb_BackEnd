@@ -2396,6 +2396,85 @@
 | (이 외 Admin API의 Error Responses 참조) | | |
 
 ---
+# 휴무일 기간 일괄 등록 (Create Holiday Range)
+
+## **ENDPOINT:** `POST /api/admin/holidays/range`
+**Description:** 시작일~종료일 사이의 **평일**을 한 번에 휴무일로 등록합니다. 관리자 화면의 '휴무일 관리' 탭이 사용합니다.
+**Required Permissions:** Admin Only
+
+> - **주말은 등록하지 않습니다.** 운영일 계산에서 이미 자동 제외되기 때문입니다 (`includeWeekends: true`로 강제 가능).
+> - **이미 등록된 날짜는 건너뜁니다.** 기존 사유를 보존하기 위함입니다 (예: 12/25 '크리스마스').
+> - 한 번에 처리 가능한 기간은 **최대 366일**입니다.
+
+---
+
+#### **Request Body**
+
+```json
+{
+  "startDate": "2026-11-30",
+  "endDate": "2027-01-15",
+  "description": "대여 휴무 기간",
+  "includeWeekends": false
+}
+```
+
+| Field | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `startDate` | `string` | **Required** | 시작일 (YYYY-MM-DD, 포함) |
+| `endDate` | `string` | **Required** | 종료일 (YYYY-MM-DD, 포함) |
+| `description` | `string` | Optional | 사유 (최대 100자, 달력에 표시) |
+| `includeWeekends` | `boolean` | Optional | 기본 `false`. 주말도 등록할지 여부 |
+
+---
+
+#### **Responses**
+
+*   **Success Response (`201 Created`)**
+
+```json
+{
+  "message": "휴무일 34일을 등록했습니다.",
+  "created": 34,
+  "alreadyRegistered": 1,
+  "weekendsSkipped": 12,
+  "dates": ["2026-11-30", "2026-12-01"]
+}
+```
+
+*   **Error Responses**
+
+| HTTP Code | 설명 |
+| :--- | :--- |
+| `400 Bad Request` | 종료일이 시작일보다 빠르거나, 기간이 366일을 초과할 때 |
+
+---
+# 휴무일 기간 일괄 삭제 (Delete Holiday Range)
+
+## **ENDPOINT:** `DELETE /api/admin/holidays/range`
+**Description:** 시작일~종료일 사이에 등록된 휴무일을 모두 삭제합니다.
+**Required Permissions:** Admin Only
+
+---
+
+#### **Query Parameters**
+
+| 파라미터 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `startDate` | `string` | 시작일 (YYYY-MM-DD, 포함) |
+| `endDate` | `string` | 종료일 (YYYY-MM-DD, 포함) |
+
+---
+
+#### **Responses**
+
+*   **Success Response (`200 OK`)**
+
+```json
+{ "message": "휴무일 22일을 삭제했습니다.", "deleted": 22 }
+```
+
+---
 # 휴무일 삭제 (Delete Holiday)
 
 `FR-31` 요구사항에 따라, 관리자가 등록된 휴무일을 삭제합니다.

@@ -101,7 +101,7 @@ RentalWeb/
 
 ### 백엔드 — **완료**
 - NestJS 기반 REST API 서버 (`Project/server/`)
-- 14개 모듈, 총 70개 API 엔드포인트
+- 14개 모듈, 총 72개 API 엔드포인트
 - Prisma 스키마 16개 모델 — DB 스키마 완성
 - JWT 인증, SMS 연동, 자동 연체 스케줄러, 감사로그 등 비즈니스 로직 완성
 - Swagger UI를 통한 API 문서 자동 생성
@@ -146,7 +146,7 @@ RentalWeb/
 
 ---
 
-## API 엔드포인트 목록 (총 70개)
+## API 엔드포인트 목록 (총 72개)
 
 ### 인증 (Auth) — 10개
 - `POST /api/auth/request-signup-verification` — 회원가입 SMS 인증번호 요청 (FR-01, Throttle 3/min)
@@ -218,6 +218,8 @@ RentalWeb/
 - `GET /api/admin/holidays` — 휴무일 목록 (All Users)
 - `GET /api/admin/holidays/calendar` — 월별 휴무일 캘린더 조회 (All Users, `?year=&month=`, 주말+등록휴무일 합산)
 - `POST /api/admin/holidays` — 휴무일 추가 **[Admin]**
+- `POST /api/admin/holidays/range` — 휴무일 기간 일괄 등록 **[Admin]** (평일만, 주말 자동 제외, 기존 등록일은 사유 보존하며 건너뜀, 최대 366일)
+- `DELETE /api/admin/holidays/range` — 휴무일 기간 일괄 삭제 **[Admin]**
 - `DELETE /api/admin/holidays/:id` — 휴무일 삭제 **[Admin]**
 - `GET /api/admin/configurations` — 시스템 설정 **[Admin]**
 - `PUT /api/admin/configurations` — 설정 수정 **[Admin]**
@@ -245,7 +247,7 @@ RentalWeb/
 ### 대여 정책
 - 예약 가능 기간: **오늘 기준 최대 2개월 이내** (`rental_max_period_months`)
 - 최대 대여 기간: **`rental_max_duration_days` 설정값 (기본 15일)**
-- 운영일: **평일(월~금)** only — 주말, 공휴일, 관리자 지정 휴무일 불가
+- 운영일: **평일(월~금)** only — 주말, 공휴일, 관리자 지정 휴무일 불가. 휴무일은 관리자 페이지 '휴무일 관리' 탭에서 기간 단위로 등록/삭제 (주말은 DB에 넣지 않음 — 운영일 계산에서 자동 제외)
 - 사용자 수정: **RESERVED 품목이 하나라도 있어야 가능** (items 없이 startDate/endDate만 보내는 날짜 전용 수정 지원). 취소는 RESERVED 상태만 가능. 관리자는 제약 우회
 - **상태 모델**: `rental_items.status`가 품목별 표준(Source of Truth). `rentals.status`는 `deriveRentalStatus()`로 파생되는 대표 상태 (우선순위: OVERDUE > RENTED > RESERVED > DEFECTIVE > 전 품목 CANCELED일 때만 CANCELED > 그 외 RETURNED). 모든 상태 변경 경로에서 자동 동기화
 - **불량 반납(DEFECTIVE)**: `rental_items.status`만 변경 — 재고(totalQuantity) 차감이나 item_instances BROKEN 자동 처리 없음. 재고 조정은 관리자 수동
